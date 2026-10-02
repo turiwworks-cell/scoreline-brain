@@ -2,6 +2,7 @@
   --h: 28px;
   --pad: 14px;
   --icon-x: 15px; /* centre of the icon from the left edge */
+  --text-x: 28px; /* where the label starts when there is an icon */
   --gap-r: 10px; /* air after the label when there is an icon */
   display: inline-flex;
   align-items: center;
@@ -37,6 +38,7 @@
   --h: 24px;
   --pad: 12px;
   --icon-x: 12px;
+  --text-x: 24px;
   --gap-r: 8px;
   font: var(--fw-s) var(--fs-11p5) / normal var(--font-sans);
 }
@@ -45,6 +47,7 @@
   --h: 28px;
   --pad: 14px;
   --icon-x: 15px;
+  --text-x: 28px;
   --gap-r: 10px;
   font: var(--type-tag);
 }
@@ -53,14 +56,15 @@
   --h: 30px;
   --pad: 15px;
   --icon-x: 16px;
+  --text-x: 30px;
   --gap-r: 10px;
   font: var(--fw-s) var(--fs-12p5) / normal var(--font-sans);
 }
 
-/* with an icon the label starts at 2 * icon-x - 2 (luau:4363, 6086, 6119) */
+/* with an icon the label starts at text-x: 24, 28, 30 (luau:4363, 6086, 6119) */
 .withIcon {
   position: relative;
-  padding: 0 var(--gap-r) 0 calc(var(--icon-x) * 2 - 2px);
+  padding: 0 var(--gap-r) 0 var(--text-x);
 }
 
 .icon {

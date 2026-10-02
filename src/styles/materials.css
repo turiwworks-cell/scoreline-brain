@@ -58,10 +58,9 @@
  * ------------------------------------------------------------------- */
 .m-glass {
   --glass-body: 0.96;
+  --glass-fill: rgb(from var(--c-glass) r g b / var(--glass-body));
   /* HALO (0.9) is folded into each peak: pane 0.14, rim 0.6, glow 0.3 (luau:3277-3298) */
   --spot-a: calc(var(--lit-eff, 0) * 0.126);
-  position: relative;
-  isolation: isolate;
   background:
     radial-gradient(
       circle var(--spot-r, 52px) at var(--mx, 50%) var(--my, 50%),
@@ -79,10 +78,14 @@
     ),
     /* GL_SHEEN */
     linear-gradient(180deg, rgb(255 255 255 / 0.045) 0%, rgb(255 255 255 / 0) 55%, rgb(255 255 255 / 0.015) 100%),
-    rgb(from var(--glass-tint, var(--c-glass)) r g b / var(--glass-body));
+    /* a tint is used as given; only the default glass takes the body opacity (luau:3293) */
+    var(--glass-tint, var(--glass-fill));
 }
 
+/* low specificity, so a component can place or round a pane without winning a source-order fight */
 :where(.m-glass) {
+  position: relative;
+  isolation: isolate;
   border-radius: var(--r-16);
 }
 

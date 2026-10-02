@@ -1,5 +1,5 @@
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
-import { feel } from './feel';
+import { withFeel } from './feel';
 
 /*
  * A glass pane (glass(), luau:3304): dark pane, sheen, 1 px rim brighter at the bottom.
@@ -10,7 +10,7 @@ export type GlassProps = HTMLAttributes<HTMLDivElement> & {
   radius?: number;
   /** thinner pane for use over pictures (body 0.7 instead of 0.96) */
   thin?: boolean;
-  /** pane colour instead of the dark glass, e.g. a team tint */
+  /** pane colour instead of the dark glass, used as given (with its own alpha), like the Lua's tint */
   tint?: string;
   /** shows the hover light */
   lit?: boolean;
@@ -23,7 +23,7 @@ export function Glass({ radius, thin, tint, lit, className, style, children, ...
   if (radius !== undefined) st.borderRadius = radius;
   if (tint) (st as Record<string, string>)['--glass-tint'] = tint;
   return (
-    <div className={cls} style={st} {...(lit ? feel : null)} {...rest}>
+    <div className={cls} style={st} {...(lit ? withFeel(rest) : rest)}>
       {children}
     </div>
   );

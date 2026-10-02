@@ -1,5 +1,5 @@
 import { useState, type CSSProperties, type ReactNode } from 'react';
-import { Button, Glass, LiveDot, Pill, RoundButton, SoftLight, Tabs } from '../../ui';
+import { Button, Glass, LiveDot, Pill, RoundButton, SoftLight, spotRadius, Tabs } from '../../ui';
 import styles from './DevKit.module.css';
 
 /*
@@ -222,9 +222,9 @@ export function DevKit() {
           </Glass>
           <p className={styles.note}>Frozen at full light, for screenshots:</p>
           <div className={styles.row}>
-            <Glass radius={22} className={`m-feel ${styles.frozen}`} style={v({ '--lit': 1, '--mx': '48px', '--my': '30px', '--spot-r': '78px' })} />
-            <Button label="Lit button" style={v({ '--lit': 1, '--mx': '40px', '--my': '12px', '--spot-r': '44px' })} />
-            <RoundButton aria-label="Lit menu" style={v({ '--lit': 1, '--mx': '14px', '--my': '12px', '--spot-r': '26px' })}>
+            <Glass radius={22} className={`m-feel ${styles.frozen}`} style={v({ '--lit': 1, '--mx': '48px', '--my': '30px', '--spot-r': `${spotRadius(140, 64)}px` })} />
+            <Button label="Lit button" minWidth={110} style={v({ '--lit': 1, '--mx': '40px', '--my': '12px', '--spot-r': `${spotRadius(110, 36)}px` })} />
+            <RoundButton aria-label="Lit menu" style={v({ '--lit': 1, '--mx': '14px', '--my': '12px', '--spot-r': `${spotRadius(40, 40)}px` })}>
               <MenuGlyph />
             </RoundButton>
           </div>

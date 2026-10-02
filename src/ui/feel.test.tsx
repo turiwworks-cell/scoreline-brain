@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { Button } from './Button';
+import { Glass } from './Glass';
 import { spotRadius } from './feel';
 import { Tabs } from './Tabs';
 
@@ -53,5 +54,190 @@ describe('Tabs', () => {
     expect(onChange).toHaveBeenCalledWith('b');
     fireEvent.click(tabs[1]!);
     expect(onChange).toHaveBeenLastCalledWith('b');
+  });
+});
+
+describe('nested controls', () => {
+  test('a press on a button inside a lit pane dips only the button', () => {
+    render(
+      <Glass lit data-testid="card">
+        <Button label="One" />
+        <Button label="Two" />
+      </Glass>,
+    );
+    const card = screen.getByTestId('card');
+    const one = screen.getByRole('button', { name: 'One' });
+    fireEvent.pointerDown(one, { button: 0, clientX: 1, clientY: 1 });
+    expect(one.hasAttribute('data-pressed')).toBe(true);
+    expect(card.hasAttribute('data-pressed')).toBe(false);
+    const rolling = Array.from(card.querySelectorAll('[data-roll]')).map((l) => l.hasAttribute('data-rolling'));
+    expect(rolling).toEqual([true, false]);
+  });
+
+  test('a press on the pane itself does not roll the buttons inside it', () => {
+    render(
+      <Glass lit data-testid="card">
+        <Button label="One" />
+      </Glass>,
+    );
+    const card = screen.getByTestId('card');
+    fireEvent.pointerDown(card, { button: 0, clientX: 1, clientY: 1 });
+    expect(card.hasAttribute('data-pressed')).toBe(true);
+    expect(card.querySelector('[data-roll]')?.hasAttribute('data-rolling')).toBe(false);
+  });
+
+  test('a key on a nested button does not press the pane', () => {
+    render(
+      <Glass lit data-testid="card">
+        <Button label="One" />
+      </Glass>,
+    );
+    fireEvent.keyDown(screen.getByRole('button', { name: 'One' }), { key: ' ' });
+    expect(screen.getByTestId('card').hasAttribute('data-pressed')).toBe(false);
+  });
+});
+
+describe('handlers passed by the caller', () => {
+  test('run alongside the built-in feel instead of replacing it', () => {
+    const onPointerDown = vi.fn();
+    const onKeyDown = vi.fn();
+    render(<Button label="Go" onPointerDown={onPointerDown} onKeyDown={onKeyDown} />);
+    const btn = screen.getByRole('button', { name: 'Go' });
+    fireEvent.pointerDown(btn, { button: 0, clientX: 1, clientY: 1 });
+    expect(onPointerDown).toHaveBeenCalledTimes(1);
+    expect(btn.hasAttribute('data-pressed')).toBe(true);
+    fireEvent.keyDown(btn, { key: 'Enter' });
+    expect(onKeyDown).toHaveBeenCalledTimes(1);
+  });
+
+  test('also on a lit Glass', () => {
+    const onPointerMove = vi.fn();
+    render(<Glass lit data-testid="card" onPointerMove={onPointerMove} />);
+    const card = screen.getByTestId('card');
+    fireEvent.pointerMove(card, { clientX: 5, clientY: 6 });
+    expect(onPointerMove).toHaveBeenCalledTimes(1);
+    expect(card.style.getPropertyValue('--mx')).not.toBe('');
+  });
+});
+
+describe('a control cannot stay pressed', () => {
+  const dipEnd = (el: HTMLElement) => {
+    const ev = new Event('transitionend');
+    Object.defineProperty(ev, 'propertyName', { value: '--dip' });
+    el.dispatchEvent(ev);
+  };
+
+  afterEach(() => vi.useRealTimers());
+
+  test('release clears the press at once when the dip has finished', () => {
+    render(<Button label="Go" />);
+    const btn = screen.getByRole('button', { name: 'Go' });
+    fireEvent.pointerDown(btn, { button: 0, clientX: 1, clientY: 1 });
+    dipEnd(btn);
+    expect(btn.hasAttribute('data-pressed')).toBe(true);
+    fireEvent.pointerUp(window);
+    expect(btn.hasAttribute('data-pressed')).toBe(false);
+  });
+
+  test('a quick tap waits for the dip, and the timer clears it if transitionend never comes', () => {
+    vi.useFakeTimers();
+    render(<Button label="Go" />);
+    const btn = screen.getByRole('button', { name: 'Go' });
+    btn.style.setProperty('--dur-press', '120ms');
+    fireEvent.pointerDown(btn, { button: 0, clientX: 1, clientY: 1 });
+    fireEvent.pointerUp(window);
+    expect(btn.hasAttribute('data-pressed')).toBe(true); // the whole dip still shows
+    vi.advanceTimersByTime(119);
+    expect(btn.hasAttribute('data-pressed')).toBe(true);
+    vi.advanceTimersByTime(200);
+    expect(btn.hasAttribute('data-pressed')).toBe(false);
+  });
+
+  test('a late transitionend after the timer is harmless', () => {
+    vi.useFakeTimers();
+    render(<Button label="Go" />);
+    const btn = screen.getByRole('button', { name: 'Go' });
+    fireEvent.pointerDown(btn, { button: 0, clientX: 1, clientY: 1 });
+    fireEvent.pointerUp(window);
+    vi.advanceTimersByTime(1000);
+    dipEnd(btn);
+    expect(btn.hasAttribute('data-pressed')).toBe(false);
+  });
+
+  test('a press that is still held is not cut short', () => {
+    vi.useFakeTimers();
+    render(<Button label="Go" />);
+    const btn = screen.getByRole('button', { name: 'Go' });
+    fireEvent.pointerDown(btn, { button: 0, clientX: 1, clientY: 1 });
+    vi.advanceTimersByTime(60_000);
+    expect(btn.hasAttribute('data-pressed')).toBe(true);
+    fireEvent.pointerUp(window);
+    vi.advanceTimersByTime(1000);
+    expect(btn.hasAttribute('data-pressed')).toBe(false);
+  });
+
+  test('a cancelled pointer and a lost window focus also release', () => {
+    vi.useFakeTimers();
+    render(<Button label="Go" />);
+    const btn = screen.getByRole('button', { name: 'Go' });
+    fireEvent.pointerDown(btn, { button: 0, clientX: 1, clientY: 1 });
+    fireEvent.pointerCancel(window);
+    vi.advanceTimersByTime(1000);
+    expect(btn.hasAttribute('data-pressed')).toBe(false);
+    fireEvent.pointerDown(btn, { button: 0, clientX: 1, clientY: 1 });
+    fireEvent.blur(window);
+    vi.advanceTimersByTime(1000);
+    expect(btn.hasAttribute('data-pressed')).toBe(false);
+  });
+
+  test('an element removed mid-press leaves nothing running', () => {
+    vi.useFakeTimers();
+    const { unmount } = render(<Button label="Go" />);
+    const btn = screen.getByRole('button', { name: 'Go' });
+    fireEvent.pointerDown(btn, { button: 0, clientX: 1, clientY: 1 });
+    unmount();
+    fireEvent.pointerUp(window);
+    expect(() => vi.runAllTimers()).not.toThrow();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+});
+
+describe('Tabs indicator and fonts', () => {
+  afterEach(() => {
+    Reflect.deleteProperty(document, 'fonts');
+    vi.restoreAllMocks();
+  });
+
+  test('is placed again once the font has loaded', async () => {
+    let ready!: () => void;
+    const fontsReady = new Promise<void>((r) => (ready = r));
+    Object.defineProperty(document, 'fonts', {
+      configurable: true,
+      value: { ready: fontsReady, addEventListener: vi.fn(), removeEventListener: vi.fn() },
+    });
+    let width = 60; // the fallback face
+    vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockImplementation(() => width);
+    const items = [
+      { id: 'a', label: 'Sat 19' },
+      { id: 'b', label: 'Today' },
+    ];
+    render(<Tabs aria-label="Day" variant="day" items={items} value="a" onChange={() => {}} />);
+    const ind = document.querySelector<HTMLElement>('[aria-hidden="true"]')!;
+    const first = ind.style.transform;
+    expect(first).toContain(`scaleX(${(60 - 26) / 100})`);
+    width = 80; // Hanken Grotesk arrives
+    ready();
+    await fontsReady;
+    await Promise.resolve();
+    expect(ind.style.transform).toContain(`scaleX(${(80 - 26) / 100})`);
+    expect(ind.style.transform).not.toBe(first);
+  });
+
+  test('an inline items array does not re-run placement on every render', () => {
+    const spy = vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(50);
+    const { rerender } = render(<Tabs aria-label="T" items={[{ id: 'a', label: 'A' }]} value="a" onChange={() => {}} />);
+    const calls = spy.mock.calls.length;
+    rerender(<Tabs aria-label="T" items={[{ id: 'a', label: 'A' }]} value="a" onChange={() => {}} />);
+    expect(spy.mock.calls.length).toBe(calls);
   });
 });

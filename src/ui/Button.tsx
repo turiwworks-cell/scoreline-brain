@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react';
-import { feel } from './feel';
+import { withFeel } from './feel';
 import { RollLabel } from './RollLabel';
 import styles from './Button.module.css';
 
@@ -23,7 +23,7 @@ export function Button({ label, height, minWidth, className, style, type, ...res
   if (height !== undefined) (st as Record<string, string>)['--h'] = `${height}px`;
   if (minWidth !== undefined) st.minWidth = minWidth;
   return (
-    <button type={type ?? 'button'} className={cx(styles.pill, className)} style={st} {...feel} {...rest}>
+    <button type={type ?? 'button'} className={cx(styles.pill, className)} style={st} {...withFeel(rest)}>
       <RollLabel text={label} />
     </button>
   );
@@ -36,7 +36,7 @@ export type RoundButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export function RoundButton({ className, children, type, ...rest }: RoundButtonProps) {
   return (
-    <button type={type ?? 'button'} className={cx(styles.round, className)} {...feel} {...rest}>
+    <button type={type ?? 'button'} className={cx(styles.round, className)} {...withFeel(rest)}>
       {children}
     </button>
   );

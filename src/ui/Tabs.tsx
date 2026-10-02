@@ -39,6 +39,9 @@ export function Tabs({ items, value, onChange, variant = 'line', idBase, classNa
   const listRef = useRef<HTMLDivElement>(null);
   const indRef = useRef<HTMLSpanElement>(null);
 
+  // widths can change without the list resizing (the font swaps in, a label changes), so
+  // the indicator is re-placed on any change to a tab as well as to the list
+  const itemsKey = items.map((t) => `${t.id}:${t.label}`).join('|');
   useLayoutEffect(() => {
     const list = listRef.current;
     const ind = indRef.current;
@@ -63,12 +66,23 @@ export function Tabs({ items, value, onChange, variant = 'line', idBase, classNa
     // first placement doesn't slide; later ones do
     const raf = requestAnimationFrame(() => ind.setAttribute('data-ready', ''));
     const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(place);
-    ro?.observe(list);
+    if (ro) {
+      ro.observe(list);
+      list.querySelectorAll('[role="tab"]').forEach((t) => ro.observe(t));
+    }
+    // the face may load after first layout; measure again once it has
+    const fonts = typeof document === 'undefined' ? undefined : document.fonts;
+    let live = true;
+    void fonts?.ready.then(() => live && place());
+    fonts?.addEventListener?.('loadingdone', place);
     return () => {
+      live = false;
       cancelAnimationFrame(raf);
       ro?.disconnect();
+      fonts?.removeEventListener?.('loadingdone', place);
     };
-  }, [value, variant, items]);
+    // items is read through itemsKey so an inline array doesn't re-run this every render
+  }, [value, variant, itemsKey]);
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     const i = items.findIndex((t) => t.id === value);

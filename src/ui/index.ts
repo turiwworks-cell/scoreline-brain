@@ -1,5 +1,5 @@
 export { Button, RoundButton, type ButtonProps, type RoundButtonProps } from './Button';
-export { feel, roll, spotRadius } from './feel';
+export { feel, roll, spotRadius, withFeel } from './feel';
 export { Glass, type GlassProps } from './Glass';
 export { LiveDot, Pill, type PillProps } from './Pill';
 export { RollLabel } from './RollLabel';
