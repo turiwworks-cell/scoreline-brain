@@ -1,5 +1,5 @@
 import { useMemo, type CSSProperties } from 'react';
-import { softLightGradient, type SoftLightSpec } from './softLight';
+import { softLightGradient, type SoftLightSpec } from './softLightGradient';
 
 /*
  * A soft light drawn inside its box (the box clips it, like the Lua's clipRect).

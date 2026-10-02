@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
-import { SOFT_LIGHT_STOPS, softLightGradient, softLightStops } from './softLight';
+import { SOFT_LIGHT_STOPS, softLightGradient, softLightStops } from './softLightGradient';
 
-describe('softLight', () => {
+describe('softLightGradient', () => {
   test('has 25 stops that fall off as (1 - t^2)^3 to zero', () => {
     const stops = softLightStops('#74acdf', 0.5);
     expect(stops).toHaveLength(SOFT_LIGHT_STOPS);

@@ -14,7 +14,7 @@ export { ratingTone, type RatingTone } from './rating';
 export { RatingBadge, type RatingBadgeProps } from './RatingBadge';
 export { RollLabel } from './RollLabel';
 export { SoftLight } from './SoftLight';
-export { softLightGradient, softLightStops, SOFT_LIGHT_STOPS, type SoftLightSpec } from './softLight';
+export { softLightGradient, softLightStops, SOFT_LIGHT_STOPS, type SoftLightSpec } from './softLightGradient';
 export { tagLayout, tagList, type TagCounts } from './tagLayout';
 export { EventTags, SubOffTag, Tag, type EventTagsProps, type SubOffTagProps, type TagProps } from './Tags';
 export { Tabs, type TabItem, type TabsProps } from './Tabs';
