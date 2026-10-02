@@ -109,7 +109,9 @@ holds while the list doesn't change shape.)
 ## 3. `event`: one moment, now
 
 One per SSE message on `/events`, with the event's `seq` as the SSE `id` so a reconnect resumes
-with `Last-Event-ID`.
+with `Last-Event-ID`. The client runs its own reconnects (backoff, then a full resync), and a
+browser `EventSource` can't set that header on a new connection, so the client sends the resume
+point as the `lastEventId` query parameter (`/events?lastEventId=15`). The server reads either.
 
 ```json
 { "id": "9f3", "seq": 15, "match": 501, "kind": "goal", "side": "home", "minute": 66,
@@ -200,6 +202,10 @@ an unknown kind. A `/feed` that isn't JSON parses as an empty feed.
 A v1 source (no `seq`) still works: every `seq` reads as 0, every snapshot is "current" and
 replaces the match as v1 did. A v1 goal event without `score` adds one to its side. Such a
 source keeps the v1 rollback risk; that is what v2 removes.
+
+**Known limitation.** `v1` sources that do not provide `seq` remain supported for backward
+compatibility, but stale-snapshot protection cannot be guaranteed for them, so score rollback is
+still possible.
 
 ---
 

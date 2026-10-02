@@ -91,6 +91,8 @@ Milestones:
 - **Ref:** the bridge in `Scoreline_Fixed.html:9895–10059`.
 - **Done when:** tests with a fake Source cover reconnect and resync, and a poll with no changes
   causes no store update.
+- **Follow-up:** Before production, decide whether v1 feed compatibility should be removed so
+  seq-based stale-snapshot protection is always enforced.
 
 ### 4 · Domain helpers (Sonnet)
 - **Build:** Standings (`luau:2923–2976`), the live-list order with favourites first
