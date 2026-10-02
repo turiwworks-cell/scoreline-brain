@@ -1,0 +1,38 @@
+/*
+ * Player photo URLs: the files scripts/slice-atlas.ts cuts from the squad atlases (Part 8),
+ * at public/img/players/<team>/<n>-<kind>@<1|2>x.<avif|webp> (ARCHITECTURE §8).
+ *
+ * Each kind comes at two widths, described in `w` so the browser takes the smallest file that
+ * covers the box at the screen's density. AVIF first, WebP for browsers without it.
+ */
+
+export type PhotoKind = 'bust' | 'head' | 'frost';
+
+export const PHOTO_ROOT = '/img/players';
+
+/**
+ * Pixel sizes of each kind's files. @2x is the atlas's own pixels (2 per design unit,
+ * ATLAS.k, luau:1469), @1x half that. The bust is 288 × 360 design units; the head cut-out
+ * covers CROP.head (180 units) in 224 px; the frost is the bust at a quarter, pre-blurred.
+ */
+export const PHOTO_SIZES: Readonly<Record<PhotoKind, { readonly 1: readonly [number, number]; readonly 2: readonly [number, number] }>> = {
+  bust: { 1: [288, 360], 2: [576, 720] },
+  head: { 1: [112, 112], 2: [224, 224] },
+  frost: { 1: [72, 90], 2: [144, 180] },
+};
+
+export interface PhotoSources {
+  /** WebP @1x, for `<img src>` */
+  readonly src: string;
+  /** WebP at both widths */
+  readonly srcSet: string;
+  /** AVIF at both widths, for a `<source>` ahead of the `<img>` */
+  readonly sources: readonly { readonly type: string; readonly srcSet: string }[];
+}
+
+/** `path` is a manifest entry's `path` (`<team>/<n>`). */
+export function photoSources(path: string, kind: PhotoKind = 'bust'): PhotoSources {
+  const url = (scale: 1 | 2, format: 'avif' | 'webp') => `${PHOTO_ROOT}/${path}-${kind}@${scale}x.${format}`;
+  const set = (format: 'avif' | 'webp') => `${url(1, format)} ${PHOTO_SIZES[kind][1][0]}w, ${url(2, format)} ${PHOTO_SIZES[kind][2][0]}w`;
+  return { src: url(1, 'webp'), srcSet: set('webp'), sources: [{ type: 'image/avif', srcSet: set('avif') }] };
+}

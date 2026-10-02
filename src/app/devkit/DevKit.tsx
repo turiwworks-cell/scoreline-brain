@@ -1,6 +1,7 @@
 import { useState, type CSSProperties } from 'react';
 import { Button, Glass, Icon, LiveDot, Pill, RoundButton, SoftLight, spotRadius, Tabs, Tag } from '../../ui';
 import { Part7 } from './Part7';
+import { Part8 } from './Part8';
 import { Section } from './Section';
 import styles from './DevKit.module.css';
 
@@ -268,6 +269,7 @@ export function DevKit() {
       </div>
 
       <Part7 />
+      <Part8 />
     </main>
   );
 }
