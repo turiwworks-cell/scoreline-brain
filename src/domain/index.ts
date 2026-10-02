@@ -4,3 +4,7 @@ export { applyEvent, applyFeed, emptyState, playerKey } from './apply';
 export { liveMinute, syncClock, type MatchTime } from './clock';
 export { colorOf, feedSchema, liveEventSchema, parseEvent, parseFeed } from './schemas';
 export { share } from './share';
+export { leaders, lineupOf, type Leader } from './leaders';
+export { liveMatches } from './live';
+export { standings, type LeagueBase, type PriorResult, type StandingRow } from './standings';
+export { minLabel, minText, nameOf, plainLine, scoreStr } from './text';

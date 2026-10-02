@@ -99,6 +99,11 @@ Milestones:
   (`luau:3694–3703`), tonight's leaders, minute and score formatting (`luau:2431`, `2466–2478`),
   and the plain event lines (`plainLine`, `luau:7691`).
 - **Done when:** unit tests reproduce the Lua's outputs on the demo data.
+- **Follow-up:** A league without a sent `table` is counted from its team list and earlier
+  results, which the v2 feed doesn't carry (the Lua read an undocumented `leagues[].teams` and
+  kept `prior` in its demo data). `standings` takes them as a `LeagueBase` argument; until the
+  contract carries them, such a league has no table. Decide in Part 5 or 22 whether to add them
+  to the contract or have sources always send `table`.
 
 ### 5 · DemoSource (Sonnet)
 - **Build:** Port the simulation (`luau:7342–7642`, `2521–2923`), the demo data
