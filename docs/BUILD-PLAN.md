@@ -104,6 +104,9 @@ Milestones:
   kept `prior` in its demo data). `standings` takes them as a `LeagueBase` argument; until the
   contract carries them, such a league has no table. Decide in Part 5 or 22 whether to add them
   to the contract or have sources always send `table`.
+  **Part 5:** DemoSource sends `table` for every league with a team list, counted with
+  `standings` from the Lua's team lists and earlier results (`src/data/demo/wire.ts`). No contract
+  change. Part 22 still decides the same for the real adapter.
 
 ### 5 · DemoSource (Sonnet)
 - **Build:** Port the simulation (`luau:7342–7642`, `2521–2923`), the demo data
