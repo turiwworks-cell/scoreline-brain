@@ -94,3 +94,31 @@ export const selectMatchIdsByDay = perKey((day: number) =>
 export const selectLiveMatchIds: Selector<readonly number[]> = derivedList((s) =>
   s.domain.matchOrder.filter((id) => s.domain.matches[id]?.status === 'live'),
 );
+
+/**
+ * The match the desktop opens in its match pane on load (ARCHITECTURE §6): the featured one, else
+ * the first live match, else the first of today, else the first. Undefined before any feed.
+ */
+export const selectFeaturedMatchId: Selector<number | undefined> = (s) => {
+  const { matches, matchOrder } = s.domain;
+  return (
+    matchOrder.find((id) => matches[id]?.featured) ??
+    matchOrder.find((id) => matches[id]?.status === 'live') ??
+    matchOrder.find((id) => matches[id]?.day === 0) ??
+    matchOrder[0]
+  );
+};
+
+/**
+ * A match `team` plays in, for a player opened without one: live first, then today's, then the
+ * first in feed order.
+ */
+export const selectMatchIdOfTeam = perKey((team: string): Selector<number | undefined> => (s) => {
+  const { matches, matchOrder } = s.domain;
+  const plays = (id: number) => matches[id]?.home === team || matches[id]?.away === team;
+  return (
+    matchOrder.find((id) => plays(id) && matches[id]?.status === 'live') ??
+    matchOrder.find((id) => plays(id) && matches[id]?.day === 0) ??
+    matchOrder.find(plays)
+  );
+});

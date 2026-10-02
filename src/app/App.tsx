@@ -1,28 +1,27 @@
-import { lazy, Suspense } from 'react';
+import { useMemo } from 'react';
+import type { DataRouter } from 'react-router';
+import { RouterProvider } from 'react-router/dom';
+import { MotionProvider } from '../motion';
 import { IconSprite } from '../ui/IconSprite';
-import styles from './App.module.css';
+import { createNavActions } from './nav/actions';
+import { NavContext } from './nav/useNav';
+import { appRouter } from './router';
 
-// /dev/kit shows the shared materials (Part 6). Its own chunk, so it costs the app nothing.
-// Part 9 replaces this path check with the router.
-const DevKit = lazy(() => import('./devkit/DevKit').then((m) => ({ default: m.DevKit })));
-
-export function App() {
+/**
+ * The app: the icon sprite (Part 7), Motion (LazyMotion + MotionConfig), the navigation actions
+ * and the router. Tests pass their own (memory) router.
+ */
+export function App({ router = appRouter() }: { router?: DataRouter }) {
+  const nav = useMemo(() => createNavActions(router), [router]);
   return (
     <>
       {/* the one icon sprite every <Icon> and tag draws from (Part 7) */}
       <IconSprite />
-      <Screen />
+      <MotionProvider>
+        <NavContext value={nav}>
+          <RouterProvider router={router} />
+        </NavContext>
+      </MotionProvider>
     </>
   );
-}
-
-function Screen() {
-  if (typeof window !== 'undefined' && window.location.pathname.replace(/\/+$/, '') === '/dev/kit') {
-    return (
-      <Suspense fallback={null}>
-        <DevKit />
-      </Suspense>
-    );
-  }
-  return <main className={styles.shell} data-testid="app-shell" aria-label="Scoreline" />;
 }

@@ -13,6 +13,9 @@ if (demo) {
   void import('./data/demo').then(({ createDemoSource }) => connectSource(createDemoSource(demo), scorelineStore.getState().actions));
 }
 
+// each pane restores its own scroll (app/nav/scrollMemory.ts); the page itself never scrolls
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
 const root = document.getElementById('root');
 if (!root) throw new Error('Missing #root');
 createRoot(root).render(

@@ -14,8 +14,10 @@
     "check": "npm run typecheck && npm run lint && npm run test"
   },
   "dependencies": {
+    "motion": "^14.0.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "react-router": "^8.4.0",
     "zod": "^4.6.5",
     "zustand": "^5.0.15"
   },

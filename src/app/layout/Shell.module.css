@@ -1,0 +1,132 @@
+/*
+ * The shell (ARCHITECTURE §5, §6). Fixed to the viewport: the page itself never scrolls, each
+ * screen is its own native scroll container. Breakpoints match layoutMode.ts.
+ */
+
+.shell {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--c-bg);
+}
+
+/* A screen: one native scroll container with its own scroll memory. */
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--c-bg);
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-dim) transparent;
+}
+
+/* ------------------------------------------------------------------------------------------
+ * Phone: the list at the base, match and player layers pushed on top.
+ * ---------------------------------------------------------------------------------------- */
+
+/* The list's frame: it slides 22 % left under a pushed match (pushBase). */
+.base {
+  position: absolute;
+  inset: 0;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.layerMatch {
+  z-index: 2;
+}
+
+.layerPlayer {
+  z-index: 3;
+}
+
+/* Safe-area insets on phone (§6): content keeps clear of the notch and the home bar. */
+.shell[data-layout='phone'] .screen {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* ------------------------------------------------------------------------------------------
+ * Tablet and desktop: glass panes side by side (drawDesktop, luau:7051).
+ * The Lua's 1280 × 892 desktop puts three 390 × 844 panes 24 px apart, 31 px from the sides
+ * (PANES, luau:363). Panes are fluid between 360 and 440 px; the side margin gives way to 12 px
+ * so two 360 px panes still fit at 768.
+ * ---------------------------------------------------------------------------------------- */
+
+.shell[data-layout='two'],
+.shell[data-layout='three'] {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  padding: 24px clamp(12px, calc(50vw - 372px), 31px);
+}
+
+.pane {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 360px;
+  max-width: 440px;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: var(--r-30);
+  background: var(--c-bg);
+}
+
+/* glassRim (luau:3264): the pane's 1 px rim, over its content (GL_RIM) */
+.pane::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.22) 0%, rgb(255 255 255 / 0.13) 45%, rgb(255 255 255 / 0.15) 80%, rgb(255 255 255 / 0.28) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+/* A pane swaps its screen at once: the one arriving sits over the one leaving. */
+.paneScreen[data-present='true'] {
+  z-index: 1;
+}
+
+.paneScreen[data-present='false'] {
+  z-index: 0;
+}
+
+/* Tablet: the player rises as a sheet over the match pane, which dims under it. */
+.paneScrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sheet {
+  top: 12px;
+  z-index: 3;
+  border-radius: var(--r-30) var(--r-30) 0 0;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18);
+}
+
+/* Announcements for screen readers when navigation leaves focus where it was. */
+.announcer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
