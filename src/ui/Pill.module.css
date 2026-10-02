@@ -1,0 +1,130 @@
+.pill {
+  --h: 28px;
+  --pad: 14px;
+  --icon-x: 15px; /* centre of the icon from the left edge */
+  --gap-r: 10px; /* air after the label when there is an icon */
+  display: inline-flex;
+  align-items: center;
+  height: var(--h);
+  padding: 0 var(--pad);
+  border-radius: calc(var(--h) / 2);
+  color: var(--c-text);
+  white-space: nowrap;
+  vertical-align: middle;
+  flex: none;
+}
+
+/* the text box sits on the pill's centre line, as bc(cy, size) does */
+.text {
+  position: relative;
+  z-index: 0;
+}
+
+.label {
+  --h: 24px;
+  --pad: 12px;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+/* tracked text carries its spacing after the last letter; take it back to centre the word */
+.label .text {
+  margin-right: calc(-1 * var(--track-label));
+}
+
+.sm {
+  --h: 24px;
+  --pad: 12px;
+  --icon-x: 12px;
+  --gap-r: 8px;
+  font: var(--fw-s) var(--fs-11p5) / normal var(--font-sans);
+}
+
+.md {
+  --h: 28px;
+  --pad: 14px;
+  --icon-x: 15px;
+  --gap-r: 10px;
+  font: var(--type-tag);
+}
+
+.lg {
+  --h: 30px;
+  --pad: 15px;
+  --icon-x: 16px;
+  --gap-r: 10px;
+  font: var(--fw-s) var(--fs-12p5) / normal var(--font-sans);
+}
+
+/* with an icon the label starts at 2 * icon-x - 2 (luau:4363, 6086, 6119) */
+.withIcon {
+  position: relative;
+  padding: 0 var(--gap-r) 0 calc(var(--icon-x) * 2 - 2px);
+}
+
+.icon {
+  position: absolute;
+  left: var(--icon-x);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  z-index: 0;
+}
+
+/* the Live toggle's green: 27 px tall in the Lua's 38 px header pill */
+.live {
+  background: var(--c-live);
+  color: var(--c-ink-dark);
+}
+
+.spectrum {
+  background: var(--spectrum-accent);
+  color: var(--c-ink);
+}
+
+.dot {
+  position: relative;
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--c-live);
+}
+
+.dotInk {
+  background: var(--c-ink-dark);
+}
+
+/* the ring grows from 4.5 to 11.5 px over the first 70 % of 1.8 s and fades */
+.pulse::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgb(52 227 154 / 0.55);
+  animation: pulse var(--dur-live-pulse) linear infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(calc(11.5 / 4.5));
+    opacity: 0;
+  }
+  100% {
+    transform: scale(calc(11.5 / 4.5));
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse::before {
+    animation: none;
+    opacity: 0;
+  }
+}

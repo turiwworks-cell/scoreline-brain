@@ -1,0 +1,176 @@
+/*
+ * Materials: the named CSS recipes for the Lua's glass, hover light and press dip
+ * (luau:3199-3460). Components in src/ui apply these classes; colours, curves and
+ * timings come from tokens.css.
+ *
+ * No backdrop blur anywhere (ARCHITECTURE §7): glass is an opaque dark pane, as in the Lua.
+ */
+
+/* The hover light (0..1) and the press dip (0..1) of a control, as animatable numbers.
+ * They play the role of uiFeel()'s two tweens (luau:3350). */
+@property --lit {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+@property --dip {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+/* ---------------------------------------------------------------------
+ * Feel: hover light + press dip, on any control.
+ * --mx / --my (cursor position inside the control) and --spot-r (how far the light
+ * reaches) are written by src/ui/feel.ts from pointer events, never by React.
+ * ------------------------------------------------------------------- */
+.m-feel {
+  /* own values, never inherited from a lit parent */
+  --lit: 0;
+  --dip: 0;
+  --mx: 50%;
+  --my: 50%;
+  --spot-r: 52px;
+  /* glass shows the light while pressed too: max(lit, 0.7 * dip) (luau:3389) */
+  --lit-eff: max(var(--lit), calc(var(--dip) * 0.7));
+  --t-lit: var(--dur-hover-out) var(--ease-glide);
+  --t-dip: var(--dur-release) var(--ease-glide);
+  transition: --lit var(--t-lit), --dip var(--t-dip);
+}
+/* hover effects only with a real pointer (ARCHITECTURE §6) */
+@media (hover: hover) and (pointer: fine) {
+  .m-feel:hover {
+    --lit: 1;
+    --t-lit: var(--dur-hover-in) var(--ease-glide);
+  }
+}
+.m-feel[data-pressed] {
+  --dip: 1;
+  --t-dip: var(--dur-press) var(--ease);
+}
+
+/* ---------------------------------------------------------------------
+ * Glass (luau:3228-3308): a dark pane, a whisper of sheen, a 1 px rim that is a
+ * touch brighter at the bottom, and the hover light: a soft white spot under the
+ * cursor in the pane, a brighter catch on the rim near the cursor and a faint
+ * feathered glow along it.
+ * --glass-body: opacity of the pane, about 1 on black, 0.7 over pictures.
+ * ------------------------------------------------------------------- */
+.m-glass {
+  --glass-body: 0.96;
+  /* HALO (0.9) is folded into each peak: pane 0.14, rim 0.6, glow 0.3 (luau:3277-3298) */
+  --spot-a: calc(var(--lit-eff, 0) * 0.126);
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(
+      circle var(--spot-r, 52px) at var(--mx, 50%) var(--my, 50%),
+      rgb(255 255 255 / calc(var(--spot-a) * 1)) 0%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.9801)) 10%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.9216)) 20%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.8281)) 30%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.7056)) 40%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.5625)) 50%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.4096)) 60%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.2601)) 70%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.1296)) 80%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.0361)) 90%,
+      rgb(255 255 255 / 0) 100%
+    ),
+    /* GL_SHEEN */
+    linear-gradient(180deg, rgb(255 255 255 / 0.045) 0%, rgb(255 255 255 / 0) 55%, rgb(255 255 255 / 0.015) 100%),
+    rgb(from var(--glass-tint, var(--c-glass)) r g b / var(--glass-body));
+}
+
+:where(.m-glass) {
+  border-radius: var(--r-16);
+}
+
+/* The rim: one 1 px line, drawn over anything that sits on the pane (luau:3262). */
+.m-glass::before {
+  --spot-a: calc(var(--lit-eff, 0) * 0.54);
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle calc(var(--spot-r, 52px) * 1.2) at var(--mx, 50%) var(--my, 50%),
+      rgb(255 255 255 / calc(var(--spot-a) * 1)) 0%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.9801)) 10%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.9216)) 20%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.8281)) 30%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.7056)) 40%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.5625)) 50%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.4096)) 60%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.2601)) 70%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.1296)) 80%,
+      rgb(255 255 255 / calc(var(--spot-a) * 0.0361)) 90%,
+      rgb(255 255 255 / 0) 100%
+    ),
+    /* GL_RIM */
+    linear-gradient(180deg, rgb(255 255 255 / 0.22) 0%, rgb(255 255 255 / 0.13) 45%, rgb(255 255 255 / 0.15) 80%, rgb(255 255 255 / 0.28) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+/* The rim's feathered glow near the cursor (spotLook with stroke 3, feather 10). */
+.m-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 6px 1px rgb(255 255 255 / calc(var(--lit-eff, 0) * 0.27));
+  -webkit-mask: radial-gradient(
+    circle calc(var(--spot-r, 52px) * 1.2) at var(--mx, 50%) var(--my, 50%),
+    #000 0%, rgb(0 0 0 / 0.9801) 10%, rgb(0 0 0 / 0.9216) 20%, rgb(0 0 0 / 0.8281) 30%, rgb(0 0 0 / 0.7056) 40%,
+    rgb(0 0 0 / 0.5625) 50%, rgb(0 0 0 / 0.4096) 60%, rgb(0 0 0 / 0.2601) 70%, rgb(0 0 0 / 0.1296) 80%,
+    rgb(0 0 0 / 0.0361) 90%, transparent 100%
+  );
+  mask: radial-gradient(
+    circle calc(var(--spot-r, 52px) * 1.2) at var(--mx, 50%) var(--my, 50%),
+    #000 0%, rgb(0 0 0 / 0.9801) 10%, rgb(0 0 0 / 0.9216) 20%, rgb(0 0 0 / 0.8281) 30%, rgb(0 0 0 / 0.7056) 40%,
+    rgb(0 0 0 / 0.5625) 50%, rgb(0 0 0 / 0.4096) 60%, rgb(0 0 0 / 0.2601) 70%, rgb(0 0 0 / 0.1296) 80%,
+    rgb(0 0 0 / 0.0361) 90%, transparent 100%
+  );
+}
+
+/* A pane that is not a control never lights, even inside one that is. */
+.m-glass:not(.m-feel) {
+  --lit-eff: 0;
+}
+
+/* Over pictures the pane thins (body 0.7, luau:4361, 6117). */
+.m-glass-thin {
+  --glass-body: 0.7;
+}
+
+/* ---------------------------------------------------------------------
+ * Press dip for glass controls: the whole control, label included, shrinks by
+ * 5 % at the bottom of the dip (btnOpen, luau:3385).
+ * ------------------------------------------------------------------- */
+.m-dip {
+  transform: scale(calc(1 - var(--press-depth) * var(--dip)));
+}
+
+/* Press fade for things that are not glass (rows, cards, tabs, luau:3456, 4668). */
+.m-fade {
+  opacity: calc(1 - var(--press-fade) * var(--dip));
+}
+
+/* ---------------------------------------------------------------------
+ * Spectrum fills
+ * ------------------------------------------------------------------- */
+.m-spectrum-text {
+  /* gradTxt (luau:1567): the gradient runs diagonally across the glyphs */
+  background: linear-gradient(135deg, var(--spectrum-stops, var(--spectrum-3-stops)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

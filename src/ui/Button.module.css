@@ -1,0 +1,37 @@
+.button {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  color: var(--c-text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 2px;
+}
+
+/* pillBtn (luau:3441): label S 13, 20 px each side, radius h / 2 */
+.pill {
+  --h: 36px;
+  height: var(--h);
+  padding: 0 20px;
+  border-radius: calc(var(--h) / 2);
+  font: var(--type-button);
+  white-space: nowrap;
+}
+
+/* roundBtn (luau:3451): 40 px circle */
+.round {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-20);
+  flex: none;
+}

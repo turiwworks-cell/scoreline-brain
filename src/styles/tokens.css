@@ -1,0 +1,188 @@
+/*
+ * Design tokens, ported from the Rive-era script (legacy/scoreline_11.luau, cited as luau:<line>).
+ * Port, don't redesign: every value here is the Lua's number.
+ * Lengths are the Lua's artboard units, which are CSS pixels (390 x 844 phone, 1280 x 892 desktop).
+ */
+
+:root {
+  /* ---------------------------------------------------------------
+   * Colours (luau:1025-1030)
+   * ------------------------------------------------------------- */
+  --c-bg: #000000; /* BG */
+  --c-surf: #161616; /* SURF */
+  --c-text: #f3f2ef; /* TEXT */
+  --c-muted: #85847f; /* MUTED */
+  --c-dim: #43423f; /* DIM */
+  --c-hair: rgb(255 255 255 / 0.1); /* HAIR: 1 px rules */
+  --c-live: #34e39a; /* LIVE */
+  --c-card: #e7c94a; /* CARD: yellow card */
+  --c-red: #ff5a5a; /* RED */
+  --c-ink: rgb(0 0 0 / 0.86); /* INK: text on spectrum and pastel fills */
+  --c-ink-dark: #032616; /* INK_DARK: text on the live green */
+  --c-glass: #121212; /* the glass pane's body colour (luau:3293) */
+  --c-red-glow: #ff2d2d; /* red-card soft light (luau:6227) */
+  --c-red-scene: #b3141b; /* red-card scene light (luau:6609) */
+  --c-pastel-base: #f7f2ea; /* team colours are mixed toward this for black text (luau:1146) */
+
+  /* ---------------------------------------------------------------
+   * Spectrum: the 5 brand gradients (luau:1031-1037), stops verbatim.
+   * Index n here is STOPS[n] in the Lua (gradPaint g = n - 1).
+   * --spectrum-n runs left to right (horizontal = true), --spectrum-n-v top to bottom.
+   * ------------------------------------------------------------- */
+  --spectrum-1-stops: #f7b9d0 0%, #f9dcd6 55%, #fbe9df 76%, #f2a132 100%;
+  --spectrum-2-stops: #6aaef0 0%, #c9b8e0 34%, #f2b3c9 58%, #b0243c 100%;
+  --spectrum-3-stops: #6b58f5 0%, #a58fe6 40%, #e7c1d6 76%, #fff0e6 100%;
+  --spectrum-4-stops: #3d6a45 0%, #89a987 45%, #e9b8cf 85%, #f6bdd6 100%;
+  --spectrum-5-stops: #a8c3ea 0%, #e2e2e4 38%, #c9c92a 68%, #f0eed0 100%;
+  --spectrum-1: linear-gradient(90deg, var(--spectrum-1-stops));
+  --spectrum-2: linear-gradient(90deg, var(--spectrum-2-stops));
+  --spectrum-3: linear-gradient(90deg, var(--spectrum-3-stops));
+  --spectrum-4: linear-gradient(90deg, var(--spectrum-4-stops));
+  --spectrum-5: linear-gradient(90deg, var(--spectrum-5-stops));
+  --spectrum-1-v: linear-gradient(180deg, var(--spectrum-1-stops));
+  --spectrum-2-v: linear-gradient(180deg, var(--spectrum-2-stops));
+  --spectrum-3-v: linear-gradient(180deg, var(--spectrum-3-stops));
+  --spectrum-4-v: linear-gradient(180deg, var(--spectrum-4-stops));
+  --spectrum-5-v: linear-gradient(180deg, var(--spectrum-5-stops));
+  /* tab indicators and the chosen segment use STOPS[3] (gradRect(..., 2, true), luau:4687, 5804, 6803) */
+  --spectrum-accent: var(--spectrum-3);
+
+  /* ---------------------------------------------------------------
+   * Motion curves (luau:1042-1047, ROLL luau:3399).
+   * No curve overshoots: movement settles, it never bounces.
+   * ------------------------------------------------------------- */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1); /* EASE */
+  --ease-glide: cubic-bezier(0.16, 1, 0.3, 1); /* GLIDE */
+  --ease-inout: cubic-bezier(0.42, 0, 0.58, 1); /* INOUT */
+  --ease-in: cubic-bezier(0.5, 0, 0.75, 0); /* IN */
+  --ease-linear: cubic-bezier(0, 0, 1, 1); /* LINEAR */
+  --ease-roll: cubic-bezier(0.7, 0, 0.2, 1); /* ROLL: the letter roll */
+
+  /* Micro tier (ARCHITECTURE §5): hover light, press dip, letter roll. luau:3349-3402 */
+  --dur-hover-in: 280ms; /* the hover light rises (GLIDE) */
+  --dur-hover-out: 550ms; /* and fades where the cursor left it (GLIDE) */
+  --dur-press: 120ms; /* the press dip goes down (EASE) */
+  --dur-release: 500ms; /* and comes back (GLIDE) */
+  --press-depth: 0.05; /* glass buttons shrink by 5 % at the bottom of the dip */
+  --press-depth-segment: 0.04; /* segment labels shrink by 4 % (luau:6816) */
+  --press-fade: 0.35; /* rows, cards and tabs fade by 35 % instead of dipping */
+  --dur-roll: 420ms; /* each letter of a rolling label */
+  --roll-stagger: 11ms; /* between letters */
+  --roll-rise: 1.25em; /* how far a letter travels (size * 1.25) */
+  --dur-live-pulse: 1.8s; /* the Live dot's ring (luau:4638) */
+
+  /* Sections (TIMING_DEF, luau:367-381): dur, delay, stagger, curve. */
+  --t-cards-dur: 750ms; --t-cards-delay: 100ms; --t-cards-stagger: 60ms; --t-cards-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-live-dur: 600ms; --t-live-delay: 0ms; --t-live-stagger: 40ms; --t-live-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-list-dur: 500ms; --t-list-delay: 50ms; --t-list-stagger: 30ms; --t-list-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --t-screen-dur: 550ms; --t-screen-delay: 0ms; --t-screen-stagger: 50ms; --t-screen-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-tabs-dur: 450ms; --t-tabs-delay: 0ms; --t-tabs-stagger: 60ms; --t-tabs-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --t-momentum-dur: 900ms; --t-momentum-delay: 100ms; --t-momentum-stagger: 60ms; --t-momentum-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-events-dur: 500ms; --t-events-delay: 150ms; --t-events-stagger: 40ms; --t-events-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-stats-dur: 900ms; --t-stats-delay: 150ms; --t-stats-stagger: 60ms; --t-stats-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-lineup-dur: 600ms; --t-lineup-delay: 100ms; --t-lineup-stagger: 140ms; --t-lineup-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-squad-dur: 500ms; --t-squad-delay: 300ms; --t-squad-stagger: 30ms; --t-squad-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-player-dur: 720ms; --t-player-delay: 120ms; --t-player-stagger: 50ms; --t-player-ease: cubic-bezier(0.32, 0, 0.1, 1);
+  --t-toast-dur: 600ms; --t-toast-delay: 450ms; --t-toast-stagger: 200ms; --t-toast-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-goal-dur: 700ms; --t-goal-delay: 100ms; --t-goal-stagger: 550ms; --t-goal-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-follow-dur: 500ms; --t-follow-delay: 0ms; --t-follow-stagger: 60ms; --t-follow-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ---------------------------------------------------------------
+   * Radii (the rad argument of glass()/rrect() across the Lua)
+   * ------------------------------------------------------------- */
+  --r-4: 4px; /* small outlined badges: +N stoppage, calendar (luau:4646, 4737) */
+  --r-12: 12px; /* 24 px chips: Kick-off, goal minute (luau:4361, 5159) */
+  --r-14: 14px; /* 28 px tags, table rows, segment thumb (luau:5737, 6081, 6812) */
+  --r-15: 15px; /* 30 px chip (luau:6117) */
+  --r-16: 16px; /* toasts, insight rows (luau:5261, 5581) */
+  --r-18: 18px; /* player match card (luau:6046) */
+  --r-20: 20px; /* momentum chart, round buttons (luau:3452, 4913) */
+  --r-22: 22px; /* live cards, goal toast (luau:5628, 6222) */
+  --r-24: 24px; /* follow card (luau:4079, 4286) */
+  --r-30: 30px; /* desktop panes (luau:6773) */
+  --r-pill: 999px; /* any capsule: radius = height / 2 */
+
+  /* ---------------------------------------------------------------
+   * Type (luau:1510-1632). Hanken Grotesk, baked in the Lua as five faces:
+   *   L = 300, R = 400, M = 500, S = 600, B = 700.
+   * Sizes are the ones the Lua draws text at; tracking is in em (the Lua's track * 1000 units).
+   * Line height is CSS normal (bc(), luau:1630).
+   * ------------------------------------------------------------- */
+  --font-sans: 'Hanken Grotesk', system-ui, sans-serif;
+  --fw-l: 300;
+  --fw-r: 400;
+  --fw-m: 500;
+  --fw-s: 600;
+  --fw-b: 700;
+
+  --fs-8: 8px;
+  --fs-10p5: 10.5px;
+  --fs-11: 11px;
+  --fs-11p5: 11.5px;
+  --fs-12: 12px;
+  --fs-12p5: 12.5px;
+  --fs-13: 13px;
+  --fs-13p5: 13.5px;
+  --fs-14: 14px;
+  --fs-15: 15px;
+  --fs-16: 16px;
+  --fs-17: 17px;
+  --fs-20: 20px;
+  --fs-22: 22px;
+  --fs-25: 25px;
+  --fs-26: 26px;
+  --fs-30: 30px;
+  --fs-40: 40px;
+  --fs-46: 46px;
+  --fs-60: 60px;
+  --fs-86: 86px;
+
+  --track-label: 0.16em; /* uppercase labels: lab() */
+  --track-loose: 0.02em; /* clocks, initials */
+  --track-0: 0em;
+  --track-1: -0.01em; /* names, day tabs */
+  --track-2: -0.02em;
+  --track-3: -0.03em; /* titles */
+  --track-35: -0.035em; /* hero team name */
+  --track-4: -0.04em; /* big kick-off time */
+  --track-45: -0.045em; /* wordmark */
+  --track-5: -0.05em; /* light score numerals */
+
+  /* Roles: face, size and tracking the Lua pairs together. Use with font: and letter-spacing:. */
+  --type-label: var(--fw-m) var(--fs-10p5) / normal var(--font-sans); /* + --track-label, uppercase */
+  --type-tab: var(--fw-s) var(--fs-10p5) / normal var(--font-sans); /* + --track-label, uppercase */
+  --type-button: var(--fw-s) var(--fs-13) / normal var(--font-sans);
+  --type-tag: var(--fw-m) var(--fs-12p5) / normal var(--font-sans);
+  --type-body: var(--fw-r) var(--fs-12) / normal var(--font-sans);
+  --type-row: var(--fw-m) var(--fs-15) / normal var(--font-sans); /* + --track-1 */
+  --type-name: var(--fw-s) var(--fs-16) / normal var(--font-sans); /* + --track-1 */
+  --type-heading: var(--fw-s) var(--fs-17) / normal var(--font-sans); /* + --track-1 */
+  --type-empty: var(--fw-r) var(--fs-20) / normal var(--font-sans); /* + --track-2 */
+  --type-title: var(--fw-m) var(--fs-22) / normal var(--font-sans); /* + --track-3 */
+  --type-wordmark: var(--fw-m) var(--fs-25) / normal var(--font-sans); /* + --track-45 */
+  --type-hero: var(--fw-m) var(--fs-26) / normal var(--font-sans); /* + --track-35 */
+  --type-time: var(--fw-l) var(--fs-40) / normal var(--font-sans); /* + --track-4 */
+  --type-goal: var(--fw-b) var(--fs-46) / normal var(--font-sans); /* + --track-2 */
+  --type-score: var(--fw-l) var(--fs-60) / normal var(--font-sans); /* + --track-5 */
+  --type-score-xl: var(--fw-l) var(--fs-86) / normal var(--font-sans); /* + --track-5 */
+
+  /* ---------------------------------------------------------------
+   * Layout
+   * ------------------------------------------------------------- */
+  --gutter: 18px; /* content inset from a screen's edges (x = 18 .. 372) */
+  --hit-min: 40px; /* round buttons and tab rows */
+}
+
+/* Reduced motion: transitions finish at once (1 ms, so transitionend still fires). */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-hover-in: 1ms;
+    --dur-hover-out: 1ms;
+    --dur-press: 1ms;
+    --dur-release: 1ms;
+    --dur-roll: 1ms;
+    --roll-stagger: 0ms;
+    --t-tabs-dur: 1ms;
+    --t-list-dur: 1ms;
+  }
+}
