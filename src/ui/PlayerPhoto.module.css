@@ -1,0 +1,36 @@
+/* A face standing on the bottom of a width × width box (riseFace, luau:3654). */
+.photo {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
+}
+/* the face crop: the box's width, and on below its bottom edge for the holder to clip */
+.crop {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+.crop img {
+  position: absolute;
+  max-width: none;
+  user-select: none;
+}
+.disc {
+  position: absolute;
+}
+
+/* photoTile (luau:3672): the glass clips the light and the shoulders; its rim is drawn over both */
+.tile {
+  display: inline-block;
+  flex: none;
+  overflow: hidden;
+  vertical-align: middle;
+}
+.inTile {
+  position: absolute;
+  left: 0;
+  top: 0;
+}

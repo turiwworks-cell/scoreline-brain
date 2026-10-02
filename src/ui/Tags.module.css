@@ -1,0 +1,19 @@
+/* Substituted off, on the pitch (subOffTag, luau:3528): 16 px red capsule,
+ * 5 px in, an 8 px arrow, 3 px, the minute in B 9.5, 6 px out. */
+.subOff {
+  display: inline-flex;
+  align-items: center;
+  height: 16px;
+  padding: 0 6px 0 5px;
+  border-radius: 8px;
+  background: var(--c-red);
+  color: var(--c-text);
+  font: var(--fw-b) 9.5px / 1 var(--font-sans);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.subOffArrow {
+  flex: none;
+  margin-right: 3px;
+  overflow: visible;
+}

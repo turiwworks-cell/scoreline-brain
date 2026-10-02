@@ -1,5 +1,7 @@
-import { useState, type CSSProperties, type ReactNode } from 'react';
-import { Button, Glass, LiveDot, Pill, RoundButton, SoftLight, spotRadius, Tabs } from '../../ui';
+import { useState, type CSSProperties } from 'react';
+import { Button, Glass, Icon, LiveDot, Pill, RoundButton, SoftLight, spotRadius, Tabs, Tag } from '../../ui';
+import { Part7 } from './Part7';
+import { Section } from './Section';
 import styles from './DevKit.module.css';
 
 /*
@@ -63,16 +65,6 @@ const DESK_TABS = [
 
 const v = (o: Record<string, string | number>) => o as CSSProperties;
 
-function Section({ title, note, children, wide }: { title: string; note?: string; children: ReactNode; wide?: boolean }) {
-  return (
-    <section className={wide ? `${styles.section} ${styles.wide}` : styles.section} aria-label={title}>
-      <h2 className={styles.head}>{title}</h2>
-      {note && <p className={styles.note}>{note}</p>}
-      {children}
-    </section>
-  );
-}
-
 function MenuGlyph() {
   return (
     <span className={styles.menu} aria-hidden="true">
@@ -80,18 +72,6 @@ function MenuGlyph() {
       <span />
     </span>
   );
-}
-
-function StarGlyph() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-      <path d="M8 1.2l1.95 4.3 4.65.45-3.5 3.1 1.02 4.6L8 11.3l-4.12 2.35L4.9 9.05 1.4 5.95l4.65-.45z" fill="#a58fe6" />
-    </svg>
-  );
-}
-
-function Ball({ size = 14 }: { size?: number }) {
-  return <span className={styles.ball} style={{ width: size, height: size }} aria-hidden="true" />;
 }
 
 export function DevKit() {
@@ -103,8 +83,8 @@ export function DevKit() {
   return (
     <main className={styles.kit} data-testid="dev-kit">
       <header className={styles.top}>
-        <h1 className={styles.title}>Kit · Part 6 materials</h1>
-        <p className={styles.note}>Tokens from tokens.css, recipes from materials.css, components from src/ui.</p>
+        <h1 className={styles.title}>Kit · Parts 6 and 7</h1>
+        <p className={styles.note}>Tokens from tokens.css, recipes from materials.css, components and SVG primitives from src/ui.</p>
       </header>
 
       <div className={styles.grid}>
@@ -179,7 +159,7 @@ export function DevKit() {
             <span className={styles.cardEyebrow}>Lionel</span>
             <span className={styles.cardName}>Messi</span>
             <span className={styles.cardSub}>vs France</span>
-            <Pill size="sm" thin icon={<Ball size={14} />}>
+            <Pill size="sm" thin icon={<Tag kind="goal" size={14} />}>
               39′
             </Pill>
           </Glass>
@@ -246,7 +226,7 @@ export function DevKit() {
               <MenuGlyph />
             </RoundButton>
             <RoundButton aria-label="Follow">
-              <StarGlyph />
+              <Icon name="follow" />
             </RoundButton>
             <Button label="Pressed" style={v({ '--dip': 1, '--mx': '40px', '--my': '18px' })} />
             <Button label="Change" height={30} />
@@ -259,13 +239,13 @@ export function DevKit() {
             <Pill size="label">Half-time · 1–0</Pill>
           </div>
           <div className={styles.row}>
-            <Pill size="sm" icon={<Ball size={14} />}>
+            <Pill size="sm" icon={<Tag kind="goal" size={14} />}>
               39′
             </Pill>
-            <Pill size="md" icon={<Ball size={16} />}>
+            <Pill size="md" icon={<Tag kind="goal" size={16} />}>
               1 goal
             </Pill>
-            <Pill size="lg" icon={<span className={styles.sub} />}>
+            <Pill size="lg" icon={<Tag kind="subOut" size={16} />}>
               Off 72′
             </Pill>
           </div>
@@ -286,6 +266,8 @@ export function DevKit() {
           <Tabs aria-label="Insights" variant="segment" items={DESK_TABS} value={desk} onChange={setDesk} className={styles.segment} />
         </Section>
       </div>
+
+      <Part7 />
     </main>
   );
 }

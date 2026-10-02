@@ -1,0 +1,28 @@
+/*
+ * ratingTag (luau:3553): height round(1.6 × size), radius 0.32 × height, B at size,
+ * text 0.55 × size from each end; with the star, the text moves on by 1.05 × size and
+ * the star (radius 0.42 × size) is centred 0.4 × size after where the text would start.
+ */
+.badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: var(--h);
+  padding: 0 calc(var(--fs) * 0.55);
+  border-radius: calc(var(--h) * 0.32);
+  background: var(--bg);
+  font: var(--fw-b) var(--fs) / 1 var(--font-sans);
+  white-space: nowrap;
+  vertical-align: middle;
+  flex: none;
+}
+.best {
+  padding-left: calc(var(--fs) * 1.6);
+}
+.star {
+  position: absolute;
+  left: calc(var(--fs) * 0.53);
+  top: calc(50% - var(--fs) * 0.42);
+  width: calc(var(--fs) * 0.84);
+  height: calc(var(--fs) * 0.84);
+}
