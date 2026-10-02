@@ -13,8 +13,15 @@ const card = (page: Page, id: number) => page.locator(`[data-focus-key="match-${
 const chip = (page: Page, key: string) => page.locator(`[data-focus-key="chip-${key}"]`);
 const screenOf = (page: Page, name: string) => page.locator(`[data-screen="${name}"][data-present="true"]`);
 const scrollTop = (page: Page, name: string) => screenOf(page, name).evaluate((el) => el.scrollTop);
+const titled = (page: Page, name: string, title: string) => screenOf(page, name).getByRole('heading', { level: 1, name: title });
+// a tab click that doesn't scroll the pane first (a Playwright click may scroll the target into view)
+const pressTab = (page: Page, screen: string, name: string) => screenOf(page, screen).getByRole('tab', { name }).evaluate((el: HTMLElement) => el.click());
 
-/** No flight running, no copy left, no screen still leaving. */
+/**
+ * No flight running, no copy left, no screen still leaving. It can't tell a navigation that hasn't
+ * rendered yet from one that has finished (both look idle), so after a click or back/forward
+ * first wait for the screen the navigation shows, then call this.
+ */
 async function settled(page: Page) {
   await expect
     .poll(() => page.evaluate(() => document.querySelectorAll('[data-shared-copy], [data-shared-flying], [data-present="false"]').length), { timeout: 5000 })
@@ -122,18 +129,22 @@ test('each pane keeps its own scroll', async ({ page }, info) => {
     const listY = await scrollTop(page, 'list');
     expect(listY).toBeGreaterThan(0);
     await card(page, 7).click();
+    await expect(titled(page, 'match', 'Ivory Coast – Mali')).toBeVisible();
     await settled(page);
     expect(await scrollTop(page, 'match')).toBe(0);
     await screenOf(page, 'match').evaluate((el) => el.scrollTo(0, 120));
     await page.waitForTimeout(100);
     // a tab switch leaves the scroll alone
-    await screenOf(page, 'match').getByRole('tab', { name: 'Stats' }).click();
+    await pressTab(page, 'match', 'Stats');
+    await expect(page).toHaveURL(/\/match\/7\/stats\?demo$/);
     await expect.poll(() => scrollTop(page, 'match')).toBe(120);
 
     await page.goBack();
+    await expect(screenOf(page, 'match')).toHaveCount(0);
     await settled(page);
     await expect.poll(() => scrollTop(page, 'list')).toBe(listY);
     await page.goForward();
+    await expect(titled(page, 'match', 'Ivory Coast – Mali')).toBeVisible();
     await settled(page);
     await expect.poll(() => scrollTop(page, 'match')).toBe(120);
   } else {
@@ -144,16 +155,19 @@ test('each pane keeps its own scroll', async ({ page }, info) => {
     });
     await screenOf(page, 'match').evaluate((el) => el.scrollTo(0, 120));
     await page.waitForTimeout(100);
-    await screenOf(page, 'match').getByRole('tab', { name: 'Stats' }).click();
+    await pressTab(page, 'match', 'Stats');
+    await expect(page).toHaveURL(/\/match\/1\/stats\?demo$/);
     await expect.poll(() => scrollTop(page, 'match')).toBe(120);
 
     // another match starts at the top; the list doesn't move
     await card(page, 2).click();
+    await expect(titled(page, 'match', 'England – Brazil')).toBeVisible();
     await settled(page);
     expect(await scrollTop(page, 'match')).toBe(0);
     expect(await scrollTop(page, 'list')).toBe(listBefore);
 
     await page.goBack();
+    await expect(titled(page, 'match', 'France – Argentina')).toBeVisible();
     await settled(page);
     await expect.poll(() => scrollTop(page, 'match')).toBe(120);
   }
@@ -198,6 +212,7 @@ test('card ↔ hero and face ↔ bust fly both ways', async ({ page }) => {
   await flown(page);
 
   await card(page, 2).click();
+  await expect(titled(page, 'match', 'England – Brazil')).toBeVisible();
   await settled(page);
   let f = await flown(page);
   for (const part of ['home', 'score', 'away']) expect(f.ends).toEqual(expect.arrayContaining([`match:2:${part}@card`, `match:2:${part}@hero`]));
@@ -206,6 +221,7 @@ test('card ↔ hero and face ↔ bust fly both ways', async ({ page }) => {
   await expect(screenOf(page, 'match').locator('[data-shared-end="hero"]').first()).toBeVisible();
 
   await page.goBack();
+  await expect(titled(page, 'match', 'England – Brazil')).toHaveCount(0);
   await settled(page);
   f = await flown(page);
   expect(f.ends).toEqual(expect.arrayContaining(['match:2:score@hero', 'match:2:score@card']));
@@ -213,12 +229,14 @@ test('card ↔ hero and face ↔ bust fly both ways', async ({ page }) => {
   await open(page, '/match/1/lineup?demo');
   await flown(page);
   await chip(page, 'fra-10').click();
+  await expect(titled(page, 'player', 'Kylian Mbappé')).toBeVisible();
   await settled(page);
   f = await flown(page);
   expect(f.ends).toEqual(expect.arrayContaining(['player:fra:10:photo@face', 'player:fra:10:photo@bust']));
   await expect(screenOf(page, 'player').locator('[data-shared-end="bust"]')).toBeVisible();
 
   await page.goBack();
+  await expect(screenOf(page, 'player')).toHaveCount(0);
   await settled(page);
   f = await flown(page);
   expect(f.ends).toEqual(expect.arrayContaining(['player:fra:10:photo@bust', 'player:fra:10:photo@face']));
