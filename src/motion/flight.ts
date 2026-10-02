@@ -80,13 +80,13 @@ export function flightCount(): number {
   return active.size;
 }
 
-/** The element's box as if no ancestor were translated: where it rests once its layer has arrived. */
+/** The element's box as if neither it nor any ancestor were translated: where it rests once its layer has arrived. */
 export function restingBox(el: Element): Box {
   const r = el.getBoundingClientRect();
   let dx = 0;
   let dy = 0;
   if (typeof DOMMatrixReadOnly === 'function') {
-    for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+    for (let a: Element | null = el; a && a !== document.body; a = a.parentElement) {
       const t = getComputedStyle(a).transform;
       if (t && t !== 'none') {
         const m = new DOMMatrixReadOnly(t);
@@ -221,7 +221,38 @@ function copyOf(el: HTMLElement, size: Size): HTMLElement {
     img.loading = 'eager';
     img.decoding = 'sync';
   }
+  reId(c);
   return c;
+}
+
+let copies = 0;
+
+/**
+ * Gives the copy's ids new names and points its own `url(#…)` and `href="#…"` at them. Otherwise
+ * a crest's clip path in the copy resolves to the original's, which is hidden while it flies, and
+ * a hidden clip path clips everything away.
+ */
+function reId(c: Element) {
+  const named = c.querySelectorAll('[id]');
+  if (!named.length) return;
+  copies += 1;
+  const map = new Map<string, string>();
+  for (const el of named) {
+    const id = `${el.id}-copy${copies}`;
+    map.set(el.id, id);
+    el.id = id;
+  }
+  const swap = (v: string) => v.replace(/url\(#([^)]+)\)|^#(.+)$/g, (all, a: string | undefined, b: string | undefined) => {
+    const to = map.get(a ?? b ?? '');
+    return to ? (a ? `url(#${to})` : `#${to}`) : all;
+  });
+  for (const el of [c, ...c.querySelectorAll('*')]) {
+    for (const attr of [...el.attributes]) {
+      if (attr.name === 'id' || !attr.value.includes('#')) continue;
+      const v = swap(attr.value);
+      if (v !== attr.value) el.setAttribute(attr.name, v);
+    }
+  }
 }
 
 function overlay(): HTMLDivElement {
