@@ -1,7 +1,17 @@
 import { describe, expect, it, vi } from 'vitest';
 import { parseEvent, parseFeed, type LiveEvent } from '../domain';
 import { createScorelineStore, MAX_MOMENTS } from './store';
-import { selectActions, selectLiveMatchIds, selectMatch, selectMatchIdsByDay, selectScore, selectSync, selectTeam } from './selectors';
+import {
+  selectActions,
+  selectFeaturedMatchId,
+  selectLiveMatchIds,
+  selectMatch,
+  selectMatchIdOfTeam,
+  selectMatchIdsByDay,
+  selectScore,
+  selectSync,
+  selectTeam,
+} from './selectors';
 
 const T0 = 1_760_000_000_000;
 
@@ -150,5 +160,25 @@ describe('selectors', () => {
     expect(liveIds).toEqual([501]);
     actions.applyFeed(feed({}, { status: 'finished' }), T0 + 15_000);
     expect(selectLiveMatchIds(store.getState())).toEqual([]);
+  });
+
+  it('the featured match: flagged, else live, else today, else the first', () => {
+    const store = createScorelineStore();
+    expect(selectFeaturedMatchId(store.getState())).toBeUndefined();
+    store.getState().actions.applyFeed(feed(), T0);
+    expect(selectFeaturedMatchId(store.getState())).toBe(501);
+    store.getState().actions.applyFeed(feed({}, { status: 'scheduled' }), T0 + 15_000);
+    // nothing live: today's match
+    expect(selectFeaturedMatchId(store.getState())).toBe(501);
+  });
+
+  it('a match the team plays in, for a player opened cold', () => {
+    const store = createScorelineStore();
+    store.getState().actions.applyFeed(feed(), T0);
+    const s = store.getState();
+    expect(selectMatchIdOfTeam('che')(s)).toBe(501);
+    expect(selectMatchIdOfTeam('mci')(s)).toBe(502);
+    expect(selectMatchIdOfTeam('xyz')(s)).toBeUndefined();
+    expect(selectMatchIdOfTeam('che')).toBe(selectMatchIdOfTeam('che'));
   });
 });

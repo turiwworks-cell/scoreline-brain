@@ -27,6 +27,12 @@ export function createNavActions(router: DataRouter): NavActions {
     const loc = router.state.location;
     return { loc, href: loc.pathname + loc.search, nav: parseNav(loc.pathname, loc.search, loc.state) };
   };
+  // a push still on its way (route loaders make navigations async) counts too: a second tap on
+  // the same card before the first lands doesn't cancel and restart it
+  const pending = () => {
+    const n = router.state.navigation.location;
+    return n ? n.pathname + n.search : null;
+  };
   const pressed = (from: Element | null | undefined) => {
     if (from !== undefined) return from;
     const a = typeof document === 'undefined' ? null : document.activeElement;
@@ -37,7 +43,7 @@ export function createNavActions(router: DataRouter): NavActions {
     openMatch(id, opts = {}) {
       const { loc, href, nav } = here();
       const to = hrefOf({ list: nav.list, match: { id, tab: opts.tab ?? DEFAULT_TAB } }, loc.search);
-      if (to === href) return;
+      if (to === href || to === pending()) return;
       rememberTrigger(loc.key, pressed(opts.from));
       void router.navigate(to);
     },
@@ -56,7 +62,7 @@ export function createNavActions(router: DataRouter): NavActions {
     openPlayer(player, opts = {}) {
       const { loc, href, nav } = here();
       const to = hrefOf({ list: nav.list, player }, loc.search);
-      if (to === href) return;
+      if (to === href || to === pending()) return;
       rememberTrigger(loc.key, pressed(opts.from));
       const state: NavHistoryState = opts.under ? { under: opts.under } : {};
       void router.navigate(to, { state });

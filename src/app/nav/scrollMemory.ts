@@ -33,31 +33,35 @@ const STORAGE_KEY = 'scoreline:scroll';
 export const SCROLL_ENTRIES = 100;
 
 export function createScrollMemory(storage: Store | null): ScrollMemory {
-  let map: Record<string, Partial<Record<ScrollPane, number>>> = {};
+  // a Map keeps insertion order for every key (an object would put digit-only keys first)
+  let map = new Map<string, Partial<Record<ScrollPane, number>>>();
   try {
     const raw = storage?.getItem(STORAGE_KEY);
-    if (raw) map = JSON.parse(raw) as typeof map;
+    const entries: unknown = raw ? JSON.parse(raw) : [];
+    if (Array.isArray(entries)) map = new Map(entries as [string, Partial<Record<ScrollPane, number>>][]);
   } catch {
-    map = {};
+    map = new Map();
   }
   let timer: ReturnType<typeof setTimeout> | undefined;
   const flush = () => {
     clearTimeout(timer);
     timer = undefined;
     try {
-      storage?.setItem(STORAGE_KEY, JSON.stringify(map));
+      storage?.setItem(STORAGE_KEY, JSON.stringify([...map]));
     } catch {
       // storage full or blocked: positions still work for this page's life
     }
   };
   return {
-    get: (key, pane) => map[key]?.[pane],
+    get: (key, pane) => map.get(key)?.[pane],
     set(key, pane, y) {
-      const entry = { ...map[key], [pane]: Math.max(0, Math.round(y)) };
-      delete map[key];
-      map[key] = entry;
-      const keys = Object.keys(map);
-      for (let i = 0; i < keys.length - SCROLL_ENTRIES; i++) delete map[keys[i] as string];
+      const entry = { ...map.get(key), [pane]: Math.max(0, Math.round(y)) };
+      map.delete(key);
+      map.set(key, entry);
+      for (const old of map.keys()) {
+        if (map.size <= SCROLL_ENTRIES) break;
+        map.delete(old);
+      }
       if (storage && timer === undefined) timer = setTimeout(flush, 250);
     },
     flush,

@@ -1,7 +1,7 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useNavigationType } from 'react-router';
+import { useLocation, useNavigate, useNavigationType } from 'react-router';
 import { selectFeaturedMatchId, selectMatchIdOfTeam, useScoreline } from '../../store';
-import { parseNav } from '../nav/url';
+import { canonicalPath, parseNav } from '../nav/url';
 import { useLayoutMode } from './layoutMode';
 import { ListPane } from './ListPane';
 import { PhoneStack } from './PhoneStack';
@@ -27,6 +27,14 @@ export function Shell() {
   const featured = useScoreline(selectFeaturedMatchId);
   const teamMatch = useScoreline(selectMatchIdOfTeam(nav.player?.team ?? ''));
   const r = useMemo(() => resolve(nav, layout, { featured, teamMatch }), [nav, layout, featured, teamMatch]);
+
+  // one spelling per screen: `/match/7` becomes `/match/7/facts` before it paints (the parse
+  // above already reads both the same, so nothing changes on screen)
+  const navigate = useNavigate();
+  const canonical = canonicalPath(location.pathname);
+  useLayoutEffect(() => {
+    if (canonical !== null) void navigate(canonical + location.search, { replace: true, state: location.state });
+  }, [canonical, location.search, location.state, navigate]);
 
   const root = useRef<HTMLElement>(null);
   const title = useScreenTitle(nav);

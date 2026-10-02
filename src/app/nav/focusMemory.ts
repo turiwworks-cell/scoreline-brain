@@ -29,7 +29,9 @@ export function triggerFor(locationKey: string): HTMLElement | null {
   if (!t) return null;
   if (t.el.isConnected) return t.el as HTMLElement;
   if (!t.focusKey) return null;
-  return document.querySelector<HTMLElement>(`[data-focus-key="${CSS.escape(t.focusKey)}"]`);
+  // the one on a screen that is staying, if a leaving screen still holds another
+  const all = [...document.querySelectorAll<HTMLElement>('[data-focus-key]')].filter((el) => el.dataset.focusKey === t.focusKey);
+  return all.find((el) => !el.closest('[data-present="false"]')) ?? all[0] ?? null;
 }
 
 /** The element pressed for the navigation now being shown, once. */

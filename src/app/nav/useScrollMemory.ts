@@ -26,7 +26,12 @@ export function useScrollMemory(ref: RefObject<HTMLElement | null>, pane: Scroll
     const plan = scrollPlan({ pop: navType === 'POP', saved: memory.get(location.key, pane), contentChanged: shown.current !== contentKey });
     shown.current = contentKey;
     if (plan.kind === 'top') el.scrollTop = 0;
-    if (plan.kind !== 'restore') return;
+    if (plan.kind !== 'restore') {
+      // the new entry starts where the pane is now: a tab switch or a day change replaces the
+      // entry (a new key), and back/forward to it must find this position, not nothing
+      memory.set(location.key, pane, el.scrollTop);
+      return;
+    }
     // content may still be growing: keep at it for a few frames, until the user scrolls
     let frames = 0;
     let raf = 0;

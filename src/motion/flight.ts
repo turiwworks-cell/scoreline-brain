@@ -9,7 +9,7 @@ import { timing, type TimingKey } from './tokens';
  * Why not Motion's `layoutId`: it shows only the newest-mounted end and hides the other. Here both
  * ends stay mounted and, on tablet and desktop, both stay visible (the open match's card is still
  * in the list beside its hero), and a list re-render that remounts a card would take the shared
- * element away from the hero. So navigation decides when a flight happens (app/layout/flights.ts),
+ * element away from the hero. So navigation decides when a flight happens (planFlights in app/layout/resolve.ts),
  * and this module runs it:
  *
  * 1. The destination is already mounted at its final place (a layout effect, before paint).
