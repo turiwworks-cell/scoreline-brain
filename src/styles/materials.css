@@ -58,6 +58,8 @@
  * ------------------------------------------------------------------- */
 .m-glass {
   --glass-body: 0.96;
+  /* each pane's own tint only: never inherited from a tinted pane it sits in (Glass sets it inline) */
+  --glass-tint: initial;
   --glass-fill: rgb(from var(--c-glass) r g b / var(--glass-body));
   /* HALO (0.9) is folded into each peak: pane 0.14, rim 0.6, glow 0.3 (luau:3277-3298) */
   --spot-a: calc(var(--lit-eff, 0) * 0.126);

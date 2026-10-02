@@ -253,6 +253,14 @@
 .thinPane {
   padding: 12px 14px 4px;
 }
+.tintedCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 14px 14px 6px 18px;
+}
 .swatchPane {
   width: 80px;
   height: 52px;

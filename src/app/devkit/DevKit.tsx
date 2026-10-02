@@ -193,6 +193,12 @@ export function DevKit() {
             <Glass radius={20} className={styles.swatchPane} />
             <Glass radius={14} tint="#0b2b1d" className={styles.swatchPane} />
           </div>
+          <Glass radius={16} tint="#0b2b1d" className={styles.tintedCard} data-testid="tinted-card">
+            <span className={styles.cardSub}>Tinted pane, plain glass pill inside</span>
+            <Pill size="md" data-testid="nested-pill">
+              Untinted
+            </Pill>
+          </Glass>
         </Section>
 
         <Section title="SoftLight" note="(1 − t²)³ fall-off over 25 stops, core mixed toward white (luau:3310-3336). No banding, no noise.">
