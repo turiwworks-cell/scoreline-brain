@@ -10,6 +10,7 @@ export { IconSprite } from './IconSprite';
 export { MatchClock, type ClockMatch, type MatchClockProps } from './MatchClock';
 export { LiveDot, Pill, type PillProps } from './Pill';
 export { KitDisc, PhotoTile, PlayerPhoto, type KitDiscProps, type PhotoTileProps, type PlayerPhotoProps } from './PlayerPhoto';
+export { PHOTO_ROOT, PHOTO_SIZES, photoSources, type PhotoKind, type PhotoSources } from './photos';
 export { ratingTone, type RatingTone } from './rating';
 export { RatingBadge, type RatingBadgeProps } from './RatingBadge';
 export { RollLabel } from './RollLabel';

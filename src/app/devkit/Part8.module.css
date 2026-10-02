@@ -1,0 +1,81 @@
+.partHead {
+  margin: 56px 0 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--c-hair);
+}
+.partTitle {
+  margin: 0;
+  font: var(--type-title);
+  letter-spacing: var(--track-3);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(354px, 100%), 1fr));
+  gap: 40px 46px;
+  align-items: start;
+}
+
+.caption {
+  font: var(--type-body);
+  color: var(--c-muted);
+}
+
+/* ----- every squad photo ----- */
+.squad {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 52px);
+  gap: 10px 8px;
+}
+.squad li {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+
+/* ----- PlayerPhoto at its sizes ----- */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.card {
+  display: inline-block;
+  overflow: hidden;
+}
+
+/* ----- each kind on its own ----- */
+.kinds {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(354px, 100%), 1fr));
+  gap: 18px 46px;
+}
+.kinds li {
+  display: grid;
+  gap: 6px;
+}
+.kindRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 6px;
+  min-width: 0;
+}
+.kindRow picture {
+  display: block;
+  flex: none;
+  background: var(--c-glass);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.raw {
+  display: block;
+}

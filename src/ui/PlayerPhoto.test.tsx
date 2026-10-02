@@ -50,6 +50,20 @@ test('a photo is the face crop of the bust, standing on the bottom; a failed loa
   expect(container.querySelector('img')).toBeTruthy();
 });
 
+test('with sources, the bust is a <picture>: AVIF ahead of WebP, each sized to the drawn width', () => {
+  const sources = [{ type: 'image/avif', srcSet: '/a@1x.avif 288w, /a@2x.avif 576w' }];
+  const { container } = render(<PlayerPhoto team={arg} n={10} width={84} src="/a@1x.webp" srcSet="/a@1x.webp 288w, /a@2x.webp 576w" sources={sources} />);
+  const picture = container.querySelector('picture')!;
+  const source = picture.querySelector('source')!;
+  expect(source.getAttribute('type')).toBe('image/avif');
+  expect(source.getAttribute('sizes')).toBe('144px');
+  const img = picture.querySelector('img')!;
+  expect(img.getAttribute('sizes')).toBe('144px');
+  expect(img.getAttribute('src')).toBe('/a@1x.webp');
+  fireEvent.error(img);
+  expect(container.querySelector('picture')).toBeNull();
+});
+
 test('the tile is a glass pane of radius 0.3 s, lit from below in the team colour', () => {
   const { container } = render(<PhotoTile team={arg} n={10} size={52} />);
   const tile = container.firstElementChild as HTMLElement;

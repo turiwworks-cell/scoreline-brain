@@ -28,3 +28,16 @@ test('the kit shows every Part 7 primitive, and each team-coloured one for every
     expect(row.querySelectorAll(`[data-kit-disc="${t.id}"]`), t.id).toHaveLength(3);
   }
 });
+
+test('the kit shows the Part 8 photos: every France and Argentina player, and each kind', () => {
+  render(<DevKit />);
+  for (const name of ['Squad photos', 'Photos in place', 'Bust, head, frost']) {
+    expect(screen.getByRole('region', { name })).toBeTruthy();
+  }
+  for (const team of ['fra', 'arg']) {
+    const list = screen.getByTestId(`photos-${team}`);
+    expect(list.querySelectorAll('[data-photo="bust"]'), team).toHaveLength(26);
+    expect(list.querySelector('source[type="image/avif"]')!.getAttribute('srcset')).toContain(`/img/players/${team}/1-bust@2x.avif 576w`);
+  }
+  expect(screen.getAllByRole('img', { name: 'Lionel Scaloni, frost' })).toHaveLength(2);
+});
