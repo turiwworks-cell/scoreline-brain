@@ -171,3 +171,10 @@ describe('RatingBadge', () => {
     expect(el.getAttribute('aria-label')).toBe('Rating 8.3, best in the match');
   });
 });
+
+describe('accessible names', () => {
+  test('event tags name the real counts, not the capped ones', () => {
+    const { container } = render(<EventTags goals={4} assists={1} />);
+    expect(container.querySelector('svg')!.getAttribute('aria-label')).toBe('4 goals, 1 assist');
+  });
+});

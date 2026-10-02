@@ -12,7 +12,8 @@ function schedule() {
   timer = setTimeout(() => {
     timer = undefined;
     for (const l of [...listeners]) l();
-    if (listeners.size > 0) schedule();
+    // a listener may have subscribed (and so scheduled) already
+    if (listeners.size > 0 && timer === undefined) schedule();
   }, 1000 - (Date.now() % 1000) + 5);
 }
 

@@ -29,7 +29,7 @@ export function RatingBadge({ value, best, size = 10, className, style, ...rest 
   } as CSSProperties;
   const cls = [styles.badge, best && styles.best, className].filter(Boolean).join(' ');
   return (
-    <span className={cls} style={st} aria-label={`Rating ${label}${best ? ', best in the match' : ''}`} {...rest}>
+    <span className={cls} style={st} role="img" aria-label={`Rating ${label}${best ? ', best in the match' : ''}`} {...rest}>
       {best && (
         <svg className={styles.star} viewBox="-1 -1 2 2" aria-hidden="true" focusable="false">
           <path d={UNIT_PATHS.star} fill="currentColor" />

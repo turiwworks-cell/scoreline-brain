@@ -60,8 +60,9 @@ export const EventTags = memo(function EventTags({ goals, assists, yellow, red, 
   if (list.length === 0) return null;
   const { xs, width } = tagLayout(list, r);
   const parts = [
-    goals ? `${Math.min(goals, 3)} ${goals === 1 ? 'goal' : 'goals'}` : '',
-    assists ? `${Math.min(assists, 3)} ${assists === 1 ? 'assist' : 'assists'}` : '',
+    // the real counts: only the drawing stops at 3
+    goals ? `${goals} ${goals === 1 ? 'goal' : 'goals'}` : '',
+    assists ? `${assists} ${assists === 1 ? 'assist' : 'assists'}` : '',
     yellow ? 'yellow card' : '',
     red ? 'red card' : '',
   ].filter(Boolean);
@@ -101,7 +102,7 @@ export type SubOffTagProps = HTMLAttributes<HTMLSpanElement> & { minute: number 
 /** Substituted off, on the pitch: a red capsule with the arrow and the minute (subOffTag, luau:3528). */
 export function SubOffTag({ minute, className, ...rest }: SubOffTagProps) {
   return (
-    <span className={className ? `${styles.subOff} ${className}` : styles.subOff} aria-label={`Off ${minute}'`} {...rest}>
+    <span className={className ? `${styles.subOff} ${className}` : styles.subOff} role="img" aria-label={`Off ${minute}'`} {...rest}>
       <svg className={styles.subOffArrow} width={8} height={16} viewBox="-4 -8 8 16" aria-hidden="true" focusable="false">
         <path d={ICON_SRC.arrowL} transform="scale(8.4)" fill="none" stroke="currentColor" strokeWidth={0.19} strokeLinecap="round" strokeLinejoin="round" />
       </svg>
