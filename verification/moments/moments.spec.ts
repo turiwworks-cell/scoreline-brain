@@ -55,8 +55,12 @@ test('goalHome plays the goal scene; a first tap shows it all, the next closes i
   else await expect(page.locator('[data-pane="match"] [data-testid="moment-scene"]')).toBeVisible();
   // the story lands: scorer, minute, commentary
   await expect(scene.getByText('Commentary')).toBeVisible({ timeout: 6000 });
-  if (hasSignedMoments) await expect(scene.locator('canvas')).toBeVisible();
-  await page.screenshot({ path: `test-results/moments-goal-${box.width}.png` });
+  if (hasSignedMoments) {
+    await expect(scene.locator('canvas')).toHaveCSS('opacity', '1');
+    await page.waitForTimeout(2000);
+    await expect(scene.locator('canvas')).toHaveCSS('opacity', '1');
+  }
+  await page.screenshot({ path: `test-results/moments-goal-${page.viewportSize()!.width}.png` });
   await scene.click({ position: { x: 40, y: box.height / 2 } });
   await scene.click({ position: { x: 40, y: box.height / 2 } });
   await expect(scene).toHaveCount(0, { timeout: 2000 });
@@ -69,7 +73,11 @@ test('redHome plays the red card scene; Escape closes it', async ({ page }) => {
   await expect(scene).toHaveAttribute('data-variant', 'red');
   await expect(scene.getByText(/^Down to ten · /)).toBeVisible({ timeout: 6000 });
   await expect(scene.getByText('Sent off', { exact: true })).toBeVisible();
-  if (hasSignedMoments) await expect(scene.locator('canvas')).toBeVisible();
+  if (hasSignedMoments) {
+    await expect(scene.locator('canvas')).toHaveCSS('opacity', '1');
+    await page.waitForTimeout(2000);
+    await expect(scene.locator('canvas')).toHaveCSS('opacity', '1');
+  }
   await page.screenshot({ path: 'test-results/app-red-' + page.viewportSize()!.width + '.png' });
   await page.keyboard.press('Escape');
   await expect(scene).toHaveCount(0, { timeout: 2000 });
