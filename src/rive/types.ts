@@ -16,6 +16,7 @@ export interface ViewModel {
 export interface RiveInstance {
   readonly stateMachineNames: string[];
   readonly viewModelInstance: ViewModel | null;
+  reset(options: { artboard?: string; stateMachine: string; autoplay: false; autoBind: true }): void;
   play(name?: string): void;
   pause(): void;
   stopRendering(): void;
@@ -26,6 +27,11 @@ export interface RiveInstance {
 
 export interface RiveOptions {
   canvas: HTMLCanvasElement;
+  artboard?: string;
+  tabIndex: -1;
+  focusOptions: { allowFocusInterrupt: false };
+  shouldDisableRiveListeners: true;
+  onAdvance?(): void;
   buffer: ArrayBuffer;
   autoplay: false;
   autoBind: true;

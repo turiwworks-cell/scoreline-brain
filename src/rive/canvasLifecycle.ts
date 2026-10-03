@@ -4,6 +4,8 @@ import type { CanvasBinding, RiveInstance } from './types';
 
 export type CanvasOptions = {
   source: string;
+  artboard?: string;
+  advance?(): void;
   bind(instance: RiveInstance): CanvasBinding | void;
   ready(): void;
   error(error: unknown): void;
@@ -55,8 +57,8 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
       try {
         machine = instance.stateMachineNames[0];
         if (!machine) throw new Error('Rive asset has no state machine');
-        instance.play(machine);
-        instance.pause();
+        // Bind the selected machine before any playback. The v2 default may be a linear timeline.
+        instance.reset({ artboard: options.artboard, stateMachine: machine, autoplay: false, autoBind: true });
         instance.stopRendering();
         binding = options.bind(instance) ?? undefined;
         bound = true;
@@ -90,6 +92,11 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
         instance = new runtime.Rive({
           canvas,
           buffer,
+          artboard: options.artboard,
+          tabIndex: -1,
+          focusOptions: { allowFocusInterrupt: false },
+          shouldDisableRiveListeners: true,
+          onAdvance: options.advance,
           autoplay: false,
           autoBind: true,
           useOffscreenRenderer: true,

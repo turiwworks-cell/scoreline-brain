@@ -95,10 +95,10 @@ describe('MomentStage', () => {
 });
 
 describe('the scene', () => {
-  it('is the open match’s goal, with the scorer, the assist and the commentary', () => {
+  it('is the open match’s goal, with the scorer, the assist and the commentary', async () => {
     const a = setup({ openId: 1, front: true });
     a.goal(1);
-    const scene = screen.getByTestId('moment-scene');
+    const scene = await screen.findByTestId('moment-scene');
     expect(scene.dataset.variant).toBe('goal');
     expect(scene.getAttribute('aria-label')).toBe("Goal: Doué, France, 61'");
     // the word stand-in: six letters, each a soft copy and a sharp one
@@ -111,9 +111,10 @@ describe('the scene', () => {
     expect(scene.querySelector('img')?.getAttribute('src')).toBe('/img/players/fra/20-bust@1x.webp');
   });
 
-  it('a first tap shows everything, the next closes it (tapScene, luau:7322)', () => {
+  it('a first tap shows everything, the next closes it (tapScene, luau:7322)', async () => {
     const a = setup({ openId: 1, front: true });
     a.goal(1);
+    await screen.findByTestId('moment-scene');
     const started = a.stage()!.startedAt;
     fireEvent.click(screen.getByTestId('moment-scene'));
     expect(a.stage()!.startedAt).toBeCloseTo(started - sceneBeats('goal').full);
@@ -123,9 +124,10 @@ describe('the scene', () => {
     expect(screen.getByTestId('moment-scene').dataset.phase).toBe('out');
   });
 
-  it('the close button and Escape send it away without a tap', () => {
+  it('the close button and Escape send it away without a tap', async () => {
     const a = setup({ openId: 1, front: true });
     a.goal(1);
+    await screen.findByTestId('moment-scene');
     const started = a.stage()!.startedAt;
     fireEvent.click(screen.getByRole('button', { name: 'Close goal' }));
     expect(a.stage()!.phase).toBe('out');
@@ -134,6 +136,7 @@ describe('the scene', () => {
     a.advance(1);
     expect(screen.queryByTestId('moment-scene')).toBeNull();
     a.goal(1);
+    await screen.findByTestId('moment-scene');
     // an Escape something else already handled (a sheet, a menu) leaves the scene alone
     const handled = new KeyboardEvent('keydown', { key: 'Escape', cancelable: true });
     handled.preventDefault();
@@ -143,11 +146,11 @@ describe('the scene', () => {
     expect(a.stage()!.phase).toBe('out');
   });
 
-  it('a red card plays the red scene', () => {
+  it('a red card plays the red scene', async () => {
     const a = setup({ openId: 1, front: true });
     const e = parseEvent({ seq: 900, match: 1, id: 'r1', kind: 'red', side: 'home', minute: 70, player: 4 });
     act(() => scorelineStore.getState().actions.applyEvent(e!, Date.now()));
-    const scene = screen.getByTestId('moment-scene');
+    const scene = await screen.findByTestId('moment-scene');
     expect(scene.dataset.variant).toBe('red');
     expect(scene.textContent).toContain('RED CARD');
     expect(scene.textContent).toContain('Down to ten');

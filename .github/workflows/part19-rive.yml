@@ -2,6 +2,7 @@ name: Part 19 validation
 on:
   push:
     branches: [codex/part-19-rive]
+    paths-ignore: ['reports/**']
   workflow_dispatch:
 
 jobs:
@@ -12,10 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - label: baseline
-            ref: 74f8edad99245ef3b6186a2b79be408fd3fa2a71
           - label: part19
-            ref: codex/part-19-rive
+            ref: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,7 +28,6 @@ jobs:
       - name: Typecheck and lint
         run: npm run typecheck && npm run lint
       - name: Unit suite
-        continue-on-error: true
         run: npx vitest run --maxWorkers=1 --reporter=json --outputFile=.verification/unit.json
       - name: Production build and initial bundle
         run: |
@@ -49,6 +47,9 @@ jobs:
           const files = [...initial].filter(file => file.endsWith('.js')).map(file => ({file, gzip: zlib.gzipSync(fs.readFileSync('dist/' + file)).byteLength}));
           fs.writeFileSync('.verification/bundle.json', JSON.stringify({initialBytes: files.reduce((n,f) => n + f.gzip, 0), files}, null, 2));
           console.log(fs.readFileSync('.verification/bundle.json', 'utf8'));
+          const bytes = files.reduce((n,f) => n + f.gzip, 0);
+          if (bytes > 218555) throw new Error('Initial JS exceeds the validated Part 18 baseline: ' + bytes + ' > 218555');
+          if (files.some(f => /rive|webgl|wasm/.test(f.file))) throw new Error('Rive runtime entered the initial dependency graph');
           JS
       - name: Cache real Rive package for local verification
         if: matrix.label == 'part19'
@@ -63,12 +64,27 @@ jobs:
             dist/.vite/manifest.json
           retention-days: 7
       - run: npx playwright install --with-deps chromium
-      - name: Production browser suite
-        continue-on-error: true
-        run: PLAYWRIGHT_JSON_OUTPUT_NAME=.verification/browser.json npx playwright test --workers=1 --retries=0 --reporter=json
+      - name: Header regression check
+        run: PLAYWRIGHT_JSON_OUTPUT_NAME=.verification/browser.json npx playwright test e2e/list.spec.ts --grep 'the header, the day tabs' --workers=1 --retries=0 --reporter=line,json
+      - name: Real Rive lifecycle verification
+        if: matrix.label == 'part19'
+        run: |
+          npx tsc -p verification/rive/tsconfig.json
+          PLAYWRIGHT_JSON_OUTPUT_NAME=.verification/rive.json npx playwright test -c playwright.rive.config.ts --reporter=line,json
       - name: Moment interactions
-        continue-on-error: true
         run: PLAYWRIGHT_JSON_OUTPUT_NAME=.verification/moments.json npx playwright test -c playwright.moments.config.ts --reporter=json
+      - name: Report verification counts
+        if: always()
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          for (const kind of ['unit', 'browser', 'moments', 'rive']) {
+            const path = '.verification/' + kind + '.json';
+            if (!fs.existsSync(path)) continue;
+            const r = JSON.parse(fs.readFileSync(path, 'utf8'));
+            console.log('VERIFICATION ' + JSON.stringify({kind, passed: r.numPassedTests, failed: r.numFailedTests, stats: r.stats}));
+          }
+          JS
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -30,7 +30,7 @@ export function LiveToggle({ on, count, onToggle }: LiveToggleProps) {
   return (
     <LiveIcon live={on} count={count} onChange={onToggle} className={`m-glass ${styles.live}`} fallback={
       <span className={styles.capsule} aria-hidden="true">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="3" fill="currentColor" /><circle cx="7" cy="7" r="6" stroke="currentColor" opacity={on ? 0 : 0.35} /></svg>
+        <svg width="9" height="9" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="4.5" fill={on ? 'currentColor' : 'var(--c-live)'} /><circle cx="7" cy="7" r="6" stroke="currentColor" opacity={on ? 0 : 0.35} /></svg>
         <span>Live</span>
       </span>
     }>

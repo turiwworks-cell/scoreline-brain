@@ -16,7 +16,7 @@ const instances: Fake[] = [];
 class Fake implements RiveInstance {
   stateMachineNames = ['Moments'];
   viewModelInstance = null;
-  play = vi.fn(); pause = vi.fn(); stopRendering = vi.fn(); startRendering = vi.fn(); resizeDrawingSurfaceToCanvas = vi.fn(); cleanup = vi.fn();
+  reset = vi.fn(); play = vi.fn(); pause = vi.fn(); stopRendering = vi.fn(); startRendering = vi.fn(); resizeDrawingSurfaceToCanvas = vi.fn(); cleanup = vi.fn();
   constructor(public options: RiveOptions) { instances.push(this); }
 }
 const mounted: ReturnType<typeof mountCanvas>[] = [];
@@ -49,6 +49,10 @@ describe('Rive canvas ownership', () => {
     expect(inst.options.autoplay).toBe(false);
     expect(inst.options.autoBind).toBe(true);
     expect(inst.options.enableRiveAssetCDN).toBe(false);
+    expect(inst.reset).toHaveBeenCalledWith({ artboard: undefined, stateMachine: 'Moments', autoplay: false, autoBind: true });
+    expect(inst.reset.mock.invocationCallOrder[0]).toBeLessThan(s.options.bind.mock.invocationCallOrder[0]!);
+    expect(inst.options.tabIndex).toBe(-1);
+    expect(inst.options.shouldDisableRiveListeners).toBe(true);
     expect(s.options.bind).toHaveBeenCalledWith(inst);
     expect(s.binding.resume).toHaveBeenCalled(); expect(s.options.ready).toHaveBeenCalledTimes(1);
     expect(mock.slots!.count).toBe(1);

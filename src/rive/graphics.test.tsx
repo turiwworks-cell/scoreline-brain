@@ -20,7 +20,7 @@ function fixture() {
   const live = property(false); const kind = property(''); const c1 = property(0); const c2 = property(0); const phase = property(0);
   const trigger = vi.fn();
   const vm: ViewModel = { boolean: () => live, string: () => kind, color: (name) => name === 'color1' ? c1 : c2, number: () => phase, trigger: () => ({ trigger }) };
-  const instance: RiveInstance = { stateMachineNames: ['State Machine 1'], viewModelInstance: vm, play: vi.fn(), pause: vi.fn(), startRendering: vi.fn(), stopRendering: vi.fn(), resizeDrawingSurfaceToCanvas: vi.fn(), cleanup: vi.fn() };
+  const instance: RiveInstance = { stateMachineNames: ['State Machine 1'], viewModelInstance: vm, reset: vi.fn(), play: vi.fn(), pause: vi.fn(), startRendering: vi.fn(), stopRendering: vi.fn(), resizeDrawingSurfaceToCanvas: vi.fn(), cleanup: vi.fn() };
   return { instance, live, kind, c1, c2, phase, trigger };
 }
 afterEach(() => { cleanup(); mock.canvas = null; vi.restoreAllMocks(); });

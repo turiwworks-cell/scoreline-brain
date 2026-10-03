@@ -4,6 +4,8 @@ import type { CanvasBinding, RiveInstance } from './types';
 
 export type RiveCanvasProps = {
   source: string;
+  artboard?: string;
+  onAdvance?(): void;
   className?: string;
   style?: CSSProperties;
   bind(instance: RiveInstance): CanvasBinding | void;
@@ -19,11 +21,13 @@ export function RiveCanvas(props: RiveCanvasProps) {
     if (!canvas.current) return;
     const life = mountCanvas(canvas.current, {
       source: props.source,
+      artboard: props.artboard,
+      advance: () => latest.current.onAdvance?.(),
       bind: (instance) => latest.current.bind(instance),
       ready: () => latest.current.onReady?.(),
       error: (error) => latest.current.onError?.(error),
     });
     return () => life.dispose();
-  }, [props.source]);
+  }, [props.source, props.artboard]);
   return <canvas ref={canvas} className={props.className} aria-hidden="true" tabIndex={-1} style={{ ...props.style, pointerEvents: 'none' }} />;
 }

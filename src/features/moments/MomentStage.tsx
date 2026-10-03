@@ -1,10 +1,14 @@
+import { lazy, Suspense, useEffect } from 'react';
+import { afterPaint } from '../../rive/afterPaint';
 import { useReducedMotion } from 'motion/react';
 import { appMoments, useMomentStage, type MomentDirector } from '../../motion';
 import { useScoreline } from '../../store';
 import { playerPhoto, usePhotoManifest } from '../../ui';
 import { momentInfo } from './model';
-import { Scene } from './Scene';
 import { Toast } from './Toast';
+
+const loadScene = () => import('./Scene');
+const Scene = lazy(() => loadScene().then((module) => ({ default: module.Scene })));
 
 export type StageSlot = 'all' | 'scene' | 'toast';
 
@@ -31,6 +35,8 @@ export type MomentStageProps = {
  * `phase: 'out'`; when the stage empties or moves on, the element goes.
  */
 export function MomentStage({ slot, onOpenMatch, isFollowed, director, reducedMotion }: MomentStageProps) {
+  // Warm the Rive-aware scene after paint, outside the initial dependency graph.
+  useEffect(() => afterPaint(() => { void loadScene().catch(() => {}); }), []);
   const d = director ?? appMoments();
   const p = useMomentStage(d);
   const prefers = useReducedMotion() ?? false;
@@ -43,6 +49,6 @@ export function MomentStage({ slot, onOpenMatch, isFollowed, director, reducedMo
   const info = momentInfo(domain, p.moment);
   const photo = info && info.n > 0 ? playerPhoto(manifest, info.team.id, info.n) : undefined;
   const followed = !!info && info.n > 0 && isFollowed(info.team.id, info.n);
-  if (scene) return info && p.beats ? <Scene key={p.key} p={p} info={info} d={d} photo={photo} followed={followed} /> : null;
+  if (scene) return info && p.beats ? <Suspense fallback={null}><Scene key={p.key} p={p} info={info} d={d} photo={photo} followed={followed} /></Suspense> : null;
   return <Toast key={p.key} p={p} info={info} d={d} reduced={reduced} photo={photo} followed={followed} onOpen={onOpenMatch} />;
 }
