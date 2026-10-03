@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { animate, m, useMotionValue, useMotionValueEvent, useReducedMotion, useTransform } from 'motion/react';
 import type { Side, Team } from '../../../domain';
 import { transition } from '../../../motion';
@@ -37,11 +37,20 @@ export const TeamSwitch = memo(function TeamSwitch({ home, away, side, onChange 
   // the thumb is one segment wide: its own width is the distance between the two places
   const x = useTransform(k, (v) => `${v * 100}%`);
   const teams = { home, away };
+  const group = useRef<HTMLDivElement>(null);
+  // the arrows move between the two sides, as a radio group does
+  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    const to = e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? 'home' : e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 'away' : null;
+    if (!to) return;
+    e.preventDefault();
+    onChange(to);
+    group.current?.querySelector<HTMLElement>(`[data-side="${to}"]`)?.focus();
+  };
 
   return (
     <Glass radius={23} className={styles.switch} role="radiogroup" aria-label="Team">
       <m.span className={styles.thumb} style={{ x, background: thumbFill(teams[near]) }} aria-hidden="true" data-thumb={near} />
-      <div className={styles.segs}>
+      <div ref={group} className={styles.segs} onKeyDown={onKeyDown}>
         {(['home', 'away'] as const).map((s) => {
           const t = teams[s];
           return (

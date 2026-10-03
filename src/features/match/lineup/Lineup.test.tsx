@@ -119,6 +119,14 @@ describe('a match that has started', () => {
     expect(chip.querySelector('[data-shared="player:fra:10:photo"][data-shared-end="face"]')).toBeTruthy();
   });
 
+  it('moves between the sides with the arrow keys', () => {
+    const { onSide } = setup(1);
+    fireEvent.keyDown(screen.getByRole('radio', { name: 'France' }), { key: 'ArrowRight' });
+    expect(onSide).toHaveBeenCalledWith('away');
+    fireEvent.keyDown(screen.getByRole('radio', { name: 'Argentina' }), { key: 'ArrowLeft' });
+    expect(onSide).toHaveBeenLastCalledWith('home');
+  });
+
   it('asks the app for the other side with the switch', () => {
     const { onSide } = setup(1);
     expect(screen.getByRole('radio', { name: 'France', checked: true })).toBeTruthy();
