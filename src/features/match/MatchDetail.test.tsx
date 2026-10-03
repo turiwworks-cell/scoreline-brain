@@ -25,7 +25,7 @@ function setup(props: Partial<MatchDetailProps> = {}) {
   const view = render(
     <>
       <IconSprite />
-      <MatchDetail id={1} tab="facts" chrome="back" lineup={<p>Lineup placeholder</p>} missing={<p>Not found</p>} {...calls} {...props} />
+      <MatchDetail id={1} tab="facts" chrome="back" missing={<p>Not found</p>} {...calls} {...props} />
     </>,
   );
   return { ...calls, ...view };

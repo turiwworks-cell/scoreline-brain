@@ -157,12 +157,6 @@ test('Table marks the top two and the sides playing now', async ({ page }, info)
   await page.screenshot({ path: info.outputPath('table.png') });
 });
 
-test('the Lineup tab keeps its placeholder until Part 13', async ({ page }) => {
-  await open(page, '/match/1/lineup?demo');
-  await expect(screen(page).getByRole('tab', { name: 'Lineup', selected: true })).toBeVisible();
-  await expect(screen(page).locator('[data-focus-key="chip-fra-10"]')).toBeVisible();
-});
-
 test('before kick-off, after full time and a friendly', async ({ page }) => {
   await open(page, '/match/11/facts?demo');
   const s = screen(page);

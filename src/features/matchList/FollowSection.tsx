@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Team } from '../../domain';
 import { useScoreline } from '../../store';
-import { feel } from '../../ui';
+import { feel, Star } from '../../ui';
 import { Block } from './cascade';
 import { FollowCard } from './FollowCard';
 import { FollowPicker } from './FollowPicker';
@@ -9,7 +9,6 @@ import { useFollowLive } from './follow/live';
 import type { Followed } from './follow/model';
 import { useFollowed, type FollowPref } from './follow/pref';
 import { selectFollowMatchId } from './selectors';
-import { Star } from './Star';
 import styles from './Follow.module.css';
 
 /*

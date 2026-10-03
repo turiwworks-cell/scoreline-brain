@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { UNIT_PATHS } from '../../ui';
+import { UNIT_PATHS } from './icons';
 
 /* The follow star in the spectrum (gstar, luau:3120): STOPS[3] across the star's box. */
 export function Star({ className }: { className?: string }) {

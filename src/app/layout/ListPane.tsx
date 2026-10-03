@@ -1,15 +1,12 @@
 import { m } from 'motion/react';
-import { demoMode } from '../../data';
 import { MatchList } from '../../features/matchList';
 import { pushBase } from '../../motion';
+import { demoFollowed } from '../followed';
 import { useNav } from '../nav/useNav';
 import type { ListState } from '../nav/url';
 import type { LayoutMode } from './layoutMode';
 import { Screen } from './Screen';
 import styles from './Shell.module.css';
-
-// the player followed until prefs exist: the demo follows Argentina's 10 (DemoSource, luau:8915)
-const DEMO_FOLLOWED = { team: 'arg', n: 10 };
 
 /**
  * The match list. The shell renders it first, with the same key, in every layout, so it never
@@ -28,7 +25,7 @@ export function ListPane({ layout, shifted, covered, list, openId }: { layout: L
           onLive={nav.setLive}
           onOpenMatch={(id, from) => nav.openMatch(id, { from })}
           onOpenPlayer={(player, from) => nav.openPlayer(player, { from })}
-          defaultFollowed={demoMode(window.location.search) ? DEMO_FOLLOWED : null}
+          defaultFollowed={demoFollowed()}
         />
       </Screen>
     </m.div>

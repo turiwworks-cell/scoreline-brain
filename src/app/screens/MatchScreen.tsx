@@ -1,14 +1,16 @@
+import { followPref, useFollowed } from '../../features/matchList';
 import { MatchDetail } from '../../features/match';
 import { selectLoaded, useScoreline } from '../../store';
+import { demoFollowed } from '../followed';
 import { useNav } from '../nav/useNav';
 import type { MatchRef } from '../nav/url';
-import { LineupPlaceholder } from './LineupPlaceholder';
 import { Missing } from './Missing';
 
-/** The match screen: the feature on the URL's tab, with the navigation and Part 13's placeholder line-up. */
+/** The match screen: the feature on the URL's tab, with the navigation. */
 export function MatchScreen({ match, chrome }: { match: MatchRef; chrome: 'back' | 'none' }) {
   const nav = useNav();
   const loaded = useScoreline(selectLoaded);
+  const followed = useFollowed(followPref(demoFollowed()));
   return (
     <MatchDetail
       id={match.id}
@@ -17,7 +19,7 @@ export function MatchScreen({ match, chrome }: { match: MatchRef; chrome: 'back'
       onBack={nav.back}
       onTab={(tab) => nav.setTab(match.id, tab)}
       onOpenPlayer={(player, from) => nav.openPlayer(player, { under: match, from })}
-      lineup={<LineupPlaceholder id={match.id} />}
+      followed={followed}
       missing={<Missing back={chrome === 'back'} loaded={loaded} what="This match" />}
     />
   );

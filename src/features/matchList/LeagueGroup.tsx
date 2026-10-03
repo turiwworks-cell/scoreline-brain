@@ -1,12 +1,11 @@
 import { memo, useId, useMemo, type CSSProperties } from 'react';
 import type { Match, Team } from '../../domain';
-import { Icon } from '../../ui';
+import { Icon, Star } from '../../ui';
 import { selectLeague, selectMatch, selectTeam, useScoreline } from '../../store';
 import { Block } from './cascade';
 import { FAV } from './groups';
 import type { GoalFeed } from './goalFeed';
 import { MatchRow } from './MatchRow';
-import { Star } from './Star';
 import styles from './Groups.module.css';
 
 /*

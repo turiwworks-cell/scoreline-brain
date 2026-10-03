@@ -1,11 +1,13 @@
-import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import { m } from 'motion/react';
 import { CASCADE, cascade, transition } from '../../motion';
+import type { Side } from '../../domain';
 import { selectLeague, selectMatch, selectTeam, useScoreline } from '../../store';
 import { Icon, RoundButton, Tabs } from '../../ui';
 import { Facts } from './Facts';
 import { DETAIL_TABS, type DetailTab } from './tabs';
 import { Hero } from './Hero';
+import { Lineup } from './lineup';
 import { Stats } from './Stats';
 import { Table } from './Table';
 import styles from './MatchDetail.module.css';
@@ -33,8 +35,8 @@ export type MatchDetailProps = {
   onFavourite?: () => void;
   /** a goal row replays the goal scene; absent until the scenes exist */
   onReplayGoal?: (eventId: string) => void;
-  /** the Lineup tab's content until Part 13 builds it */
-  lineup: ReactNode;
+  /** the player the user follows: a star by his name in the line-up */
+  followed?: { readonly team: string; readonly n: number } | null;
   /** shown when the match isn't in the feed */
   missing: ReactNode;
 };
@@ -49,8 +51,12 @@ const tabItems = (scheduled: boolean) => [
 
 const isTab = (v: string): v is DetailTab => (DETAIL_TABS as readonly string[]).includes(v);
 
-/** The width the screen lays out at: the Lua's 390 until the first measure. */
-function useWidth(ref: RefObject<HTMLElement | null>): number {
+/**
+ * The width the screen lays out at: the Lua's 390 until the first measure. `mounted` is whether the
+ * element is in the tree: before the feed has the match the screen renders `missing` instead, and
+ * the element must be measured when it appears (a deep link on a pane wider than 390).
+ */
+function useWidth(ref: RefObject<HTMLElement | null>, mounted: boolean): number {
   const [w, setW] = useState(390);
   useLayoutEffect(() => {
     const el = ref.current;
@@ -61,21 +67,26 @@ function useWidth(ref: RefObject<HTMLElement | null>): number {
     const ro = new ResizeObserver(read);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [ref]);
+  }, [ref, mounted]);
   return w;
 }
 
-export function MatchDetail({ id, tab, chrome, onBack, onTab, onOpenPlayer, onFavourite, onReplayGoal, lineup, missing }: MatchDetailProps) {
+export function MatchDetail({ id, tab, chrome, onBack, onTab, onOpenPlayer, onFavourite, onReplayGoal, followed, missing }: MatchDetailProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const width = useWidth(ref);
   const match = useScoreline(selectMatch(id));
   const home = useScoreline(selectTeam(match?.home ?? ''));
   const away = useScoreline(selectTeam(match?.away ?? ''));
+  const width = useWidth(ref, !!match && !!home && !!away);
   const league = useScoreline(selectLeague(match?.league ?? ''));
 
   // the pane slides in from the side of the tab it came from (paneDir, luau:7162)
   const [pane, setPane] = useState({ tab, dir: 0, first: true });
   if (pane.tab !== tab) setPane({ tab, dir: DETAIL_TABS.indexOf(tab) > DETAIL_TABS.indexOf(pane.tab) ? 1 : -1, first: false });
+
+  // the side the Lineup tab shows lasts while the match is open, whichever tab is (luSide, luau:7139)
+  const [lineupSide, setLineupSide] = useState<{ id: number; side: Side }>({ id, side: 'home' });
+  if (lineupSide.id !== id) setLineupSide({ id, side: 'home' });
+  const onSide = useCallback((side: Side) => setLineupSide({ id, side }), [id]);
 
   if (!match || !home || !away) return <>{missing}</>;
   const scheduled = match.status === 'scheduled';
@@ -123,7 +134,7 @@ export function MatchDetail({ id, tab, chrome, onBack, onTab, onOpenPlayer, onFa
           ) : tab === 'stats' ? (
             <Stats match={match} home={home} away={away} />
           ) : tab === 'lineup' ? (
-            lineup
+            <Lineup match={match} home={home} away={away} width={width} side={lineupSide.side} onSide={onSide} followed={followed} onOpenPlayer={onOpenPlayer} />
           ) : (
             <Table match={match} league={league} />
           )}

@@ -1,7 +1,7 @@
 /*
  * Placeholder screens (Part 9). Just enough to prove the shell: navigation, panes, scrolling,
  * focus and the two shared elements. Parts 10–15 replace them with the real screens; the match
- * screen's Lineup tab keeps its faces until Part 13.
+ * screen's Lineup tab is the real one since Part 13.
  * Content of a shared element is styled through its own classes (see motion/Shared.tsx).
  */
 
@@ -66,46 +66,6 @@
   border-radius: var(--r-16);
   font: var(--type-body);
   color: var(--c-muted);
-}
-
-/* ---- the Lineup tab until Part 13 ---------------------------------------------------------- */
-
-.lineup {
-  display: grid;
-  margin: 0 var(--gutter);
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-}
-
-.chips {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin: 10px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.chip {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 4px;
-  border: 0;
-  border-radius: var(--r-16);
-  background: none;
-  color: inherit;
-  font: var(--type-tag);
-  text-align: left;
-  cursor: pointer;
-}
-
-.chipName {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* ---- player --------------------------------------------------------------------------------- */
