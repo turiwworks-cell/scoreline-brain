@@ -1,5 +1,6 @@
 import type { DataRouter } from 'react-router';
 import { rememberTrigger } from './focusMemory';
+import { revealCurrentPlayer } from './playerReveal';
 import { DEFAULT_TAB, hrefOf, matchPath, parseNav, type MatchRef, type MatchTab, type NavHistoryState, type PlayerRef, type PlayerStep } from './url';
 
 /*
@@ -67,7 +68,11 @@ export function createNavActions(router: DataRouter): NavActions {
     openPlayer(player, opts = {}) {
       const { loc, href, nav } = here();
       const to = hrefOf({ list: nav.list, player }, loc.search);
-      if (to === href || to === pending()) return;
+      if (to === href) {
+        revealCurrentPlayer();
+        return;
+      }
+      if (to === pending()) return;
       rememberTrigger(loc.key, pressed(opts.from));
       const state: NavHistoryState = opts.under ? { under: opts.under } : {};
       void router.navigate(to, { state });
