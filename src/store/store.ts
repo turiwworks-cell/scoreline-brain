@@ -23,6 +23,8 @@ const IDLE: SyncStatus = { phase: 'idle', feedError: false };
 export interface ScorelineActions {
   /** Applies a parsed feed. `now` is epoch ms. No-op (no store update) when nothing changed. */
   applyFeed(feed: Feed, now?: number): void;
+  /** Replaces a restarted demo evening quietly and clears its queued moments; preserves sync. */
+  resetFeed(feed: Feed, now?: number): void;
   /** Applies one parsed live event. `now` is epoch ms. No-op when nothing changed. */
   applyEvent(event: LiveEvent, now?: number): void;
   /** Records a connection status. No-op when it equals the current one. */
@@ -35,6 +37,8 @@ export interface ScorelineState {
   readonly domain: DomainState;
   readonly sync: SyncStatus;
   readonly moments: readonly Moment[];
+  /** Bumps only when a demo evening is explicitly restarted, so UI memories can start fresh. */
+  readonly session: number;
   /** Stable for the store's lifetime: selecting it never re-renders. */
   readonly actions: ScorelineActions;
 }
@@ -56,10 +60,15 @@ export function createScorelineStore(initial: DomainState = emptyState()): Score
       domain: initial,
       sync: IDLE,
       moments: NO_MOMENTS,
+      session: 0,
       actions: {
         applyFeed(feed, now = Date.now()) {
           const r = applyFeed(get().domain, feed, now);
           commit(r.state, r.moments);
+        },
+        resetFeed(feed, now = Date.now()) {
+          const r = applyFeed(emptyState(), feed, now);
+          set({ domain: r.state, moments: NO_MOMENTS, session: get().session + 1 });
         },
         applyEvent(event, now = Date.now()) {
           const r = applyEvent(get().domain, event, now);

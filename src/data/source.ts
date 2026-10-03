@@ -4,7 +4,8 @@
 
 import type { Feed, LiveEvent } from '../domain';
 
-export type FeedHandler = (feed: Feed) => void;
+/** `reset` begins a fresh demo evening; it is local delivery metadata, never a wire field. */
+export type FeedHandler = (feed: Feed, options?: { readonly reset: true }) => void;
 export type EventHandler = (event: LiveEvent) => void;
 export type StatusHandler = (status: SyncStatus) => void;
 

@@ -4,7 +4,7 @@ import { createGoalFeed, watchMoments, type MomentSource } from './goalFeed';
 import { markLife } from './goalFeel';
 
 function source(initial: Moment[] = []) {
-  let state = { moments: initial as readonly Moment[] };
+  let state = { moments: initial as readonly Moment[], session: 0 };
   const ls = new Set<(s: typeof state, p: typeof state) => void>();
   const src: MomentSource = {
     getState: () => state,
@@ -17,12 +17,17 @@ function source(initial: Moment[] = []) {
     src,
     push(...m: Moment[]) {
       const prev = state;
-      state = { moments: [...state.moments, ...m] };
+      state = { ...state, moments: [...state.moments, ...m] };
       ls.forEach((l) => l(state, prev));
     },
     replace(m: Moment[]) {
       const prev = state;
-      state = { moments: m };
+      state = { ...state, moments: m };
+      ls.forEach((l) => l(state, prev));
+    },
+    restart() {
+      const prev = state;
+      state = { moments: [], session: state.session + 1 };
       ls.forEach((l) => l(state, prev));
     },
   };
@@ -52,6 +57,19 @@ describe('watchMoments', () => {
 });
 
 describe('goal feed', () => {
+  it('clears old marks on demo restart and accepts a repeated event id in the new evening', () => {
+    const feed = createGoalFeed({ now: () => 1 });
+    const s = source();
+    feed.watch(s.src);
+    s.push(goal('again', 1));
+    expect(feed.mark(1)).toBeDefined();
+    s.restart();
+    expect(feed.marks().size).toBe(0);
+    expect(feed.latest()).toBeUndefined();
+    s.push(goal('again', 1, 'away'));
+    expect(feed.mark(1)?.side).toBe('away');
+  });
+
   it('remembers the latest goal of each match and who scored', () => {
     let now = 5;
     const feed = createGoalFeed({ now: () => now });

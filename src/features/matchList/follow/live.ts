@@ -26,6 +26,7 @@ export const FRESH: FollowLive = { acts: [], ball: false, ballAt: -100, goalAt: 
 export const BALL_HOLD = 2.5;
 
 export type FollowEvent =
+  | { type: 'reset' }
   | { type: 'act'; at: number; text: string; kind: string; onBall: boolean; clock: string }
   | { type: 'goal'; at: number; text: string; clock: string }
   | { type: 'assist'; at: number; text: string; clock: string }
@@ -35,6 +36,8 @@ export type FollowEvent =
 
 export function followReduce(s: FollowLive, e: FollowEvent): FollowLive {
   switch (e.type) {
+    case 'reset':
+      return FRESH;
     case 'act':
       return { ...s, acts: pushAct(s.acts, { t: e.at, txt: e.text, kind: e.kind, clock: e.clock }), ball: e.onBall, ballAt: e.at };
     case 'goal':
@@ -117,12 +120,22 @@ export function useFollowLive(f: Followed | null, matchId: number | undefined, n
       // a match that was reloaded (a new snapshot) shouldn't replay old events
       if (seenEvents.size > 400) seenEvents = new Set(m.events.map((e) => e.id));
     });
-    const stopMoments = watchMoments(scorelineStore, (mo) => {
-      const m = scorelineStore.getState().domain.matches[mo.matchId];
-      if (!m || mo.matchId !== matchId) return;
-      if (mo.kind === 'red' && mo.event?.player === f.n && (mo.side === 'home' ? m.home : m.away) === f.team) send({ type: 'red', at: at() });
-      for (const e of goalEvents(mo, m, f, names, at(), clockOf(m, Date.now()))) send(e);
-    });
+    const stopMoments = watchMoments(
+      scorelineStore,
+      (mo) => {
+        const m = scorelineStore.getState().domain.matches[mo.matchId];
+        if (!m || mo.matchId !== matchId) return;
+        if (mo.kind === 'red' && mo.event?.player === f.n && (mo.side === 'home' ? m.home : m.away) === f.team) send({ type: 'red', at: at() });
+        for (const e of goalEvents(mo, m, f, names, at(), clockOf(m, Date.now()))) send(e);
+      },
+      () => {
+        clearTimeout(release.current);
+        last = scorelineStore.getState().domain.matches[matchId];
+        seenEvents = new Set((last?.events ?? []).map((e) => e.id));
+        lastAction = last?.action;
+        dispatch({ type: 'reset' });
+      },
+    );
     return () => {
       off();
       stopMoments();

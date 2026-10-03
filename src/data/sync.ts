@@ -6,6 +6,8 @@ import type { Source, SyncStatus } from './source';
 
 export interface SyncTarget {
   applyFeed(feed: Feed, now: number): void;
+  /** Optional local-session reset, used by DemoSource restart; ordinary polling never requests it. */
+  resetFeed?(feed: Feed, now: number): void;
   applyEvent(event: LiveEvent, now: number): void;
   setSync(status: SyncStatus): void;
 }
@@ -21,7 +23,10 @@ export interface Connection {
 export function connectSource(source: Source, target: SyncTarget, now: () => number = Date.now): Connection {
   let connected = true;
   source.start(
-    (feed) => target.applyFeed(feed, now()),
+    (feed, options) => {
+      if (options?.reset && target.resetFeed) target.resetFeed(feed, now());
+      else target.applyFeed(feed, now());
+    },
     (event) => target.applyEvent(event, now()),
     (status) => target.setSync(status),
   );

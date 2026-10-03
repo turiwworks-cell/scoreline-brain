@@ -36,8 +36,8 @@ export interface GoalFeed {
 }
 
 export interface MomentSource {
-  getState(): { moments: readonly Moment[] };
-  subscribe(listener: (state: { moments: readonly Moment[] }, prev: { moments: readonly Moment[] }) => void): () => void;
+  getState(): { moments: readonly Moment[]; session?: number };
+  subscribe(listener: (state: { moments: readonly Moment[]; session?: number }, prev: { moments: readonly Moment[]; session?: number }) => void): () => void;
 }
 
 const SEEN_CAP = 400;
@@ -47,7 +47,7 @@ const SEEN_CAP = 400;
  * the MomentDirector's to empty (Part 17); this only looks, and remembers ids so a moment is never
  * seen twice. Returns the unsubscribe.
  */
-export function watchMoments(source: MomentSource, handle: (moment: Moment) => void): () => void {
+export function watchMoments(source: MomentSource, handle: (moment: Moment) => void, onReset?: () => void): () => void {
   const seen = new Set<string>();
   const take = (moments: readonly Moment[]) => {
     for (const mo of moments) {
@@ -60,6 +60,10 @@ export function watchMoments(source: MomentSource, handle: (moment: Moment) => v
   // moments already queued when this starts are old news: remember them, handle none
   for (const mo of source.getState().moments) seen.add(mo.id);
   return source.subscribe((state, prev) => {
+    if (state.session !== prev.session) {
+      seen.clear();
+      onReset?.();
+    }
     if (state.moments !== prev.moments) take(state.moments);
   });
 }
@@ -105,10 +109,19 @@ export function createGoalFeed(clock: Clock = performanceClock): GoalFeed {
       };
     },
     watch(source) {
-      return watchMoments(source, (mo) => {
-        if (mo.kind === 'goal' && mo.side) feed.record(mo.matchId, mo.side);
-        else if (mo.kind === 'goalCancelled') feed.clear(mo.matchId);
-      });
+      return watchMoments(
+        source,
+        (mo) => {
+          if (mo.kind === 'goal' && mo.side) feed.record(mo.matchId, mo.side);
+          else if (mo.kind === 'goalCancelled') feed.clear(mo.matchId);
+        },
+        () => {
+          if (marks.size === 0) return;
+          marks.clear();
+          last = undefined;
+          emit();
+        },
+      );
     },
   };
   return feed;

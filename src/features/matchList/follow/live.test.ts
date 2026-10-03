@@ -70,6 +70,25 @@ describe('useFollowLive', () => {
     act(() => scorelineStore.getState().actions.applyEvent(parsed, Date.now()));
   };
 
+  it('restart clears goal/red/action memories and accepts the same goal id again', () => {
+    act(() => scorelineStore.getState().actions.resetFeed(parseFeed(demoFeedJson()), Date.now()));
+    let clock = 50;
+    const { result } = renderHook(() => useFollowLive({ team: 'arg', n: 10 }, 1, () => clock));
+    const goal = { id: 'again', seq: 99, kind: 'goal', side: 'away', minute: 59, player: 10, score: [2, 2] };
+    ev(goal);
+    expect(result.current.goalAt).toBe(50);
+    ev({ id: 'red', seq: 100, kind: 'red', side: 'away', minute: 60, player: 10 });
+    expect(result.current.redAt).toBe(50);
+    act(() => scorelineStore.getState().actions.resetFeed(parseFeed(demoFeedJson()), Date.now()));
+    expect(result.current).toBe(FRESH);
+    expect(vi.getTimerCount()).toBe(0);
+    clock = 51;
+    ev(goal);
+    expect(result.current.goalAt).toBe(51);
+    expect(result.current.acts).toHaveLength(1);
+    act(() => scorelineStore.getState().actions.resetFeed(parseFeed(demoFeedJson()), Date.now()));
+  });
+
   it('collects his actions, ignores everyone else’s, and lets go of the ball after a goal', () => {
     let clock = 100;
     const { result } = renderHook(() => useFollowLive({ team: 'arg', n: 10 }, 1, () => clock));

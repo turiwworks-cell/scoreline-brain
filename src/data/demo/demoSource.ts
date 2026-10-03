@@ -15,6 +15,7 @@
 import { parseEvent, parseFeed } from '../../domain';
 import { realScheduler, type Scheduler, type TimerHandle } from '../environment';
 import { IDLE_STATUS, type EventHandler, type FeedHandler, type Source, type StatusHandler } from '../source';
+import { clearActiveDemoSource, setActiveDemoSource } from './active';
 import { DemoSim, TICK_SECONDS, type DemoSimOptions, type DemoTrigger, type Followed, type Outgoing } from './sim';
 import { feedJson, messageJson } from './wire';
 
@@ -36,6 +37,16 @@ export interface DemoSource extends Source {
   trigger(name: DemoTrigger): boolean;
   /** Follows a player (their actions arrive as `action` events), or nobody. */
   follow(player: Followed | null): void;
+  /** True while the evening is held by `pause()`. Only meaningful while `running`. */
+  readonly paused: boolean;
+  /** Holds the evening where it is: no timer runs, the connection stays. No-op unless running. */
+  pause(): void;
+  /** Carries on from where `pause()` stopped, beginning with a full feed. No-op unless paused. */
+  resume(): void;
+  /** Begins the evening again from kick-off (same seed), keeping the connection and the follow. */
+  restart(): void;
+  /** Calls `listener` whenever `running` or `paused` changes. Returns the call that removes it. */
+  subscribe(listener: () => void): () => void;
 }
 
 interface Handlers {
@@ -47,7 +58,7 @@ interface Handlers {
 export function createDemoSource(options: DemoSourceOptions = {}): DemoSource {
   const sched = options.scheduler ?? realScheduler;
   const speed = options.speed !== undefined && options.speed > 0 ? options.speed : 1;
-  const sim = new DemoSim(options);
+  let sim = new DemoSim(options);
 
   // Match time (ms) the simulation has reached, and when its next tick and action are due.
   let simMs = 0;
@@ -58,6 +69,9 @@ export function createDemoSource(options: DemoSourceOptions = {}): DemoSource {
   let session = 0;
   let handlers: Handlers | null = null;
   let timer: TimerHandle | null = null;
+  let paused = false;
+  const listeners = new Set<() => void>();
+  const notify = (): void => listeners.forEach((l) => l());
 
   function clearTimer(): void {
     if (timer !== null) sched.clearTimeout(timer);
@@ -66,7 +80,7 @@ export function createDemoSource(options: DemoSourceOptions = {}): DemoSource {
 
   function schedule(): void {
     clearTimer();
-    if (!handlers) return;
+    if (!handlers || paused) return;
     const s = session;
     const due = Math.min(tickDue, actDue);
     timer = sched.setTimeout(() => wake(s, due), Math.max(0, (due - simMs) / speed));
@@ -101,24 +115,30 @@ export function createDemoSource(options: DemoSourceOptions = {}): DemoSource {
     if (snapshot) sendFeed(s);
   }
 
-  function sendFeed(s: number): void {
+  function sendFeed(s: number, reset = false): void {
     if (s !== session || !handlers) return;
-    handlers.onFeed(parseFeed(feedJson(sim)));
+    handlers.onFeed(parseFeed(feedJson(sim)), reset ? { reset: true } : undefined);
   }
 
-  return {
+  const source: DemoSource = {
     speed,
     get running() {
       return handlers !== null;
+    },
+    get paused() {
+      return paused;
     },
     start(onFeed, onEvent, onStatus) {
       if (handlers) return;
       session += 1;
       const s = session;
       handlers = { onFeed, onEvent, onStatus };
+      paused = false;
+      setActiveDemoSource(source);
       onStatus?.({ phase: 'live', feedError: false });
       sendFeed(s);
       if (s === session) schedule();
+      notify();
     },
     stop() {
       if (!handlers) return;
@@ -126,7 +146,10 @@ export function createDemoSource(options: DemoSourceOptions = {}): DemoSource {
       clearTimer();
       const h = handlers;
       handlers = null;
+      paused = false;
+      clearActiveDemoSource(source);
       h.onStatus?.(IDLE_STATUS);
+      notify();
     },
     ensureMatchDetails() {
       // Every snapshot already carries every match's line-ups, stats and ratings.
@@ -142,5 +165,38 @@ export function createDemoSource(options: DemoSourceOptions = {}): DemoSource {
       actDue = player ? simMs + FIRST_ACT_MS : Infinity;
       if (handlers) schedule();
     },
+    pause() {
+      if (!handlers || paused) return;
+      paused = true;
+      clearTimer();
+      notify();
+    },
+    resume() {
+      if (!handlers || !paused) return;
+      paused = false;
+      // The app's clock kept counting while the evening was held; a feed puts them back in step.
+      sendFeed(session);
+      schedule();
+      notify();
+    },
+    restart() {
+      if (!handlers) return;
+      session += 1;
+      clearTimer();
+      const followed = sim.followed;
+      sim = new DemoSim(options);
+      sim.followed = followed;
+      simMs = 0;
+      tickDue = TICK_MS;
+      actDue = followed ? FIRST_ACT_MS : Infinity;
+      // Fresh seq values must replace the old evening, not be treated as a stale poll.
+      sendFeed(session, true);
+      schedule();
+    },
+    subscribe(listener) {
+      listeners.add(listener);
+      return () => void listeners.delete(listener);
+    },
   };
+  return source;
 }

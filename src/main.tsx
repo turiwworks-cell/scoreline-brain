@@ -13,6 +13,10 @@ if (demo) {
   void import('./data/demo').then(({ createDemoSource }) => connectSource(createDemoSource(demo), scorelineStore.getState().actions));
 }
 
+// Development only: the dev panel (Part 16). The condition is replaced at build time, so a
+// production bundle holds neither this import nor anything under src/dev.
+if (import.meta.env.DEV) void import('./dev/bootstrap').then((m) => m.mountDevPanel());
+
 // each pane restores its own scroll (app/nav/scrollMemory.ts); the page itself never scrolls
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 

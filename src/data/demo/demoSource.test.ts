@@ -211,3 +211,132 @@ describe('DemoSource', () => {
     expect(source.trigger('goalFavorite')).toBe(false);
   });
 });
+
+describe('DemoSource dev controls', () => {
+  it('restart resets the connected store quietly and new goals are accepted afterwards', () => {
+    const scheduler = new FakeScheduler();
+    const store = createScorelineStore();
+    const source = createDemoSource({ scheduler, seed: 2026, autoGoals: false });
+    const connection = connectSource(source, store.getState().actions, () => scheduler.now());
+    const initial = store.getState().domain.matches[1]!;
+    source.pause();
+    expect(source.trigger('goalHome')).toBe(true);
+    expect(source.trigger('fullTime')).toBe(true);
+    expect(store.getState().domain.matches[1]!.status).toBe('finished');
+    expect(store.getState().moments.length).toBeGreaterThan(0);
+
+    source.restart();
+    const restarted = store.getState();
+    expect(restarted.domain.matches[1]).toMatchObject({
+      score: initial.score,
+      status: initial.status,
+      seq: initial.seq,
+      events: initial.events,
+      players: initial.players,
+      stats: initial.stats,
+      lineups: initial.lineups,
+    });
+    expect(restarted.moments).toEqual([]);
+    expect(restarted.sync.phase).toBe('live');
+    expect(source.paused).toBe(true);
+    expect(scheduler.pending).toBe(0);
+    expect(source.trigger('goalHome')).toBe(true);
+    expect(store.getState().domain.matches[1]!.score).toEqual([3, 1]);
+    expect(store.getState().moments.map((m) => m.kind)).toEqual(['goal']);
+    connection.disconnect();
+  });
+
+  it('fires each of the seven triggers as demo events, the Lua’s names in the Lua’s order', async () => {
+    const { DEMO_TRIGGERS } = await import('./sim');
+    expect([...DEMO_TRIGGERS]).toEqual(['goalHome', 'goalAway', 'goalFavorite', 'redHome', 'redAway', 'redFavorite', 'fullTime']);
+    const r = recorded({ seed: 2026, autoGoals: false });
+    r.start();
+    const kindsFor = (name: (typeof DEMO_TRIGGERS)[number]) => {
+      const before = r.events.length;
+      expect(r.source.trigger(name), name).toBe(true);
+      return r.events.slice(before).map((e) => e.kind);
+    };
+    expect(kindsFor('goalHome')).toContain('goal');
+    expect(kindsFor('goalAway')).toContain('goal');
+    expect(kindsFor('goalFavorite')).toContain('goal');
+    expect(kindsFor('redHome')).toContain('red');
+    expect(kindsFor('redAway')).toContain('red');
+    expect(kindsFor('redFavorite')).toContain('red');
+    expect(kindsFor('fullTime')).toContain('fulltime');
+  });
+
+  it('pause holds the evening with no timer; resume carries on with one timer and a fresh feed', () => {
+    const r = recorded();
+    r.start();
+    expect(r.scheduler.pending).toBe(1);
+    r.scheduler.advance(TICK_MS * 3);
+    const minute = minuteOf(r.feeds);
+    r.source.pause();
+    r.source.pause();
+    expect(r.source.paused).toBe(true);
+    expect(r.scheduler.pending).toBe(0);
+    const feeds = r.feeds.length;
+    r.scheduler.advance(TICK_MS * 20);
+    expect(r.feeds.length).toBe(feeds);
+    r.source.resume();
+    r.source.resume();
+    expect(r.source.paused).toBe(false);
+    expect(r.scheduler.pending).toBe(1);
+    expect(r.feeds.length).toBe(feeds + 1);
+    expect(minuteOf(r.feeds)).toBe(minute);
+    r.source.stop();
+    expect(r.scheduler.pending).toBe(0);
+  });
+
+  it('a trigger works while paused and never wakes a timer', () => {
+    const r = recorded({ autoGoals: false });
+    r.start();
+    r.source.pause();
+    expect(r.source.trigger('goalHome')).toBe(true);
+    expect(r.scheduler.pending).toBe(0);
+  });
+
+  it('restart begins the evening again on the same connection with one timer', () => {
+    const r = recorded({ seed: 2026 });
+    r.start();
+    const first = minuteOf(r.feeds);
+    r.scheduler.advance(TICK_MS * 30);
+    expect(minuteOf(r.feeds)).not.toBe(first);
+    r.source.restart();
+    expect(minuteOf(r.feeds)).toBe(first);
+    expect(r.scheduler.pending).toBe(1);
+    expect(r.source.running).toBe(true);
+    // restarting while paused stays paused
+    r.source.pause();
+    r.source.restart();
+    expect(r.source.paused).toBe(true);
+    expect(r.scheduler.pending).toBe(0);
+  });
+
+  it('notifies subscribers of pause, resume and stop, and not after unsubscribing', () => {
+    const r = recorded();
+    let n = 0;
+    const off = r.source.subscribe(() => n++);
+    r.start();
+    r.source.pause();
+    r.source.resume();
+    r.source.stop();
+    expect(n).toBe(4);
+    off();
+    r.start();
+    expect(n).toBe(4);
+  });
+
+  it('registers as the active source while started and leaves when stopped', async () => {
+    const { activeDemoSource } = await import('./active');
+    const a = recorded();
+    const b = recorded();
+    a.start();
+    expect(activeDemoSource()).toBe(a.source);
+    b.start();
+    a.source.stop();
+    expect(activeDemoSource()).toBe(b.source);
+    b.source.stop();
+    expect(activeDemoSource()).toBeNull();
+  });
+});
