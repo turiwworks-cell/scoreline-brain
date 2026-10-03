@@ -149,10 +149,15 @@ test('each pane keeps its own scroll', async ({ page }, info) => {
     await expect.poll(() => scrollTop(page, 'match')).toBe(120);
   } else {
     await open(page, '/match/1/facts?demo');
+    // scrolled part-way: with the real list the last scroll position puts the second match under the
+    // sticky header, and a click there makes Playwright scroll the pane to reach it. The list's
+    // blocks are still arriving when the page first shows a card, so wait until it can scroll that far.
+    await expect.poll(() => screenOf(page, 'list').evaluate((el) => el.scrollHeight - el.clientHeight)).toBeGreaterThan(300);
     const listBefore = await screenOf(page, 'list').evaluate((el) => {
-      el.scrollTo(0, el.scrollHeight);
+      el.scrollTo(0, 300);
       return el.scrollTop;
     });
+    expect(listBefore).toBe(300);
     await screenOf(page, 'match').evaluate((el) => el.scrollTo(0, 120));
     await page.waitForTimeout(100);
     await pressTab(page, 'match', 'Stats');

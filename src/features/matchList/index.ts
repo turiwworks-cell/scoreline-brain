@@ -1,0 +1,4 @@
+// The match list (Part 10). The app mounts `MatchList` in the list pane and gives it the navigation.
+export { MatchList, type MatchListProps } from './MatchList';
+export { FOLLOW_KEY, followPref, createFollowPref, type FollowPref } from './follow/pref';
+export type { Followed } from './follow/model';

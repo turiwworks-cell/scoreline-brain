@@ -1,0 +1,79 @@
+/*
+ * The match list screen (drawListScreen and drawFeed, luau:4529–4690). The Lua draws on a 390 x 844
+ * artboard: the list runs from y = 159 down behind a header that stays where it is (the status
+ * bar's room, the spectrum mark, the wordmark, Live, the menu, the day tabs), and starts 22 px below
+ * that line. Here the header is a sticky block 159 px tall, so every y of the Lua comes out the same.
+ *
+ * --live-k is the page's Live tween (0.6 s, the `live` timing): the section, the day tab, the Live
+ * pill and the header all follow it.
+ */
+
+@property --live-k {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+.page {
+  --live-k: 0;
+  position: relative;
+  /* a block sliding in from the side (blockIn) must not widen the scroller while it lands */
+  overflow-x: clip;
+  transition: --live-k var(--t-live-dur) var(--t-live-ease);
+}
+.page[data-live] {
+  --live-k: 1;
+}
+
+/* the header: BG all the way up, so the list passes under it and is cut at y = 159 (luau:4559) */
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  box-sizing: border-box;
+  height: calc(max(62px, env(safe-area-inset-top)) + 97px);
+  padding-top: max(62px, env(safe-area-inset-top));
+  background: var(--c-bg);
+}
+.tabs {
+  margin-top: 8px;
+}
+
+.body {
+  padding: 22px 0 calc(56px + env(safe-area-inset-bottom));
+}
+
+/* nothing to show: a line and a hint, centred (luau:4573) */
+.empty {
+  position: relative;
+  height: 240px;
+  text-align: center;
+}
+.emptyTitle {
+  position: absolute;
+  inset: 90px 0 auto;
+  margin: 0;
+  font: var(--type-empty);
+  letter-spacing: var(--track-2);
+  color: var(--c-muted);
+}
+.emptyHint {
+  position: absolute;
+  inset: 126px 0 auto;
+  margin: 0;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 13.7px;
+  color: var(--c-muted);
+}
+.nodata {
+  margin: 0;
+  padding: 90px 36px;
+  text-align: center;
+  font: var(--type-body);
+  color: var(--c-muted);
+}
+.nodata a {
+  color: var(--c-text);
+}

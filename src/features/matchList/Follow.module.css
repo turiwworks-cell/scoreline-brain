@@ -1,0 +1,953 @@
+/*
+ * The player you follow (drawFollow and its picker, luau:4045–4527). A section label with the spectrum
+ * star, then either the picker (a glass panel with quick picks) or the card: a glass pane 64 px tall
+ * closed, 200–300 px open depending on his evening. The card's height is
+ *     64 + (full − 64) × k
+ * with k (open amount, 0.55 s GLIDE) and full (the height his phase asks for, 0.6 s GLIDE) both
+ * transitioned numbers, so closing while the phase changes composes the way the Lua's two tweens do.
+ * Positions are the Lua's, measured from the card's top left corner (the Lua's x0 = 12, y).
+ */
+
+@property --k {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+@property --full {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 266;
+}
+
+/* the section: its label, then the picker or the card, then 30 px before the next group */
+.section {
+  padding-bottom: 30px;
+}
+
+/* ----- the section label ----- */
+.head {
+  position: relative;
+  height: 26px;
+}
+.star {
+  position: absolute;
+  left: 17.4px;
+  top: 1.4px;
+  width: 11.2px;
+  height: 11.2px;
+}
+.label {
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 13.7px;
+  white-space: nowrap;
+}
+.title {
+  position: absolute;
+  left: 34px;
+  top: 0;
+  margin: 0;
+  color: var(--c-text);
+}
+.change {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  background: none;
+  font: inherit;
+  line-height: 13.7px;
+  /* a button centres its content; this one hangs from the top */
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  position: absolute;
+  right: 4px;
+  top: -10px;
+  height: 34px;
+  padding: 10px 14px 0;
+  color: var(--c-muted);
+  cursor: pointer;
+  opacity: calc(1 - var(--press-fade) * var(--dip));
+  -webkit-tap-highlight-color: transparent;
+}
+.change > .label,
+.unfollow > .label {
+  display: block;
+}
+.change:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: -2px;
+  border-radius: var(--r-4);
+}
+
+/* ----- the picker: 148 px of glass ----- */
+.picker {
+  position: relative;
+  margin: 0 12px;
+  height: 148px;
+}
+.pickTitle {
+  position: absolute;
+  left: 18px;
+  top: 17px;
+  margin: 0;
+  font: var(--type-heading);
+  letter-spacing: var(--track-1);
+}
+.pickSub {
+  position: absolute;
+  left: 18px;
+  top: 41.5px;
+  margin: 0;
+  font: var(--fw-r) var(--fs-12p5) / normal var(--font-sans);
+  color: var(--c-muted);
+}
+.unfollow {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  background: none;
+  font: inherit;
+  line-height: 13.7px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  position: absolute;
+  right: 6px;
+  top: 12px;
+  height: 32px;
+  padding: 7.5px 12px 0;
+  color: var(--c-red);
+  cursor: pointer;
+  opacity: calc(1 - var(--press-fade) * var(--dip));
+  -webkit-tap-highlight-color: transparent;
+}
+.unfollow:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: -2px;
+  border-radius: var(--r-4);
+}
+.chips {
+  position: absolute;
+  left: 10px;
+  top: 70px;
+  display: grid;
+  grid-template-columns: repeat(3, 108px);
+  gap: 6px 4px;
+}
+/* a quick pick: glass, 108 x 28, the player's head in a cut-out on the left, his name rolling on press */
+.chip {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  width: 108px;
+  height: 28px;
+  border-radius: 14px;
+  overflow: hidden;
+  color: var(--c-text);
+  font: var(--fw-s) var(--fs-12p5) / normal var(--font-sans);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.chip[data-staged] {
+  animation: phaseIn var(--t-follow-dur) var(--t-follow-ease) both;
+  animation-delay: calc(var(--t-follow-delay) + var(--i, 0) * var(--t-follow-stagger));
+}
+.chip:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 2px;
+}
+.chip[aria-pressed='true']::after {
+  content: '';
+  position: absolute;
+  inset: 0.5px;
+  border-radius: 13.5px;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.42);
+  pointer-events: none;
+  z-index: 2;
+}
+.face {
+  position: absolute;
+  left: 3px;
+  top: 0;
+}
+.chipName {
+  position: absolute;
+  left: 33px;
+  top: 50%;
+  translate: 0 -50%;
+  max-width: 66px;
+  font-size: calc(var(--fit, 12.5) * 1px);
+  white-space: nowrap;
+}
+
+/* ----- the card ----- */
+.follow {
+  --hn: calc(64 + (var(--full) - 64) * var(--k)); /* its height now, a number */
+  --ek: clamp(0, calc((var(--k) - 0.35) / 0.65), 1); /* the open content shows from k = 0.35 */
+  --ck: clamp(0, calc((0.6 - var(--k)) / 0.6), 1); /* the closed content until k = 0.6 */
+  --k: 1;
+  position: relative;
+  margin: 0 12px;
+  height: calc(var(--hn) * 1px);
+  border-radius: var(--r-24);
+  /* the feel's own two numbers keep their transitions beside the card's two */
+  transition:
+    --lit var(--t-lit),
+    --dip var(--t-dip),
+    --k 550ms var(--ease-glide),
+    --full 600ms var(--ease-glide);
+  /* sent off: it shakes (luau:4279); a press dips it 1.5 % (luau:4284) */
+  transform: translateX(calc(var(--shake, 0) * 1px)) scale(calc(1 - 0.015 * var(--dip)));
+}
+.follow[data-open='false'] {
+  --k: 0;
+}
+/* a card you press dips but is not lit by the pointer (glassPane without a light, luau:4276) */
+.follow.follow {
+  --lit-eff: 0;
+}
+
+/* the rim fades only while the card opens or closes (luau:4496): the closed content's strength until
+   k = 0.6, the open content's after */
+.follow.rim::before {
+  --step: clamp(0, calc((var(--k) - 0.594) * 1000), 1);
+  opacity: calc((1 - var(--step)) * var(--ck) + var(--step) * var(--ek));
+}
+
+/* everything on the card is laid on these; text never takes the pointer */
+.layer {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+.open {
+  opacity: var(--ek);
+}
+.closed {
+  opacity: var(--ck);
+}
+
+/* a goal: the top 136 px floods with the team's colours (luau:4287) */
+.flood {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: min(136px, 100%);
+  opacity: var(--gm, 0);
+  background: linear-gradient(90deg, var(--f0), var(--f1) 55%, var(--f0));
+  pointer-events: none;
+}
+
+.text {
+  position: absolute;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* the chest-up photo stands on the stats band and lifts 3 % on a goal (luau:4296). The one that
+   comes in is the outer; the shared element, which a flight copies, carries no animation. */
+.chestPos {
+  position: absolute;
+  top: 2px;
+  right: -8px;
+  width: 144px;
+  height: 134px;
+  animation: chestIn var(--t-follow-dur) var(--t-follow-ease) both;
+}
+.chest {
+  display: block;
+  width: 144px;
+  height: 134px;
+  overflow: hidden;
+  transform-origin: 100% 100%;
+  transform: scale(calc(1 + 0.06 * var(--gm, 0)));
+  pointer-events: none;
+}
+@keyframes chestIn {
+  from {
+    opacity: 0;
+    translate: 12px 18px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+.chestImg {
+  display: block;
+  width: 144px;
+  height: 180px;
+  margin-top: -4px;
+  max-width: none;
+  user-select: none;
+}
+.kitPos {
+  position: absolute;
+  right: 32px;
+  top: 30px;
+  width: 88px;
+  height: 88px;
+  animation: phaseIn var(--t-follow-dur) var(--t-follow-ease) both;
+}
+.kit {
+  display: block;
+  width: 88px;
+  height: 88px;
+  pointer-events: none;
+}
+.kit > svg {
+  display: block;
+}
+
+/* the two heads of the open card: his name, or his goal (luau:4308) */
+.nameBlock {
+  position: absolute;
+  inset: 0;
+  opacity: clamp(0, calc(1 - var(--gm, 0) * 2), 1);
+}
+.goalBlock {
+  position: absolute;
+  inset: 0;
+  opacity: clamp(0, calc(var(--gm, 0) * 2 - 1), 1);
+  color: var(--c-ink);
+}
+.first {
+  left: 18px;
+  top: 23px;
+  font: var(--fw-r) var(--fs-13) / normal var(--font-sans);
+  color: var(--c-muted);
+}
+.last {
+  left: 18px;
+  top: 36px;
+  font-weight: var(--fw-s);
+  letter-spacing: var(--track-2);
+  color: var(--c-text);
+}
+.vs {
+  position: absolute;
+  left: 18px;
+  top: 76px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.vsText {
+  font: var(--fw-m) var(--fs-12p5) / normal var(--font-sans);
+  color: var(--c-muted);
+}
+.goalWord {
+  left: 18px;
+  top: 20px;
+  font: var(--type-goal);
+  letter-spacing: var(--track-2);
+}
+.goalName {
+  left: 18px;
+  top: 77px;
+  font: var(--fw-s) var(--fs-17) / normal var(--font-sans);
+}
+.goalLine {
+  left: 18px;
+  top: 101.5px;
+  font: var(--fw-r) var(--fs-12p5) / normal var(--font-sans);
+  color: rgb(0 0 0 / 0.62);
+}
+
+/* his evening in one line, centred on y = 110 */
+.line {
+  position: absolute;
+  left: 18px;
+  top: 98px;
+  width: 196px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.lineIn {
+  animation: phaseIn 550ms var(--ease-glide) both;
+}
+/* one of his goals tonight: thin glass, the ball and the minute (luau:4348) */
+.goalChip {
+  flex: none;
+  height: 24px;
+  padding: 0 8px 0 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 12px;
+  font: var(--fw-s) var(--fs-11p5) / normal var(--font-sans);
+  color: var(--c-text);
+  white-space: nowrap;
+}
+.note {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--fw-r) var(--fs-12) / normal var(--font-sans);
+  color: var(--c-dim);
+}
+.after {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  width: 100%;
+}
+.noteM {
+  font-weight: var(--fw-m);
+  color: var(--c-muted);
+}
+.noteRed {
+  font-weight: var(--fw-m);
+  color: var(--c-red);
+}
+
+@keyframes phaseIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ----- the stats band: opaque, 64 px, at y = 136 (luau:4150) ----- */
+.band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 136px;
+  height: 64px;
+  background: var(--c-glass);
+  display: flex;
+  /* what the card's moving edge has not cleared stays hidden (luau:4468) */
+  opacity: clamp(0, calc((var(--hn) - 192) / 12), 1);
+}
+.band::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: rgb(255 255 255 / 0.08);
+}
+.cell {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  /* the cells come in one after another, from a third of their strength (luau:4162) */
+  animation: cellIn var(--t-follow-dur) var(--t-follow-ease) both;
+  animation-delay: calc(var(--t-follow-delay) + var(--i, 0) * var(--t-follow-stagger));
+}
+.cell > .cellValue {
+  animation: valueIn var(--t-follow-dur) var(--t-follow-ease) both;
+  animation-delay: calc(var(--t-follow-delay) + var(--i, 0) * var(--t-follow-stagger));
+}
+@keyframes cellIn {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes valueIn {
+  from {
+    translate: 0 5px;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+.cell + .cell::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 14px;
+  width: 1px;
+  height: 38px;
+  background: rgb(255 255 255 / 0.07);
+}
+.cellLabel {
+  position: absolute;
+  left: 18px;
+  top: 13.5px;
+  color: var(--c-muted);
+}
+.cellValue {
+  position: absolute;
+  left: 18px;
+  right: 8px;
+  top: calc(48px - 1em);
+  font: var(--fw-m) var(--fs-18, 18px) / normal var(--font-sans);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cellValue[data-kind='s'] {
+  font-size: 16px;
+}
+.cellValue[data-kind='r'] {
+  top: 33px;
+}
+/* a group that fades in with the phase it belongs to (luau:4252) */
+.fade {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.fade[data-in] {
+  animation: phaseIn 550ms var(--ease-glide) both;
+}
+
+/* ----- after his match: next fixture and a quiet countdown, y = 200 ----- */
+.rule {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  top: 200px;
+  height: 1px;
+  background: rgb(255 255 255 / 0.07);
+}
+.rule[data-in] {
+  animation: phaseIn 550ms var(--ease-glide) both;
+}
+.next {
+  position: absolute;
+  inset: 200px 0 0 0;
+  opacity: clamp(0, calc((var(--hn) - 284) / 12), 1);
+}
+.nextLabel {
+  position: absolute;
+  left: 18px;
+  top: 15.5px;
+  color: var(--c-muted);
+}
+.nextWho {
+  position: absolute;
+  left: 18px;
+  top: 40px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100% - 140px);
+}
+.nextName {
+  font: var(--type-name);
+  letter-spacing: var(--track-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nextWhen {
+  position: absolute;
+  left: 18px;
+  top: 67.9px;
+  font: var(--fw-r) var(--fs-12p5) / normal var(--font-sans);
+  color: var(--c-muted);
+}
+.count {
+  position: absolute;
+  right: 18px;
+  top: 0;
+  width: 81px;
+  height: 100px;
+}
+.countLabel {
+  position: absolute;
+  right: 0;
+  top: 15.5px;
+  color: #6a6964;
+}
+.unit {
+  position: absolute;
+  left: calc(var(--i) * 30px);
+  top: 41px;
+  width: 21px;
+  height: 36px;
+  text-align: center;
+  font: var(--fw-m) var(--fs-15) / normal var(--font-sans);
+  color: #d6d4cf;
+  font-variant-numeric: tabular-nums;
+}
+.unit:nth-of-type(1) {
+  left: 0;
+}
+.digit {
+  display: block;
+  height: 20px;
+  line-height: 20px;
+}
+.digit[data-old] {
+  position: absolute;
+  inset: 0 0 auto 0;
+  animation: rollOut 550ms var(--ease-inout) both;
+}
+.digit[data-new] {
+  animation: rollIn 550ms var(--ease-inout) both;
+}
+@keyframes rollOut {
+  from {
+    opacity: 1;
+    translate: 0 0;
+  }
+  to {
+    opacity: 0;
+    translate: 0 -7px;
+  }
+}
+@keyframes rollIn {
+  from {
+    opacity: 0;
+    translate: 0 7px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+.unitName {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 21px;
+  font: var(--fw-m) 8px / normal var(--font-sans);
+  letter-spacing: 0.14em;
+  text-indent: 0.14em;
+  color: #6a6964;
+}
+.colon {
+  position: absolute;
+  left: calc(21px + var(--i) * 30px);
+  top: 40px;
+  width: 9px;
+  text-align: center;
+  font: var(--fw-r) var(--fs-15) / 20px var(--font-sans);
+  color: var(--c-dim);
+}
+
+/* ----- while he plays: the ball and his last two acts, y = 200 (luau:4444) ----- */
+.acts {
+  position: absolute;
+  inset: 200px 0 0 0;
+}
+.ballDot {
+  position: absolute;
+  left: 19px;
+  top: 20px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c-dim);
+  opacity: clamp(0, calc((var(--hn) - 232) / 12), 1);
+}
+.ballDot[data-ball] {
+  background: var(--c-live);
+}
+.ballDot[data-ball]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgb(52 227 154 / 0.25);
+  animation: ring 785ms cubic-bezier(0.37, 0, 0.63, 1) infinite alternate;
+}
+@keyframes ring {
+  from {
+    transform: scale(2);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.act {
+  position: absolute;
+  left: 34px;
+  right: 18px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.act[data-row='0'] {
+  top: 13px;
+  font: var(--fw-m) var(--fs-14) / normal var(--font-sans);
+  opacity: clamp(0, calc((var(--hn) - 232) / 12), 1);
+}
+.act[data-row='1'] {
+  top: 35px;
+  font: var(--fw-r) var(--fs-12p5) / normal var(--font-sans);
+  opacity: calc(0.6 * clamp(0, calc((var(--hn) - 254) / 12), 1));
+}
+.act[data-weight='r'] {
+  font-weight: var(--fw-r);
+}
+.act[data-weight='m'] {
+  font-weight: var(--fw-m);
+}
+.actIn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  animation: actIn var(--t-follow-dur) var(--t-follow-ease) both;
+}
+@keyframes actIn {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+.actText {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.actClock {
+  flex: none;
+  font: var(--fw-m) var(--fs-11) / normal var(--font-sans);
+  color: var(--c-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ----- closed: his face, his name and what matters now ----- */
+.faceBox {
+  position: absolute;
+  left: 12px;
+  bottom: 0;
+  width: 54px;
+  height: 54px;
+  overflow: hidden;
+}
+.cName {
+  left: 66px;
+  top: 24px;
+  translate: 0 -50%;
+  font: var(--type-name);
+  letter-spacing: var(--track-1);
+  max-width: 120px;
+}
+.cSub {
+  position: absolute;
+  left: 66px;
+  top: 43px;
+  height: 14px;
+  translate: 0 -50%;
+  display: flex;
+  align-items: center;
+  gap: 5.4px;
+  font: var(--fw-r) var(--fs-12) / normal var(--font-sans);
+  color: var(--c-muted);
+  white-space: nowrap;
+  max-width: calc(100% - 66px - 70px);
+}
+.cDot {
+  position: relative;
+  flex: none;
+  width: 5.2px;
+  height: 5.2px;
+  margin-left: 0.4px;
+  border-radius: 50%;
+  background: var(--c-dim);
+}
+.cDot[data-ball] {
+  background: var(--c-live);
+}
+.cDot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgb(52 227 154 / 0.25);
+  animation: ring 785ms cubic-bezier(0.37, 0, 0.63, 1) infinite alternate;
+}
+.cRight {
+  position: absolute;
+  right: 58px;
+  top: 32px;
+  height: 22px;
+  translate: 0 -50%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cNext {
+  position: absolute;
+  right: 58px;
+  top: 0;
+  bottom: 0;
+  text-align: right;
+}
+.cDay {
+  position: absolute;
+  right: 0;
+  top: 24px;
+  translate: 0 -50%;
+  font: var(--fw-m) var(--fs-13) / normal var(--font-sans);
+  white-space: nowrap;
+}
+.cClock {
+  position: absolute;
+  right: 0;
+  top: 43px;
+  translate: 0 -50%;
+  font: var(--fw-r) var(--fs-12) / normal var(--font-sans);
+  color: var(--c-muted);
+}
+.cWho {
+  position: absolute;
+  left: 66px;
+  top: 43px;
+  translate: 0 -50%;
+  font: var(--fw-r) var(--fs-12) / normal var(--font-sans);
+  color: var(--c-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 66px - 58px - 84px);
+}
+
+/* ----- sent off: the card floods red, pulses, then says it (luau:4470) ----- */
+.red {
+  position: absolute;
+  inset: 0;
+  opacity: var(--rf, 0);
+  background: linear-gradient(180deg, #ff3b30 0%, #d9141b 60%, #8e0a10 100%);
+  pointer-events: none;
+}
+.redText {
+  position: absolute;
+  inset: 0;
+  opacity: var(--rt, 0);
+  pointer-events: none;
+}
+.redWord {
+  left: 18px;
+  font: var(--fw-b) 44px / normal var(--font-sans);
+  letter-spacing: var(--track-2);
+  color: var(--c-text);
+  transform-origin: 0 77%;
+  transform: scale(calc(1.25 - 0.25 * var(--rt, 0)));
+}
+.redMeta {
+  left: 18px;
+  font: var(--fw-m) var(--fs-13) / normal var(--font-sans);
+  color: rgb(255 255 255 / 0.82);
+}
+.redCard {
+  position: absolute;
+  width: 52px;
+  height: 74px;
+  border-radius: 5px;
+  background: #ff2d2d;
+  box-shadow:
+    2px 3px 0 rgb(0 0 0 / 0.35),
+    inset 0 0 0 1px rgb(255 255 255 / 0.35);
+  transform: rotate(calc(0.22rad - 0.3rad * (1 - var(--rt, 0))));
+}
+/* short card: the closed height */
+.follow[data-short] .redWord {
+  top: 15px;
+  font-size: 26px;
+}
+.follow:not([data-short]) .redWord {
+  top: calc(50% - 40px);
+}
+.follow[data-short] .redMeta {
+  display: none;
+}
+.follow:not([data-short]) .redMeta {
+  top: calc(50% + 17px);
+}
+.follow[data-short] .redCard {
+  width: 26px;
+  height: 36px;
+  right: 27px;
+  top: 14px;
+}
+.follow:not([data-short]) .redCard {
+  right: 44px;
+  top: calc(50% - 37px);
+}
+
+/* the hit area: the whole card opens the player; his face stands inside it so it can fly */
+.hit {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.hit:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 2px;
+}
+
+/* open / close: a small glass button, top right when open, centred right when closed */
+.toggle {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  right: 12px;
+  top: calc((17 - 5 * var(--k)) * 1px);
+  z-index: 2;
+  width: 34px;
+  height: 30px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  color: var(--c-text);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.toggle:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 2px;
+}
+.toggle > svg {
+  transform: rotate(calc(180deg * (1 - var(--k))));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .follow {
+    transition-duration: 1ms;
+  }
+  .ballDot[data-ball]::before,
+  .cDot::before {
+    animation: none;
+    opacity: 0;
+  }
+}

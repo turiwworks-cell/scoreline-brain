@@ -1,0 +1,124 @@
+/*
+ * The day tabs (luau:4656–4687, dayLayout and placeDayInd luau:3705–3736): each tab is as wide as its
+ * word plus 13 px each side; the strip shifts so the chosen tab is centred; the tab that says
+ * "Today" says "Ongoing" while Live is on, its width following --live-k. 354 px wide in the Lua
+ * (x = 18 .. 372), clipped at both ends by a 28 px fade to black.
+ */
+
+.wrap {
+  position: relative;
+  margin: 0 18px;
+  height: 50px;
+}
+
+.tabs {
+  position: relative;
+  height: 50px;
+  overflow: hidden;
+}
+
+/* the tabs' hit rows are 40 px tall, 8 px below the clip's top (y = 118) */
+.strip {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  display: flex;
+  will-change: transform;
+}
+.strip[data-ready] {
+  transition: transform var(--t-list-dur) var(--t-list-ease);
+}
+
+.tab {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0 13px;
+  height: 40px;
+  background: none;
+  flex: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  cursor: pointer;
+  font: var(--type-row);
+  letter-spacing: var(--track-1);
+  /* chosen = TEXT, the others DIM, the hover light lifts them 35 % toward TEXT; a press fades them 35 % */
+  color: color-mix(in srgb, var(--c-text) calc(var(--lit) * 35%), var(--c-dim));
+  opacity: calc(1 - var(--press-fade) * var(--dip));
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+}
+.tab[aria-selected='true'] {
+  color: var(--c-text);
+}
+.tab:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: -2px;
+  border-radius: var(--r-4);
+}
+
+.word {
+  display: block;
+}
+
+/* the Today tab: both words stacked, cross-fading as Live turns on; the tab's width is lerped
+   between the two words' widths (--wt, --wo are measured in px) */
+.morph {
+  width: calc(var(--wt) * 1px + (var(--wo) - var(--wt)) * 1px * var(--live-k) + 26px);
+}
+.morph .word {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  translate: 0 -50%;
+}
+.today {
+  opacity: calc(1 - var(--live-k));
+}
+.ongoing {
+  opacity: var(--live-k);
+}
+
+/* the edges fade to black (luau:4684) */
+.fade {
+  position: absolute;
+  top: 6px;
+  width: 28px;
+  height: 40px;
+  pointer-events: none;
+}
+.fadeL {
+  left: 0;
+  background: linear-gradient(90deg, #000, rgb(0 0 0 / 0));
+}
+.fadeR {
+  right: 0;
+  background: linear-gradient(90deg, rgb(0 0 0 / 0), #000);
+}
+
+/* the rule under the tabs and the indicator on it: 1 px at y = 158, 2 px at y = 157 (luau:4686) */
+.rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 48px;
+  height: 1px;
+  background: var(--c-hair);
+}
+.indicator {
+  position: absolute;
+  left: 0;
+  top: 47px;
+  width: 100px;
+  height: 2px;
+  background: var(--spectrum-accent);
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+.indicator[data-ready] {
+  transition: transform var(--t-list-dur) var(--t-list-ease);
+}
