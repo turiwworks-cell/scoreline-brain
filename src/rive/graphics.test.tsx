@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import { motionValue } from 'motion/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { LiveIcon } from './LiveIcon';
@@ -7,9 +7,9 @@ import WordGraphic from './WordGraphic';
 import type { RiveCanvasProps } from './RiveCanvas';
 import type { Property, RiveInstance, ViewModel } from './types';
 
-const mock = vi.hoisted(() => ({ canvas: null as RiveCanvasProps | null }));
+const mock = vi.hoisted(() => ({ canvas: null as RiveCanvasProps | null, source: null as string | null }));
 vi.mock('./RiveCanvas', () => ({ RiveCanvas: (props: RiveCanvasProps) => { mock.canvas = props; return <canvas aria-hidden="true" style={{ pointerEvents: 'none' }} />; } }));
-vi.mock('./assets', () => ({ liveIconSource: null, momentsSource: null }));
+vi.mock('./assets', () => ({ get liveIconSource() { return mock.source; }, momentsSource: null }));
 
 function property<T>(value: T) {
   const listeners = new Set<() => void>();
@@ -17,14 +17,29 @@ function property<T>(value: T) {
   return p;
 }
 function fixture() {
-  const live = property(false); const kind = property(''); const c1 = property(0); const c2 = property(0); const phase = property(0);
+  const live = property(false); const kind = property(''); const c1 = property(0); const c2 = property(0); const phase = property(0); const textCount = property('12');
   const trigger = vi.fn();
-  const vm: ViewModel = { boolean: () => live, string: () => kind, color: (name) => name === 'color1' ? c1 : c2, number: () => phase, trigger: () => ({ trigger }) };
+  const vm: ViewModel = { boolean: () => live, string: (name) => name === 'count' ? textCount : kind, color: (name) => name === 'color1' ? c1 : c2, number: () => phase, trigger: () => ({ trigger }) };
   const instance: RiveInstance = { stateMachineNames: ['State Machine 1'], viewModelInstance: vm, reset: vi.fn(), play: vi.fn(), pause: vi.fn(), startRendering: vi.fn(), stopRendering: vi.fn(), resizeDrawingSurfaceToCanvas: vi.fn(), cleanup: vi.fn() };
-  return { instance, live, kind, c1, c2, phase, trigger };
+  return { instance, live, kind, c1, c2, phase, trigger, textCount };
 }
-afterEach(() => { cleanup(); mock.canvas = null; vi.restoreAllMocks(); });
+afterEach(() => { cleanup(); mock.canvas = null; mock.source = null; vi.restoreAllMocks(); });
 describe('Live icon binding and hit target', () => {
+  it('replaces the whole glass button and counter only after native artwork is ready', async () => {
+    mock.source = '/rive/live-icon.riv';
+    const view = render(<LiveIcon live count={8} onChange={vi.fn()} className="m-glass live" fallback={<span>Live</span>}><span>8</span></LiveIcon>);
+    await waitFor(() => expect(mock.canvas).not.toBeNull());
+    const button = view.getByRole('button', { name: 'Live, 8 in play' });
+    expect(button.classList.contains('m-glass')).toBe(true);
+    act(() => mock.canvas!.onReady?.());
+    expect(button.classList.contains('m-glass')).toBe(false);
+    expect(button.getAttribute('data-rive-live')).toBe('true');
+    expect(view.queryByText('8')).toBeNull(); expect(view.queryByText('Live')).toBeNull();
+    expect(parseFloat(button.style.width) / parseFloat(button.style.height)).toBeCloseTo(443 / 152);
+    act(() => mock.canvas!.onError?.(new Error('renderer failed')));
+    expect(button.classList.contains('m-glass')).toBe(true);
+    expect(view.getByText('8')).toBeTruthy(); expect(view.getByText('Live')).toBeTruthy();
+  });
   it('keeps a DOM button, static fallback and controlled pressed state', () => {
     const change = vi.fn();
     const view = render(<LiveIcon live={false} count={3} onChange={change} fallback={<svg aria-hidden="true" />} />);
@@ -37,16 +52,25 @@ describe('Live icon binding and hit target', () => {
   });
   it('syncs URL changes to islive, Rive changes back, and suppresses write echoes', () => {
     const change = vi.fn(); const f = fixture();
-    const view = render(<LiveGraphic source="/rive/live-icon.riv" live={false} onChange={change} fallback={<svg />} />);
+    const view = render(<LiveGraphic source="/rive/live-icon.riv" count={3} live={false} onChange={change} fallback={<svg />} />);
     const binding = mock.canvas!.bind(f.instance, () => {})!;
-    expect(f.live.listeners.size).toBe(1);
-    view.rerender(<LiveGraphic source="/rive/live-icon.riv" live onChange={change} fallback={<svg />} />);
-    expect(f.live.value).toBe(true); f.live.emit(); expect(change).not.toHaveBeenCalled();
+    expect(f.live.listeners.size).toBe(1); expect(f.textCount.value).toBe('3');
+    view.rerender(<LiveGraphic source="/rive/live-icon.riv" count={4} live onChange={change} fallback={<svg />} />);
+    expect(f.live.value).toBe(true); expect(f.textCount.value).toBe('4'); f.live.emit(); expect(change).not.toHaveBeenCalled();
     f.live.value = false; f.live.emit(); expect(change).toHaveBeenCalledWith(false);
     binding.cleanup?.(); expect(f.live.listeners.size).toBe(0);
   });
+  it('rejects a full button with no dynamic count, keeping the complete DOM fallback', () => {
+    const view = render(<LiveGraphic source="/rive/live-icon.riv" count={7} live={false} onChange={vi.fn()} fallback={<span>Live 7</span>} />);
+    const f = fixture();
+    const vm = { ...f.instance.viewModelInstance!, string: () => null };
+    expect(() => mock.canvas!.bind({ ...f.instance, viewModelInstance: vm }, () => {})).toThrow('String count');
+    act(() => mock.canvas!.onError?.(new Error('missing count')));
+    expect(view.getByText('Live 7')).toBeTruthy(); expect(view.container.querySelector('canvas')).toBeNull();
+    expect(f.live.listeners.size).toBe(0);
+  });
   it('fails closed on a missing Boolean contract and keeps the fallback', () => {
-    const view = render(<LiveGraphic source="/rive/live-icon.riv" live={false} onChange={vi.fn()} fallback={<span>Static live</span>} />);
+    const view = render(<LiveGraphic source="/rive/live-icon.riv" count={3} live={false} onChange={vi.fn()} fallback={<span>Static live</span>} />);
     const f = fixture(); const invalid = { ...f.instance, viewModelInstance: null };
     expect(() => mock.canvas!.bind(invalid, () => {})).toThrow('islive');
     act(() => mock.canvas!.onError?.(new Error('no WebGL')));

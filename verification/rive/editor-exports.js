@@ -1,4 +1,4 @@
-/* global document, location, window */
+/* global document, location, window, URLSearchParams */
 import { Rive } from '@rive-app/webgl2';
 import { riveLoader } from '../../src/rive/loader';
 
