@@ -94,7 +94,20 @@ export function Scene({ p, info, d, photo, followed }: SceneProps) {
   const skipped = p.startedAt !== firstStart || p.phase === 'out';
   const [wordClock] = useState(() => createWordClock(p.beats!.up, p.beats!.full));
   const wordSignal = useMotionValue(0);
-  const storyTime = useTransform(() => { wordSignal.get(); return wordClock.time(t.get(), skipped); });
+  // Updating a derived MotionValue during render notifies Story's React text
+  // subscribers inside Scene's render. Sync the handoff clock after commit and
+  // on clock/phase events instead, including a first-tap jump or director exit.
+  const storyTime = useMotionValue(wordClock.time(t.get(), skipped));
+  const storySkipped = useRef(skipped);
+  const syncStory = useCallback(() => {
+    storyTime.set(wordClock.time(t.get(), storySkipped.current));
+  }, [storyTime, wordClock, t]);
+  useLayoutEffect(() => {
+    storySkipped.current = skipped;
+    syncStory();
+  }, [skipped, syncStory]);
+  useMotionValueEvent(t, 'change', syncStory);
+  useMotionValueEvent(wordSignal, 'change', syncStory);
   const waiting = useCallback(() => { wordClock.waiting(); wordSignal.set(wordSignal.get() + 1); }, [wordClock, wordSignal]);
   const phase = useCallback((n: number) => { wordClock.phase(n, t.get()); wordSignal.set(wordSignal.get() + 1); }, [wordClock, wordSignal, t]);
   const fallback = useCallback(() => { wordClock.fallback(); wordSignal.set(wordSignal.get() + 1); }, [wordClock, wordSignal]);

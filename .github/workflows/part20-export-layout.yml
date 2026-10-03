@@ -2,7 +2,7 @@ name: Part 20 signed scene layout evidence
 on:
   push:
     branches: [codex/part-20-moments]
-    paths: ['verification/moments/**', '.github/workflows/part20-export-layout.yml']
+    paths: ['src/features/moments/Scene.tsx', 'verification/moments/**', '.github/workflows/part20-export-layout.yml']
   workflow_dispatch:
 permissions:
   contents: read

@@ -112,6 +112,7 @@ describe('the scene', () => {
   });
 
   it('a first tap shows everything, the next closes it (tapScene, luau:7322)', async () => {
+    const errors = vi.spyOn(console, 'error');
     const a = setup({ openId: 1, front: true });
     a.goal(1);
     await screen.findByTestId('moment-scene');
@@ -122,6 +123,8 @@ describe('the scene', () => {
     fireEvent.click(screen.getByTestId('moment-scene'));
     expect(a.stage()!.phase).toBe('out');
     expect(screen.getByTestId('moment-scene').dataset.phase).toBe('out');
+    expect(errors.mock.calls.filter(([message]) => String(message).includes('Cannot update a component'))).toHaveLength(0);
+    errors.mockRestore();
   });
 
   it('the close button and Escape send it away without a tap', async () => {
@@ -273,3 +276,4 @@ describe('the toast', () => {
     expect(photo.style.opacity).toBe('1');
   });
 });
+
