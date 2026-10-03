@@ -3,3 +3,5 @@ export { createDemoSource, TICK_MS, type DemoSource, type DemoSourceOptions } fr
 export { demoMode, FAST_SPEED, type DemoMode } from './mode';
 export { LUA_SEED } from './rng';
 export type { DemoTrigger, Followed } from './sim';
+export { activeDemoSource, subscribeActiveDemoSource } from './active';
+export { DEMO_TRIGGERS } from './sim';

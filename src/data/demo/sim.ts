@@ -45,7 +45,9 @@ export const SNAPSHOT_TICKS = 5;
 export const REST_TICKS = 25;
 
 /** The dev panel's triggers (`luau:38–45`). */
-export type DemoTrigger = 'goalHome' | 'goalAway' | 'goalFavorite' | 'redHome' | 'redAway' | 'redFavorite' | 'fullTime';
+/** The Lua's seven triggers (`luau:38–45`), in its order. */
+export const DEMO_TRIGGERS = ['goalHome', 'goalAway', 'goalFavorite', 'redHome', 'redAway', 'redFavorite', 'fullTime'] as const;
+export type DemoTrigger = (typeof DEMO_TRIGGERS)[number];
 
 export interface Followed {
   readonly team: string;
