@@ -63,7 +63,8 @@ jobs:
             .verification/unit.json
             dist/.vite/manifest.json
           retention-days: 7
-      - run: npx playwright install --with-deps chromium
+      - id: browser-install
+        run: npx playwright install --with-deps chromium
       - name: Header regression check
         run: PLAYWRIGHT_JSON_OUTPUT_NAME=.verification/browser.json npx playwright test e2e/list.spec.ts --grep 'the header, the day tabs' --workers=1 --retries=0 --reporter=line,json
       - name: Real Rive lifecycle verification
@@ -72,7 +73,7 @@ jobs:
           npx tsc -p verification/rive/tsconfig.json
           PLAYWRIGHT_JSON_OUTPUT_NAME=.verification/rive.json npx playwright test -c playwright.rive.config.ts --reporter=line,json
       - name: Moment interactions
-        if: success() || failure()
+        if: always() && steps.browser-install.outcome == 'success'
         run: PLAYWRIGHT_JSON_OUTPUT_NAME=.verification/moments.json npx playwright test -c playwright.moments.config.ts --reporter=json
       - name: Report verification counts
         if: always()

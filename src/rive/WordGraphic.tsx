@@ -44,7 +44,7 @@ export default function WordGraphic(props: GoalWordProps & { source: string }) {
       // Existing scenes keep their director timers while hidden. Never start/advance in the background.
       if (document.hidden) return;
       if (!done && phase.value < 1 && current.time.get() >= current.full) { done = true; fail(); return; }
-      if (!started && current.time.get() >= current.start) {
+      if (!done && !started && current.time.get() >= current.start) {
         started = true;
         play.trigger();
       }

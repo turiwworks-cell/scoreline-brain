@@ -3,16 +3,16 @@ import { mountCanvas } from '../../src/rive/canvasLifecycle';
 import { riveLoader, riveSlots } from '../../src/rive/loader';
 
 // Test entry only. The legacy file is not imported by the production application.
-let wasm: unknown;
+const heap: { runtime?: { HEAPU8?: Uint8Array } } = {};
 const probe = {
   bound: 0, cleaned: 0, advances: 0, ready: 0, errors: [] as string[],
   get slots() { return riveSlots.count; },
-  get wasmBytes() { return (wasm as { HEAPU8?: Uint8Array } | undefined)?.HEAPU8?.byteLength ?? null; },
+  get wasmBytes() { return heap.runtime?.HEAPU8?.byteLength ?? null; },
 };
 declare global { interface Window { riveProbe: typeof probe; } }
 window.riveProbe = probe;
 await riveLoader.runtime();
-wasm = await RuntimeLoader.awaitInstance();
+heap.runtime = await RuntimeLoader.awaitInstance() as { HEAPU8?: Uint8Array };
 const host = document.querySelector<HTMLDivElement>('#canvases')!;
 type Mount = ReturnType<typeof mountCanvas>;
 function create() {
