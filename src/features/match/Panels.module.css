@@ -102,29 +102,13 @@
 
 /*
  * The momentum block (luau:4892): headline 43.8 + 18, the chart's glass 184 tall, the minute axis
- * under it; 36 px before Events. Part 12 draws the chart; the space and the glass hold its place.
+ * under it; 36 px before Events. Momentum owns the heading, glass and axis inside this block.
  */
 .momentum {
   position: relative;
   height: 269.8px;
   margin-bottom: 36px;
 }
-.momentumGlass {
-  position: absolute;
-  left: var(--gutter);
-  right: var(--gutter);
-  top: 61.8px;
-  height: 184px;
-  display: grid;
-  place-items: center;
-}
-.momentumNote {
-  font: var(--type-label);
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  color: var(--c-dim);
-}
-
 /* ---- match info: glass tiles two by two, 68 tall, 8 apart (luau:5246) ------------------------ */
 
 /* every row of tiles takes 76 px, the last one too (luau:5266) */

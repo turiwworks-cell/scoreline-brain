@@ -64,9 +64,12 @@ describe('the screen', () => {
 });
 
 describe('Facts', () => {
-  it('shows the momentum’s place, the commentary newest first and the match info', () => {
+  it('shows the real momentum chart, the commentary newest first and the match info', () => {
     const { container } = setup();
-    expect(container.querySelector('[data-part="12"]')).toBeTruthy();
+    expect(container.querySelector('[data-momentum="1"]')).toBeTruthy();
+    expect(screen.getByRole('img', { name: /Match momentum/ })).toBeTruthy();
+    expect(container.querySelector('[data-wave="home"]')).toBeTruthy();
+    expect(container.querySelector('[data-part="12"]')).toBeNull();
     const rows = Array.from(container.querySelectorAll('[data-row]')).map((r) => r.getAttribute('data-row'));
     expect(rows[rows.length - 1]).toBe('ko');
     expect(rows).toContain('ht');

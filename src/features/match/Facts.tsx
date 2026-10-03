@@ -4,11 +4,12 @@ import { Crest, Glass, MatchClock, textWidth, useFontVersion } from '../../ui';
 import { EventsFeed } from './EventsFeed';
 import { formOf, type FormResult } from './form';
 import { H4 } from './H4';
+import { Momentum } from './Momentum';
 import styles from './Panels.module.css';
 
 /*
  * Facts (facts, luau:5300): before kick-off, the kick-off time, both sides' form and the match
- * info; once it has started, the momentum (Part 12 draws the chart), the commentary and the
+ * info; once it has started, the momentum chart, the commentary and the
  * match info.
  */
 
@@ -38,7 +39,18 @@ export const Facts = memo(function Facts({ match, home, away, league, width, onR
   return (
     <div className={styles.facts}>
       <H4 left="Momentum" right={<MatchClock match={match} className={styles.h4Clock} />} />
-      <MomentumSlot />
+      <div className={styles.momentum}>
+        <Momentum
+          key={match.id}
+          matchId={match.id}
+          minute={match.clock.minute}
+          status={match.status}
+          momentum={match.momentum}
+          events={match.events}
+          home={home}
+          away={away}
+        />
+      </div>
       <H4
         left="Events"
         right={
@@ -59,21 +71,6 @@ export const Facts = memo(function Facts({ match, home, away, league, width, onR
     </div>
   );
 });
-
-/**
- * Where the momentum chart goes (luau:4890): its headline, the chart on glass and the minute
- * axis, 269.8 px in all. Part 12 draws it; until then the space and the glass are kept so
- * everything under it sits where the Lua puts it.
- */
-function MomentumSlot() {
-  return (
-    <div className={styles.momentum} data-part="12">
-      <Glass radius={20} className={styles.momentumGlass}>
-        <span className={styles.momentumNote}>Momentum chart · Part 12</span>
-      </Glass>
-    </div>
-  );
-}
 
 /** The largest size (≤ `size`) at which `s` fits in `maxW` (fit, luau:1634). */
 function fitSize(s: string, size: number, maxW: number): number {

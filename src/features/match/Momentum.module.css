@@ -1,0 +1,11 @@
+.momentum { margin: 0 18px; min-width: 0; }
+.heading { position: relative; min-height: 61.8px; }
+.heading h3 { margin: 0; font-size: 22px; line-height: 28px; font-weight: 500; letter-spacing: -0.03em; }
+.heading p { margin: 5px 0 0; font-size: 12px; line-height: 15px; color: var(--c-muted); }
+.leader { position: absolute; top: 8.9px; left: 0; }
+.withLeader { padding-left: 38px; }
+.glass { height: 184px; padding: 14px 16px; }
+.chart { display: block; width: 100%; height: 156px; overflow: visible; }
+.teamLabel { font-family: var(--font-sans); font-size: 10.5px; font-weight: 500; letter-spacing: 0.16em; fill: var(--c-muted); text-transform: uppercase; }
+.axis { display: flex; justify-content: space-between; margin: 10px 16px 0; height: 14px; color: var(--c-dim); font-size: 10px; line-height: 14px; font-weight: 500; }
+.pulse { transform-origin: 0 0; }

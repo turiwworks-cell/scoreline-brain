@@ -52,10 +52,18 @@ test('the hero and Facts sit where the Lua puts them', async ({ page }, info) =>
   for (const name of ['Facts', 'Stats', 'Lineup', 'Table']) await expect(s.getByRole('tab', { name })).toBeVisible();
   await expect(s.getByRole('button', { name: /Mbappé/ })).toBeVisible();
 
-  // Facts (luau:5300): Momentum, its 269.8 px block (the chart is Part 12's), 36 px, Events
+  // Facts (luau:5300): real Momentum, its 269.8 px block, 36 px, Events
   const top = 96 + 269.9 + 61;
   near(await box(page, s.getByRole('heading', { name: 'Momentum' })), { x: 18, y: top });
-  near(await box(page, s.locator('[data-part="12"] > *')), { y: top + 27.7 + 61.8, h: 184, x: 18, r: 18 });
+  const momentum = s.locator('[data-momentum="1"]');
+  near(await box(page, momentum.locator(':scope > .m-glass')), { y: top + 27.7 + 61.8, h: 184, x: 18, r: 18 });
+  const plot = momentum.locator('svg[viewBox="0 0 322 156"]');
+  near(await box(page, plot), { x: 34, r: 34, y: top + 27.7 + 61.8 + 14, h: 156 });
+  await expect(plot).toHaveAttribute('role', 'img');
+  await expect(momentum.locator('[data-wave="home"]')).toHaveCount(1);
+  await expect(momentum.locator('[data-wave="away"]')).toHaveCount(1);
+  expect(await momentum.locator('[data-momentum-goal]').count()).toBeGreaterThan(0);
+  await expect(s.locator('[data-part="12"]')).toHaveCount(0);
   near(await box(page, s.getByRole('heading', { name: 'Events' })), { x: 18, y: top + 27.7 + 269.8 + 36 });
   await expect(s.getByText('Live', { exact: true })).toBeVisible();
 
@@ -81,6 +89,29 @@ test('the hero and Facts sit where the Lua puts them', async ({ page }, info) =>
   await expect(s.getByRole('region', { name: 'Match info' })).toContainText('Stade de France');
 
   await page.screenshot({ path: info.outputPath('facts.png') });
+});
+
+test('the Facts chart unmounts on tab change and returns once', async ({ page }) => {
+  await open(page, '/match/1/facts?demo');
+  const chart = screen(page).locator('[data-momentum="1"]');
+  const clip = chart.locator('[data-wave-reveal]');
+  const revealX = () => clip.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m41);
+  // Wait beyond the wave's entrance, then verify a leaf clock tick leaves the chart in place.
+  await expect(chart.locator('[data-momentum-now]')).toBeVisible();
+  const endX = await chart.locator('[data-momentum-now]').evaluate((el) => (el as SVGGElement).transform.baseVal.consolidate()!.matrix.e);
+  await expect.poll(revealX).toBeCloseTo(-323 + endX, 2);
+  const paths = await chart.locator('[data-wave="home"]').getAttribute('d');
+  const clock = screen(page).getByText(/^\d{2}:\d{2}$/).first();
+  const before = await clock.textContent();
+  await expect(clock).not.toHaveText(before!);
+  expect(await chart.locator('[data-wave="home"]').getAttribute('d')).toBe(paths);
+  expect(await revealX()).toBeCloseTo(-323 + endX, 2);
+
+  await screen(page).getByRole('tab', { name: 'Stats', exact: true }).click();
+  await expect(chart).toHaveCount(0);
+  await screen(page).getByRole('tab', { name: 'Facts', exact: true }).click();
+  await expect(chart).toHaveCount(1);
+  await expect(chart.locator('[data-momentum-now]')).toBeVisible();
 });
 
 test('Stats counts out to the possession and opens the bars', async ({ page }, info) => {
