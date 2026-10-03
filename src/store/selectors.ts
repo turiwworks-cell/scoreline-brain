@@ -82,6 +82,8 @@ export const selectScore = perKey((id: number): Selector<Score | undefined> => (
 export const selectMatchStatus = perKey((id: number): Selector<MatchStatus | undefined> => (s) => s.domain.matches[id]?.status);
 export const selectTeam = perKey((id: string): Selector<Team | undefined> => (s) => s.domain.teams[id]);
 export const selectLeague = perKey((id: string): Selector<League | undefined> => (s) => s.domain.leagues[id]);
+/** The squads: one object, replaced only when a feed changes a squad. */
+export const selectPlayers: Selector<Readonly<Record<string, Player>>> = (s) => s.domain.players;
 /** `key` is `playerKey(team, n)`. */
 export const selectPlayer = perKey((key: string): Selector<Player | undefined> => (s) => s.domain.players[key]);
 

@@ -11,7 +11,7 @@ export { MatchClock, type ClockMatch, type MatchClockProps } from './MatchClock'
 export { LiveDot, Pill, type PillProps } from './Pill';
 export { KitDisc, PhotoTile, PlayerPhoto, type KitDiscProps, type PhotoTileProps, type PlayerPhotoProps } from './PlayerPhoto';
 export { PHOTO_ROOT, PHOTO_SIZES, photoSources, type PhotoKind, type PhotoSources } from './photos';
-export { coachPhoto, loadPhotoManifest, parsePhotoManifest, playerPhoto, setPhotoManifest, usePhotoManifest, type PhotoManifest, type PhotoManifestState } from './photoManifest';
+export { coachPhoto, frostPhoto, loadPhotoManifest, parsePhotoManifest, photoProps, playerPhoto, setPhotoManifest, usePhotoManifest, type PhotoManifest, type PhotoManifestState } from './photoManifest';
 export { ratingTone, type RatingTone } from './rating';
 export { RatingBadge, type RatingBadgeProps } from './RatingBadge';
 export { RollLabel } from './RollLabel';
@@ -22,4 +22,4 @@ export { tagLayout, tagList, type TagCounts } from './tagLayout';
 export { EventTags, SubOffTag, Tag, type EventTagsProps, type SubOffTagProps, type TagProps } from './Tags';
 export { Tabs, type TabItem, type TabsProps } from './Tabs';
 export { subscribeSecond } from './ticker';
-export { textWidth, useFontVersion } from './measure';
+export { inkCentre, textWidth, useFontVersion } from './measure';

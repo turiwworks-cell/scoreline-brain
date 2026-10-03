@@ -24,6 +24,20 @@ export function textWidth(weight: number, size: number, track: number, text: str
   return c.measureText(text).width;
 }
 
+/**
+ * Where the visible ink of `text` is centred, in px from the left of its box (the Lua centres the
+ * giant shirt number by its ink, not its advance: a "1" is narrow, a "0" is wide, luau:5862).
+ * Falls back to half the advance without a canvas.
+ */
+export function inkCentre(weight: number, size: number, track: number, text: string): number {
+  const c = context();
+  if (!c) return textWidth(weight, size, track, text) / 2;
+  c.font = `${weight} ${size}px "Hanken Grotesk", system-ui, sans-serif`;
+  (c as unknown as { letterSpacing: string }).letterSpacing = `${track * size}px`;
+  const m = c.measureText(text);
+  return (m.actualBoundingBoxRight - m.actualBoundingBoxLeft) / 2;
+}
+
 // the face may load after the first measure: anything that measured re-renders once it has
 let version = 0;
 const listeners = new Set<() => void>();

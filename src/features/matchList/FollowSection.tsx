@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Team } from '../../domain';
+import type { PhotoOf } from './FollowCard';
 import { useScoreline } from '../../store';
 import { feel, Star } from '../../ui';
 import { Block } from './cascade';
@@ -26,7 +26,7 @@ export type FollowSectionProps = {
   /** it shows on Today and Ongoing; elsewhere it stays mounted, unseen, keeping what it has learned */
   shown: boolean;
   onOpenPlayer: (p: Followed, from: Element) => void;
-  photoOf?: (team: Team) => string | undefined;
+  photoOf?: PhotoOf;
 };
 
 export function FollowSection({ pref, index, shown, onOpenPlayer, photoOf }: FollowSectionProps) {

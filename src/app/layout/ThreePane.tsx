@@ -2,7 +2,7 @@ import { AnimatePresence } from 'motion/react';
 import { paneSwap } from '../../motion';
 import { playerKeyOf } from '../nav/url';
 import { InsightsPlaceholder } from '../screens/InsightsPlaceholder';
-import { PlayerPlaceholder } from '../screens/PlayerPlaceholder';
+import { PlayerScreen } from '../screens/PlayerScreen';
 import { MatchPane } from './MatchPane';
 import type { Resolved } from './resolve';
 import { Screen } from './Screen';
@@ -20,7 +20,7 @@ export function ThreePane({ r }: { r: Resolved }) {
         <AnimatePresence initial={false}>
           {r.player ? (
             <Screen key={`player-${playerKeyOf(r.player)}`} pane="player" contentKey={playerKeyOf(r.player)} label="Player" className={styles.paneScreen} variants={paneSwap} initial={false} animate="in" exit="out">
-              <PlayerPlaceholder player={r.player} chrome="none" />
+              <PlayerScreen player={r.player} match={r.match} step={r.step} chrome="none" />
             </Screen>
           ) : (
             <Screen key="insights" pane="insights" contentKey="insights" label="Insights" className={styles.paneScreen} variants={paneSwap} initial={false} animate="in" exit="out">

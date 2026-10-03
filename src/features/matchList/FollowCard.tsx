@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNod
 import { minText, nameOf, playerKey, scoreStr, type Match, type NextFixture, type Team } from '../../domain';
 import { sharedPlayer } from '../../motion';
 import { selectMatch, selectTeam, useScoreline } from '../../store';
-import { Crest, EventTags, feel, Icon, KitDisc, MatchClock, mix, pastel, PlayerPhoto, RatingBadge, SoftLight, Tag, tagList, tagLayout, textWidth, useFontVersion } from '../../ui';
+import { Crest, EventTags, feel, Icon, KitDisc, MatchClock, mix, pastel, PlayerPhoto, RatingBadge, SoftLight, Tag, tagList, tagLayout, textWidth, useFontVersion, type PhotoSources } from '../../ui';
 import { fitSize } from './cardLayout';
 import { bandCells, eveningNote, type Cell } from './follow/cells';
 import { useNowMs } from './follow/clock';
@@ -34,9 +34,11 @@ export type FollowCardProps = {
   hidden: boolean;
   onToggle: () => void;
   onOpenPlayer: (p: Followed, from: Element) => void;
-  /** the player's bust image for a team's player until the image pipeline is wired */
-  photoOf?: (team: Team) => string | undefined;
+  /** the bust files of a team's player (the photo manifest, ui/photoManifest.ts); none = the kit disc */
+  photoOf?: PhotoOf;
 };
+
+export type PhotoOf = (team: Team, n: number) => PhotoSources | undefined;
 
 /** The attributes a shared element carries (Shared.tsx), for one that is an end only some of the time. */
 const sharedEnd = (id: string, active: boolean) => (active ? { 'data-shared': id, 'data-shared-end': 'face' } : {});
@@ -83,8 +85,8 @@ export function FollowCard({ followed, live, open, hidden, onToggle, onOpenPlaye
 
   const first = player?.first ?? '';
   const last = player ? player.last : nameOf({ players }, teamId, n);
-  const src = photoOf?.(team);
-  const photo = src !== undefined && photoFailed !== src ? src : undefined;
+  const files = photoOf?.(team, n);
+  const photo = files !== undefined && photoFailed !== files.src ? files : undefined;
   const after = phase === 'post' || phase === 'red';
   const faceId = sharedPlayer(teamId, n);
 
@@ -124,7 +126,22 @@ export function FollowCard({ followed, live, open, hidden, onToggle, onOpenPlaye
           {photo ? (
             <span className={styles.chestPos}>
               <span className={styles.chest} {...sharedEnd(faceId, open && !hidden)}>
-                <img className={styles.chestImg} src={photo} alt="" width={144} height={180} draggable={false} onError={() => setPhotoFailed(photo)} />
+                <picture>
+                  {photo.sources.map((s) => (
+                    <source key={s.type} type={s.type} srcSet={s.srcSet} sizes="144px" />
+                  ))}
+                  <img
+                    className={styles.chestImg}
+                    src={photo.src}
+                    srcSet={photo.srcSet}
+                    sizes="144px"
+                    alt=""
+                    width={144}
+                    height={180}
+                    draggable={false}
+                    onError={() => setPhotoFailed(photo.src)}
+                  />
+                </picture>
               </span>
             </span>
           ) : (
@@ -180,7 +197,7 @@ export function FollowCard({ followed, live, open, hidden, onToggle, onOpenPlaye
 
         <span className={`${styles.layer} ${styles.closed}`}>
           <span className={styles.faceBox} {...sharedEnd(faceId, !open && !hidden)}>
-            <PlayerPhoto team={team} n={n} width={54} src={photo} alt="" />
+            <PlayerPhoto team={team} n={n} width={54} src={photo?.src} srcSet={photo?.srcSet} sources={photo?.sources} alt="" />
           </span>
           <span className={`${styles.text} ${styles.cName}`} style={{ fontSize: closedSize }}>
             {last}

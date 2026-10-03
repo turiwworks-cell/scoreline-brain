@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { demoMode } from '../../data';
-import type { Team } from '../../domain';
+import type { PhotoOf } from './FollowCard';
 import { selectDays, selectLiveMatchIds, selectLoaded, useScoreline } from '../../store';
 import { DayTabs, type DayTab } from './DayTabs';
 import { FeedContext, type Feed } from './feedContext';
@@ -39,7 +39,7 @@ export type MatchListProps = {
   /** opens the account sheet; absent until the sheet exists */
   onMenu?: () => void;
   /** a stand-in image for a team's followed player until the image pipeline is wired */
-  photoOf?: (team: Team) => string | undefined;
+  photoOf?: PhotoOf;
   /** who is followed until someone else is chosen (the demo follows Argentina's 10) */
   defaultFollowed?: Followed | null;
   /** the follow preference; the app's own unless a test brings one */

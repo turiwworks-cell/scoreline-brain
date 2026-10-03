@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { crossfade, fitInto, intersect, lerpBox, overlapRatio } from './geometry';
+import { crossfade, fitInto, intersect, lerpBox, overlapRatio, insetOf, windowFade } from './geometry';
 
 describe('geometry', () => {
   it('lerpBox runs from a to b', () => {
@@ -35,5 +35,19 @@ describe('geometry', () => {
     expect(crossfade(0.5).to).toBe(1);
     expect(crossfade(0.6).from).toBe(1);
     expect(crossfade(0.9).from).toBeCloseTo(0, 6);
+  });
+});
+
+describe('window flight geometry', () => {
+  it('insetOf cuts a drawn image down to its window in its own px', () => {
+    // a 280 × 350 image drawn at half size, windowed to its top 100 px (viewport) of 175
+    const i = insetOf({ x: 10, y: 20, w: 140, h: 175 }, { x: 10, y: 20, w: 140, h: 100 }, { w: 280, h: 350 });
+    expect(i).toEqual({ top: 0, left: 0, right: 0, bottom: 150 });
+  });
+  it('windowFade: the bust is in by 40 %, the face goes late, and a close is the opening backwards', () => {
+    expect(windowFade(0.4, true).moving).toBe(1);
+    expect(windowFade(0.1, true).still).toBe(1);
+    expect(windowFade(1, true).still).toBe(0);
+    expect(windowFade(0.6, false)).toEqual(windowFade(0.4, true));
   });
 });

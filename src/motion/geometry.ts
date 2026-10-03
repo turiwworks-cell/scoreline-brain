@@ -54,3 +54,30 @@ export function crossfade(p: number): { from: number; to: number } {
   const from = p <= 0.6 ? 1 : Math.max(0, 1 - (p - 0.6) / 0.3);
   return { from, to };
 }
+
+/**
+ * The inset() that cuts an image drawn at `image` (a viewport box) down to `clip`, in the image's
+ * own un-scaled px (`nat` is its layout size), so `clip-path: inset(...)` can sit on the element
+ * that is moved with translate and scale.
+ */
+export function insetOf(image: Box, clip: Box, nat: Size): { top: number; right: number; bottom: number; left: number } {
+  const s = image.w > 0 ? image.w / nat.w : 1;
+  const at = (v: number) => Math.max(0, v);
+  return {
+    top: at((clip.y - image.y) / s),
+    left: at((clip.x - image.x) / s),
+    right: at(nat.w - (clip.x + clip.w - image.x) / s),
+    bottom: at(nat.h - (clip.y + clip.h - image.y) / s),
+  };
+}
+
+/**
+ * Opacities during a window flight (the face's picture growing into the bust, luau:5976): the bust
+ * is fully in by 40 % of the way (clamp(e × 2.5)), the face it grows from stands still under it
+ * and goes late. `e` is the opening progress: it runs 0 → 1 opening and 1 → 0 closing, so the
+ * close is the same picture run backwards.
+ */
+export function windowFade(p: number, opening: boolean): { still: number; moving: number } {
+  const e = Math.min(Math.max(opening ? p : 1 - p, 0), 1);
+  return { still: crossfade(e).from, moving: Math.min(e * 2.5, 1) };
+}

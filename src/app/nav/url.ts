@@ -45,11 +45,16 @@ export interface Nav {
   readonly player?: PlayerRef;
   /** the match the player was opened from (history state) */
   readonly under?: MatchRef;
+  /** the player was reached by an arrow, the way he slid in: 1 next, -1 previous (history state) */
+  readonly step?: PlayerStep;
 }
+
+export type PlayerStep = 1 | -1;
 
 /** What the app keeps in history state next to a URL. */
 export interface NavHistoryState {
   readonly under?: MatchRef;
+  readonly step?: PlayerStep;
 }
 
 export const isMatchTab = (v: unknown): v is MatchTab => typeof v === 'string' && (MATCH_TABS as readonly string[]).includes(v);
@@ -73,6 +78,11 @@ function underOf(state: unknown): MatchRef | undefined {
   return id !== undefined ? { id, tab: isMatchTab(u.tab) ? u.tab : DEFAULT_TAB } : undefined;
 }
 
+function stepOf(state: unknown): PlayerStep | undefined {
+  const s = (state as NavHistoryState | null | undefined)?.step;
+  return s === 1 || s === -1 ? s : undefined;
+}
+
 /** Reads a location. Tolerant: anything it doesn't understand reads as the list. */
 export function parseNav(pathname: string, search: string, state?: unknown): Nav {
   const list = parseList(search);
@@ -85,7 +95,8 @@ export function parseNav(pathname: string, search: string, state?: unknown): Nav
     const n = parseShirt(b);
     if (team !== undefined && n !== undefined) {
       const under = underOf(state);
-      return { list, player: { team, n }, ...(under ? { under } : {}) };
+      const step = stepOf(state);
+      return { list, player: { team, n }, ...(under ? { under } : {}), ...(step ? { step } : {}) };
     }
   }
   return { list };

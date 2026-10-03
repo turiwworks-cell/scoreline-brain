@@ -1,5 +1,5 @@
 import { useEffect, useSyncExternalStore } from 'react';
-import { PHOTO_ROOT, photoSources, type PhotoSources } from './photos';
+import { PHOTO_ROOT, photoSources, type PhotoKind, type PhotoSources } from './photos';
 
 /*
  * Which players have a photo: public/img/players/manifest.json (Part 8), read once for the whole
@@ -94,9 +94,10 @@ export function usePhotoManifest(): PhotoManifestState {
 
 // one object per file path, so memoised photos aren't handed a new set of sources every render
 const sources = new Map<string, PhotoSources>();
-const sourcesOf = (path: string): PhotoSources => {
-  let s = sources.get(path);
-  if (!s) sources.set(path, (s = photoSources(path, 'bust')));
+const sourcesOf = (path: string, kind: PhotoKind = 'bust'): PhotoSources => {
+  const key = `${kind}:${path}`;
+  let s = sources.get(key);
+  if (!s) sources.set(key, (s = photoSources(path, kind)));
   return s;
 };
 
@@ -106,8 +107,19 @@ export function playerPhoto(manifest: PhotoManifest | null, team: string, n: num
   return path ? sourcesOf(path) : undefined;
 }
 
+/** The same player's frosted bust (the pre-blurred picture seen through glass), or undefined. */
+export function frostPhoto(manifest: PhotoManifest | null, team: string, n: number): PhotoSources | undefined {
+  const path = manifest?.players[`${team}:${n}`];
+  return path ? sourcesOf(path, 'frost') : undefined;
+}
+
 /** A coach's photo files, or undefined. */
 export function coachPhoto(manifest: PhotoManifest | null, team: string): PhotoSources | undefined {
   const path = manifest?.coaches[team];
   return path ? sourcesOf(path) : undefined;
+}
+
+/** The props `PlayerPhoto` takes for a player's files (nothing for no photo). */
+export function photoProps(files: PhotoSources | undefined): { src?: string; srcSet?: string; sources?: PhotoSources['sources'] } {
+  return files ? { src: files.src, srcSet: files.srcSet, sources: files.sources } : {};
 }

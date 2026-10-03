@@ -1,7 +1,8 @@
 import { memo, useMemo, type CSSProperties } from 'react';
 import { playerKey, type Team } from '../../domain';
 import { selectTeam, useScoreline } from '../../store';
-import { feel, PlayerPhoto, RollLabel, textWidth, useFontVersion } from '../../ui';
+import { feel, photoProps, PlayerPhoto, RollLabel, textWidth, useFontVersion } from '../../ui';
+import type { PhotoOf } from './FollowCard';
 import { fitSize } from './cardLayout';
 import { knownPicks } from './follow/cells';
 import { sameFollowed, type Followed } from './follow/model';
@@ -20,7 +21,7 @@ export type FollowPickerProps = {
   staged: boolean;
   onPick: (f: Followed) => void;
   onUnfollow: () => void;
-  photoOf?: (team: Team) => string | undefined;
+  photoOf?: PhotoOf;
 };
 
 export function FollowPicker({ followed, staged, onPick, onUnfollow, photoOf }: FollowPickerProps) {
@@ -44,7 +45,7 @@ export function FollowPicker({ followed, staged, onPick, onUnfollow, photoOf }: 
   );
 }
 
-const Chip = memo(function Chip({ pick, index, on, staged, onPick, photoOf }: { pick: Followed; index: number; on: boolean; staged: boolean; onPick: (f: Followed) => void; photoOf?: (team: Team) => string | undefined }) {
+const Chip = memo(function Chip({ pick, index, on, staged, onPick, photoOf }: { pick: Followed; index: number; on: boolean; staged: boolean; onPick: (f: Followed) => void; photoOf?: PhotoOf }) {
   const team = useScoreline(selectTeam(pick.team)) as Team | undefined;
   const players = useScoreline(selectPlayers);
   useFontVersion();
@@ -64,7 +65,7 @@ const Chip = memo(function Chip({ pick, index, on, staged, onPick, photoOf }: { 
       {...feel}
     >
       <span className={styles.face}>
-        <PlayerPhoto team={team} n={pick.n} width={28} src={photoOf?.(team)} alt="" />
+        <PlayerPhoto team={team} n={pick.n} width={28} {...photoProps(photoOf?.(team, pick.n))} alt="" />
       </span>
       <span className={styles.chipName}>
         <RollLabel text={name} />

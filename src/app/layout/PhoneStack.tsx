@@ -2,7 +2,7 @@ import { AnimatePresence, m } from 'motion/react';
 import { LAYER, playerPage, pushLayer, scrim } from '../../motion';
 import { playerKeyOf } from '../nav/url';
 import { MatchScreen } from '../screens/MatchScreen';
-import { PlayerPlaceholder } from '../screens/PlayerPlaceholder';
+import { PlayerScreen } from '../screens/PlayerScreen';
 import type { Resolved } from './resolve';
 import { Screen } from './Screen';
 import styles from './Shell.module.css';
@@ -25,7 +25,7 @@ export function PhoneStack({ r }: { r: Resolved }) {
         )}
         {r.player && (
           <Screen key="player" pane="player" contentKey={playerKeyOf(r.player)} label="Player" className={styles.layerPlayer} variants={playerPage} {...LAYER}>
-            <PlayerPlaceholder key={playerKeyOf(r.player)} player={r.player} chrome="back" />
+            <PlayerScreen key={playerKeyOf(r.player)} player={r.player} match={r.match} step={r.step} chrome="back" />
           </Screen>
         )}
       </AnimatePresence>

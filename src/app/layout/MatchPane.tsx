@@ -3,7 +3,7 @@ import { LAYER, paneSwap, scrim, sheetRise } from '../../motion';
 import { playerKeyOf } from '../nav/url';
 import { PickAMatch } from '../screens/Missing';
 import { MatchScreen } from '../screens/MatchScreen';
-import { PlayerPlaceholder } from '../screens/PlayerPlaceholder';
+import { PlayerScreen } from '../screens/PlayerScreen';
 import type { Resolved } from './resolve';
 import { Screen } from './Screen';
 import styles from './Shell.module.css';
@@ -39,7 +39,7 @@ export function MatchPane({ r, sheet }: { r: Resolved; sheet: boolean }) {
           <AnimatePresence initial={false}>
             {player && (
               <Screen key="sheet" pane="player" contentKey={playerKeyOf(player)} label="Player" className={styles.sheet} variants={sheetRise} {...LAYER}>
-                <PlayerPlaceholder key={playerKeyOf(player)} player={player} chrome="close" />
+                <PlayerScreen key={playerKeyOf(player)} player={player} match={r.match} step={r.step} chrome="close" />
               </Screen>
             )}
           </AnimatePresence>

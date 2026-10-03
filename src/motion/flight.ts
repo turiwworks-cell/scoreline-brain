@@ -1,5 +1,5 @@
 import { animate } from 'motion/react';
-import { crossfade, fitInto, intersect, lerpBox, overlapRatio, type Box, type Size } from './geometry';
+import { crossfade, fitInto, insetOf, intersect, lerpBox, overlapRatio, windowFade, type Box, type Size } from './geometry';
 import type { SharedEnd } from './sharedIds';
 import { timing, type TimingKey } from './tokens';
 
@@ -19,6 +19,12 @@ import { timing, type TimingKey } from './tokens';
  *    without its ancestors' translation, so a layer still sliding in, a sheet rising or a cascade
  *    block lifting doesn't bend the path. Uniform scale and transform/opacity only.
  * 4. At the end the copies go and both ends show again.
+ *
+ * A window flight (a face growing into a bust, luau:5976) is the same, but instead of two copies
+ * that cross-fade it moves one picture: when both ends show a photo in an <img>, the photo's box
+ * and the window it is cut to (what its holders' overflow leaves) run from one end's to the
+ * other's, so the framing of the face is kept all the way. The face end stays put under it and
+ * goes late. An end without a photo (the kit disc) takes the cross-fade above.
  *
  * A new flight for an element already in flight starts from where the copy is now, so a reversed
  * or repeated navigation picks the motion up instead of jumping. Ends that are off screen or
@@ -41,7 +47,15 @@ export interface FlightRequest {
 
 interface Piece {
   box: Box;
+  /** a window flight's photo and window right now, to start the next from */
+  view?: View;
   stop(): void;
+}
+
+/** A photo's box and the window it shows through, in viewport px. */
+interface View {
+  readonly image: Box;
+  readonly clip: Box;
 }
 
 const active = new Map<string, Piece>();
@@ -61,10 +75,14 @@ export function fly(req: FlightRequest): number {
     if (!toEl || !fromEl || toEl === fromEl) continue;
     const prev = active.get(id);
     const fromBox = prev ? prev.box : boxOf(fromEl);
+    const prevView = prev?.view;
     prev?.stop();
     if (!prev && !onScreen(fromEl, fromBox)) continue;
     if (!onScreen(toEl, restingBox(toEl))) continue;
-    start(id, fromEl, toEl, fromBox, req);
+    const fromPhoto = photoOf(fromEl);
+    const toPhoto = photoOf(toEl);
+    if (fromPhoto && toPhoto) startWindow(id, fromEl, toEl, fromPhoto, toPhoto, prevView, req);
+    else start(id, fromEl, toEl, fromBox, req);
     started += 1;
   }
   return started;
@@ -73,6 +91,13 @@ export function fly(req: FlightRequest): number {
 /** Ends every flight now: copies removed, both ends shown. */
 export function landAll(): void {
   for (const p of [...active.values()]) p.stop();
+}
+
+/** Whether anything named `${group}:…` is in flight (a screen that has just opened asks). */
+export function isFlying(group: string): boolean {
+  const prefix = `${group}:`;
+  for (const id of active.keys()) if (id.startsWith(prefix)) return true;
+  return false;
 }
 
 /** How many elements are in flight (for tests and the dev panel). */
@@ -145,6 +170,117 @@ function start(id: string, fromEl: HTMLElement, toEl: HTMLElement, fromBox: Box,
     onComplete: () => piece.stop(),
   });
   if (done) anim.controls.stop();
+}
+
+/** The photo an end shows: its <img>, and the window the end's own overflow cuts it to, both in viewport px. */
+function photoOf(end: HTMLElement): { img: HTMLImageElement; view: View } | null {
+  const img = end.querySelector('img');
+  if (!img || !img.offsetWidth || !img.offsetHeight) return null;
+  const r = img.getBoundingClientRect();
+  if (r.width <= 0 || r.height <= 0) return null;
+  const image: Box = { x: r.left, y: r.top, w: r.width, h: r.height };
+  let clip = image;
+  for (let a: Element | null = img.parentElement; a; a = a.parentElement) {
+    const o = getComputedStyle(a);
+    if (o.overflowX !== 'visible' || o.overflowY !== 'visible') clip = intersect(clip, boxOf(a));
+    if (a === end) break;
+  }
+  clip = intersect(clip, boxOf(end));
+  return clip.w > 0 && clip.h > 0 ? { img, view: { image, clip } } : null;
+}
+
+type Photo = NonNullable<ReturnType<typeof photoOf>>;
+
+function startWindow(id: string, fromEl: HTMLElement, toEl: HTMLElement, from: Photo, to: Photo, prevView: View | undefined, req: FlightRequest) {
+  const layer = overlay();
+  // the end with the smaller picture is the face, the other the bust
+  const opening = from.view.image.w * from.view.image.h <= to.view.image.w * to.view.image.h;
+  const faceEl = opening ? fromEl : toEl;
+  const bust = opening ? to.img : from.img;
+  const begin: View = prevView ?? from.view;
+
+  // where the destination's photo and window sit, as it will rest: they follow it as it settles
+  const rest = restingBox(toEl);
+  const here = boxOf(toEl);
+  const shift = { x: rest.x - here.x, y: rest.y - here.y };
+  const off = (b: Box): Box => ({ x: b.x + shift.x, y: b.y + shift.y, w: b.w, h: b.h });
+  const target: View = { image: off(to.view.image), clip: off(to.view.clip) };
+
+  const nat: Size = { w: bust.offsetWidth, h: bust.offsetHeight };
+  const faceSize = sizeOf(faceEl);
+  const still = copyOf(faceEl, faceSize);
+  const moving = pictureCopy(bust, nat);
+  layer.append(still, moving);
+  fromEl.setAttribute(FLYING, '');
+  toEl.setAttribute(FLYING, '');
+
+  const piece: Piece = { box: boxOf(fromEl), view: begin, stop: () => {} };
+  const faceFrom = opening ? boxOf(fromEl) : null;
+  const place = (p: number) => {
+    const now = toEl.isConnected ? restingBox(toEl) : rest;
+    const dx = now.x - rest.x;
+    const dy = now.y - rest.y;
+    const at = (b: Box): Box => ({ x: b.x + dx, y: b.y + dy, w: b.w, h: b.h });
+    const view: View = { image: lerpBox(begin.image, at(target.image), p), clip: lerpBox(begin.clip, at(target.clip), p) };
+    moving.style.transform = `translate(${view.image.x}px, ${view.image.y}px) scale(${view.image.w / nat.w})`;
+    const c = insetOf(view.image, view.clip, nat);
+    moving.style.clipPath = `inset(${c.top}px ${c.right}px ${c.bottom}px ${c.left}px)`;
+    const fb = faceFrom ?? (faceEl.isConnected ? restingBox(faceEl) : null);
+    if (fb) put(still, faceSize, fb);
+    const f = windowFade(p, opening);
+    still.style.opacity = String(f.still);
+    moving.style.opacity = String(f.moving);
+    piece.view = view;
+    piece.box = lerpBox(begin.clip, at(target.clip), p);
+  };
+  place(0);
+
+  let done = false;
+  const anim: { controls?: { stop(): void } } = {};
+  piece.stop = () => {
+    if (done) return;
+    done = true;
+    anim.controls?.stop();
+    still.remove();
+    moving.remove();
+    fromEl.removeAttribute(FLYING);
+    toEl.removeAttribute(FLYING);
+    if (active.get(id) === piece) active.delete(id);
+    if (active.size === 0) overlayEl?.replaceChildren();
+  };
+  active.set(id, piece);
+
+  const t = timing(req.timing);
+  anim.controls = animate(0, 1, { duration: t.duration * (req.durationScale ?? 1), ease: t.ease, onUpdate: place, onComplete: () => piece.stop() });
+  if (done) anim.controls.stop();
+}
+
+/** A copy of a photo (its <picture> when it has one), laid out at its own size, to be moved and cut. */
+function pictureCopy(img: HTMLImageElement, nat: Size): HTMLElement {
+  const holder = img.parentElement?.tagName === 'PICTURE' ? img.parentElement : img;
+  const c = holder.cloneNode(true) as HTMLElement;
+  const im = c instanceof HTMLImageElement ? c : c.querySelector('img');
+  if (im) {
+    im.loading = 'eager';
+    im.decoding = 'sync';
+    Object.assign(im.style, { position: 'static', display: 'block', width: '100%', height: '100%', maxWidth: 'none', margin: '0' });
+  }
+  Object.assign(c.style, {
+    position: 'absolute',
+    left: '0',
+    top: '0',
+    display: 'block',
+    width: `${nat.w}px`,
+    height: `${nat.h}px`,
+    maxWidth: 'none',
+    margin: '0',
+    transformOrigin: '0 0',
+    pointerEvents: 'none',
+    willChange: 'transform, opacity',
+  });
+  c.setAttribute('aria-hidden', 'true');
+  c.setAttribute('data-shared-copy', 'photo');
+  return c;
 }
 
 function ends(group: string, end: SharedEnd): HTMLElement[] {

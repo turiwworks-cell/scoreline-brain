@@ -1,0 +1,521 @@
+/*
+ * The player page (drawPlayerView, luau:5845–6179). The Lua draws on a 390 × 844 artboard; the
+ * numbers below are its own, measured from the top of the page (the page scrolls under the bar).
+ * x positions hang from the page's centre. Text is placed by its baseline: a line box 1.2 high
+ * whose top is `y - 0.9485em` puts the baseline at y, as the Lua's txt(…, y) does.
+ */
+
+.page {
+  --bar-top: max(50px, env(safe-area-inset-top));
+  position: relative;
+  min-height: 100%;
+  padding-bottom: calc(40px + env(safe-area-inset-bottom));
+  overflow-x: clip;
+}
+
+/* the soft light behind everything: fixed to the screen, not the page (backdrop, luau:5917) */
+.backdrop {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  height: 0;
+  pointer-events: none;
+}
+.backdrop > span {
+  inset: 0 0 auto 0 !important;
+  height: 640px;
+}
+
+/* everything drawn above the info: number, bust, line of light, arrows, the substitution tag */
+.scene {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 456px;
+  pointer-events: none;
+}
+
+/* ---- the giant number (bigNumber, luau:5895): L 300, white at 8 %, its baseline on the line ---- */
+.number {
+  position: absolute;
+  top: calc(399.1667px - 0.9485em);
+  font: var(--fw-l) 300px / 1.2 var(--font-sans);
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+  color: rgb(255 255 255 / 0.08);
+  user-select: none;
+}
+.numberBlur {
+  top: calc(399.1667px - 0.9485em);
+  filter: blur(8px);
+}
+
+/* ---- the bust: the cell 280 × 350 at (55, 90), cut at 318 of 360 --------------------------------- */
+.hero {
+  position: absolute;
+  top: 90px;
+  left: calc(50% - 140px);
+  width: 280px;
+  height: 309.1667px;
+  transform-origin: 50% 40%;
+}
+.bust {
+  display: block;
+  position: relative;
+  width: 280px;
+  height: 309.1667px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.bustImg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 280px;
+  height: 350px;
+  max-width: none;
+  user-select: none;
+}
+/* no photo: a 92 px kit disc at the middle of the cell (luau:5985) */
+.kit {
+  display: block;
+  position: absolute;
+  left: 94px;
+  top: 124px;
+  width: 92px;
+  height: 92px;
+  pointer-events: none;
+}
+.kit > svg {
+  display: block;
+}
+
+/* ---- the line of light (horizon, luau:5861) ---------------------------------------------------- */
+.horizon {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  pointer-events: none;
+}
+.lightUp,
+.lightDown {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.lightUp {
+  top: -90px;
+  height: 90px;
+}
+.lightDown {
+  top: 0;
+  height: 40px;
+}
+.bloom {
+  position: absolute;
+  left: calc(50% - 150px);
+  top: -1.5px;
+  width: 300px;
+  height: 3px;
+  border-radius: 1.5px;
+  filter: blur(3px);
+}
+.hair {
+  position: absolute;
+  left: calc(50% - 182px);
+  top: -0.5px;
+  width: 364px;
+  height: 1px;
+}
+
+/* ---- the arrows: previous and next team-mate, 40 px glass at y 250 ----------------------------- */
+.arrow {
+  position: absolute;
+  top: 250px;
+  pointer-events: auto;
+  --glass-tint: rgb(18 18 18 / 0.55);
+  opacity: clamp(0, calc(1 - var(--sy, 0) / 90), 1);
+}
+.prev {
+  left: 12px;
+}
+.next {
+  right: 12px;
+}
+.page[data-arrows='fading'] .arrow {
+  pointer-events: none;
+}
+.page[data-arrows='off'] .arrow {
+  visibility: hidden;
+}
+
+/* ---- off / on, a glass pill at (18, 104), 30 tall ------------------------------------------------ */
+.sub {
+  position: absolute;
+  top: 104px;
+  left: 18px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px 0 8px;
+  font: var(--fw-s) var(--fs-12p5) / normal var(--font-sans);
+  color: var(--c-text);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.sub > svg {
+  flex: none;
+}
+
+/* ---- the bar (luau:6101): 96 tall; transparent until he scrolls under it ------------------------ */
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  height: 96px;
+  margin-bottom: -96px;
+  pointer-events: none;
+}
+.bar > * {
+  pointer-events: auto;
+}
+.barGlass {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--c-bg);
+  opacity: clamp(0, calc(var(--sy, 0) / 50), 1);
+  pointer-events: none;
+}
+/* the same scene, moved up by the scroll: the frosted copy seen through the glass */
+.glassScene {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 456px;
+  transform: translateY(calc(var(--sy, 0) * -1px));
+}
+.frost {
+  position: absolute;
+  left: calc(50% - 140px);
+  top: 90px;
+  width: 280px;
+  height: 350px;
+  max-width: none;
+}
+.glassTint {
+  position: absolute;
+  inset: 0;
+  background: rgb(18 18 18 / 0.42);
+}
+.glassSheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.05), rgb(255 255 255 / 0));
+}
+.glassRule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: rgb(255 255 255 / 0.14);
+}
+.back {
+  position: absolute;
+  left: 14px;
+  top: var(--bar-top);
+}
+.follow {
+  position: absolute;
+  right: 14px;
+  top: var(--bar-top);
+}
+/* the team, centred on y 70: its crest (16) and name (lab) side by side, 8 px apart */
+.team {
+  position: absolute;
+  left: 60px;
+  right: 60px;
+  top: calc(var(--bar-top) + 20px - 8px);
+  height: 16px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  color: var(--c-text);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.team > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- under him: first name, surname, role (luau:6000) ------------------------------------------- */
+.sheet {
+  position: relative;
+  padding-top: 456px;
+}
+.info {
+  position: relative;
+  height: 92px;
+}
+.infoSlide {
+  position: absolute;
+  inset: 0;
+}
+.line {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  margin: 0;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+}
+.first {
+  font: var(--fw-r) var(--fs-16) / 1.2 var(--font-sans);
+  color: var(--c-muted);
+}
+.last {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-m);
+  letter-spacing: var(--track-3);
+  line-height: 1.2;
+  color: var(--c-text);
+}
+.last:focus {
+  outline: none;
+}
+.last:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 12px;
+  border-radius: 4px;
+}
+/* his number, small and light, hangs at the surname's top right */
+.shirt {
+  position: absolute;
+  margin: 0;
+  font: var(--fw-l) 15px / 1.2 var(--font-sans);
+  letter-spacing: -0.02em;
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+.role {
+  font: var(--fw-r) var(--fs-13) / 1.2 var(--font-sans);
+  color: var(--c-muted);
+}
+
+/* ---- facts: two hair-lines 68 apart, cells between them ----------------------------------------- */
+.facts {
+  position: relative;
+  display: flex;
+  height: 68px;
+  margin: 0 18px;
+}
+.facts::before,
+.facts::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--c-hair);
+}
+.facts::before {
+  top: 0;
+}
+.facts::after {
+  top: 68px;
+}
+.cell {
+  position: relative;
+  flex: none;
+  height: 68px;
+}
+.divider {
+  position: absolute;
+  left: 0;
+  top: 12px;
+  width: 1px;
+  height: 44px;
+  background: var(--c-hair);
+}
+.label {
+  position: absolute;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 1.2;
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+.value {
+  position: absolute;
+  font: var(--fw-m) var(--fs-15) / 1.2 var(--font-sans);
+  color: var(--c-text);
+  white-space: nowrap;
+}
+
+/* ---- this match ----------------------------------------------------------------------------------- */
+.match {
+  position: relative;
+  margin: 30px 18px 0;
+}
+.matchHead {
+  position: relative;
+  height: 30px;
+}
+.matchHead > span {
+  position: absolute;
+  top: calc(10.5px - 0.9485em);
+}
+.matchHead > span:first-child {
+  left: 0;
+}
+.matchHead > span:last-child {
+  right: 0;
+}
+.ink {
+  color: var(--c-text);
+}
+.note {
+  height: 74px;
+  padding: 17.8px 18px;
+  font: var(--fw-r) 13.5px / 19px var(--font-sans);
+  color: var(--c-muted);
+}
+.match[data-played='no'] {
+  margin-bottom: 40px;
+}
+
+/* the rating stays the focus; what he did sits beside it as tags */
+.did {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 76px;
+}
+.rating {
+  --bg: var(--spectrum-3);
+  position: relative;
+  flex: none;
+  width: 86px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--bg);
+  color: var(--c-ink);
+}
+.ratingNum {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(24px - 0.9485em);
+  font: var(--fw-b) 24px / 1.2 var(--font-sans);
+  text-align: center;
+}
+.ratingLabel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(47px - 0.9485em);
+  font: var(--fw-m) 8.5px / 1.2 var(--font-sans);
+  letter-spacing: 0.14em;
+  text-align: center;
+}
+.tags {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 6px;
+  padding-bottom: 16px;
+}
+.none {
+  align-self: center;
+  margin-top: 14px;
+  font: var(--fw-r) var(--fs-13) / normal var(--font-sans);
+  color: var(--c-dim);
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 10px 0 7px;
+  font: var(--fw-m) var(--fs-12p5) / normal var(--font-sans);
+  color: var(--c-text);
+  white-space: nowrap;
+}
+.tag > svg {
+  flex: none;
+}
+
+/* the bars (luau:6086): label and value on one line, a 5 px track under it, 46 each */
+.numbers {
+  position: relative;
+  margin: 0 18px;
+  padding-bottom: 0;
+}
+.pending {
+  position: relative;
+  height: 30px;
+  margin: 0;
+  font: var(--fw-r) var(--fs-13) / 1.2 var(--font-sans);
+  color: var(--c-dim);
+}
+.pending > span {
+  position: absolute;
+  top: calc(12px - 0.9485em);
+}
+.barRow {
+  position: relative;
+  height: 46px;
+}
+.barLabel,
+.barValue {
+  position: absolute;
+  top: calc(12px - 0.9485em);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.barLabel {
+  left: 0;
+  font: var(--fw-r) var(--fs-13) / 1.2 var(--font-sans);
+  color: var(--c-muted);
+}
+.barValue {
+  right: 0;
+  font: var(--fw-m) var(--fs-14) / 1.2 var(--font-sans);
+  color: var(--c-text);
+  font-variant-numeric: tabular-nums;
+}
+.barTrack {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 22px;
+  height: 5px;
+  border-radius: 2.5px;
+  background: rgb(255 255 255 / 0.08);
+}
+.barFill {
+  display: block;
+  height: 5px;
+  width: 5px;
+  border-radius: 2.5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrow {
+    transition: none;
+  }
+}

@@ -1,6 +1,6 @@
 import type { DataRouter } from 'react-router';
 import { rememberTrigger } from './focusMemory';
-import { DEFAULT_TAB, hrefOf, matchPath, parseNav, type MatchRef, type MatchTab, type NavHistoryState, type PlayerRef } from './url';
+import { DEFAULT_TAB, hrefOf, matchPath, parseNav, type MatchRef, type MatchTab, type NavHistoryState, type PlayerRef, type PlayerStep } from './url';
 
 /*
  * Every navigation in the app goes through these. Screens push (a new history entry: back
@@ -14,6 +14,11 @@ export interface NavActions {
   setTab(id: number, tab: MatchTab): void;
   /** Opens a player (push). `under`: the match it was opened from. */
   openPlayer(player: PlayerRef, opts?: { under?: MatchRef; from?: Element | null }): void;
+  /**
+   * The arrows on a player's page: the next or previous player of his squad (replace: back still
+   * returns to what opened the page, not through every player stepped past). `dir` is the way he slides in.
+   */
+  stepPlayer(player: PlayerRef, dir: PlayerStep): void;
   /** The list's day tab, as an offset from today (replace). */
   setDay(day: number): void;
   /** The Live filter (replace). */
@@ -66,6 +71,13 @@ export function createNavActions(router: DataRouter): NavActions {
       rememberTrigger(loc.key, pressed(opts.from));
       const state: NavHistoryState = opts.under ? { under: opts.under } : {};
       void router.navigate(to, { state });
+    },
+    stepPlayer(player, dir) {
+      const { loc, href, nav } = here();
+      const to = hrefOf({ list: nav.list, player }, loc.search);
+      if (to === href || to === pending()) return;
+      const state: NavHistoryState = { ...(nav.under ? { under: nav.under } : {}), step: dir };
+      void router.navigate(to, { replace: true, state });
     },
     setDay(day) {
       const { loc, href, nav } = here();

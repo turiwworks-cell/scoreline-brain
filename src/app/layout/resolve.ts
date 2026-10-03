@@ -1,5 +1,5 @@
 import { sharedMatchGroup, sharedPlayerGroup, type SharedEnd, type TimingKey } from '../../motion';
-import { DEFAULT_TAB, samePlayer, type ListState, type MatchRef, type Nav, type PlayerRef } from '../nav/url';
+import { DEFAULT_TAB, samePlayer, type ListState, type MatchRef, type Nav, type PlayerRef, type PlayerStep } from '../nav/url';
 import type { LayoutMode } from './layoutMode';
 
 /*
@@ -22,6 +22,8 @@ export interface Resolved {
   readonly match: MatchRef | null;
   /** the player whose screen is up: phone layer, tablet sheet, desktop third pane */
   readonly player: PlayerRef | null;
+  /** he was reached by an arrow: the way he slides in (his page glides, nothing flies) */
+  readonly step?: PlayerStep;
 }
 
 export interface MatchLookup {
@@ -41,7 +43,7 @@ export function resolve(nav: Nav, layout: LayoutMode, lookup: MatchLookup): Reso
     const id = nav.match?.id ?? nav.under?.id ?? fallback ?? lookup.featured;
     match = nav.match ?? nav.under ?? (id !== undefined ? { id, tab: DEFAULT_TAB } : null);
   }
-  return { layout, list: nav.list, match, player };
+  return { layout, list: nav.list, match, player, ...(player && nav.step ? { step: nav.step } : {}) };
 }
 
 /** How many screens stack over the list (phone layers, the tablet sheet). Focus moves into a new one. */
@@ -73,7 +75,8 @@ export function planFlights(prev: Resolved | undefined, next: Resolved): FlightP
     if (prev.match) plans.push({ group: sharedMatchGroup(prev.match.id), from: 'hero', to: 'card', timing: 'screen', direction: 'close' });
     if (next.match) plans.push({ group: sharedMatchGroup(next.match.id), from: 'card', to: 'hero', timing: 'screen', direction: 'open' });
   }
-  if (!samePlayer(prev.player ?? undefined, next.player ?? undefined)) {
+  // an arrow glides the page to the next player (luau:5948): no face flies
+  if (!samePlayer(prev.player ?? undefined, next.player ?? undefined) && !(next.step && prev.player && next.player)) {
     if (prev.player) {
       plans.push({ group: sharedPlayerGroup(prev.player.team, prev.player.n), from: 'bust', to: 'face', timing: 'player', durationScale: 0.7, direction: 'close' });
     }

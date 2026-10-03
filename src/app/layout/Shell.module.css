@@ -30,6 +30,9 @@
 .base {
   position: absolute;
   inset: 0;
+  /* its own stacking context, so the list's sticky header can never rise over a screen pushed on
+     top (a player opened by link has no match layer to give it one through the slide's transform) */
+  isolation: isolate;
 }
 
 .scrim {
