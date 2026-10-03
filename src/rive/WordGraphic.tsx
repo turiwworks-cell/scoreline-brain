@@ -5,6 +5,9 @@ import type { RiveInstance } from './types';
 import { argb } from './color';
 
 export default function WordGraphic(props: GoalWordProps & { source: string }) {
+  // Reference advances include textPath's trailing tracking and the caller's second subtraction.
+  const designSize = props.kind === 'red' ? Math.min(70, 346000 / 4493) : Math.min(104, 326000 / 3788);
+  const scale = (props.size ?? designSize) / designSize;
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const latest = useRef(props);
@@ -60,7 +63,8 @@ export default function WordGraphic(props: GoalWordProps & { source: string }) {
   return (
     <span aria-hidden="true" style={{ display: 'inline-grid', position: 'relative', height: '100%', alignItems: 'center' }}>
       <span style={{ gridArea: '1 / 1', visibility: ready && !failed ? 'hidden' : undefined }}>{props.fallback}</span>
-      {!failed && <RiveCanvas source={props.source} bind={bind} onReady={() => setReady(true)} onError={fail} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: ready ? 1 : 0 }} />}
+      {!failed && <RiveCanvas source={props.source} bind={bind} onReady={() => setReady(true)} onError={fail} style={{ position: 'absolute', left: '50%', top: '50%', width: 390 * scale, height: 340 * scale, transform: 'translate(-50%, -50%)', opacity: ready ? 1 : 0 }} />}
     </span>
   );
 }
+

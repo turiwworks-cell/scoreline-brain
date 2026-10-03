@@ -66,7 +66,7 @@ const geoOf = (W: number, H: number): Geo => {
   return { W, H, floor, ky: floor / DESIGN_FLOOR, cx: W / 2 };
 };
 
-/** The scene's box, measured before paint and on resize (390 × 844 where nothing lays out, as in tests). */
+/** The scene's box, measured before paint and on resize (390 x 844 where nothing lays out, as in tests). */
 function useBox(ref: RefObject<HTMLElement | null>): Geo {
   const [size, setSize] = useState<[number, number]>([390, 844]);
   useLayoutEffect(() => {
@@ -157,6 +157,9 @@ function useBeat(t: MotionValue<number>, T: Timing, at: number, dur = T.duration
 const WARM = '#F7F2EA';
 
 function GoalArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
+  const [riveActive, setRiveActive] = useState(false);
+  const waiting = useCallback(() => { setRiveActive(true); word.onWaiting(); }, [word.onWaiting]);
+  const fallback = useCallback(() => { setRiveActive(false); word.onFallback(); }, [word.onFallback]);
   const B = p.beats!;
   const c1 = info.team.colors[0];
   const u = useBeat(t, T, B.up);
@@ -181,7 +184,7 @@ function GoalArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
     const size = lerp(size0, size1, u.get());
     return lerp(base0, 196, u.get()) - size * 0.35;
   });
-  const wordScale = useTransform(() => (lerp(size0, size1, u.get()) / size0) * lerp(1.08, 1, bez(LAND, prog(t.get(), B.delay, settle))));
+  const wordScale = useTransform(() => (lerp(size0, size1, u.get()) / size0) * (riveActive ? 1 : lerp(1.08, 1, bez(LAND, prog(t.get(), B.delay, settle)))));
   const wordY = useTransform(() => wordMid.get() - size0 / 2);
   const flare = useTransform(() => prog(t.get(), landed - 0.1, 0.25) * (1 - 0.55 * ease(CURVES.inout, t.get(), landed + 0.15, 0.9)));
   const flareScale = useTransform(() => 0.8 + 0.2 * flare.get());
@@ -217,16 +220,16 @@ function GoalArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
       <m.div className={styles.flag} style={{ x: flagX, y: flagY, scale: flagS, opacity: pS }}>
         <Crest team={info.team} size={64} />
       </m.div>
-      <m.div className={styles.flare} style={{ y: flareY, opacity: flare, scale: flareScale }}>
+      <m.div className={styles.flare} style={{ y: flareY, opacity: riveActive ? 0 : flare, scale: flareScale }}>
         <SoftLight color={pastel(c1)} alpha={0.55} cx="50%" cy={170} rx={115} ry={65} />
       </m.div>
       <m.div className={styles.word} style={{ y: wordY, height: size0, scale: wordScale }}>
-        <GoalWord {...word} kind="goal" colors={info.team.colors} start={B.delay} fallback={<Word word="GOAAAL" size={size0} t={t} t0={B.delay} gap={gap} land={land} curve={LAND} mode="shout" stops={gs} glow={pastel(c1)} />} />
+        <GoalWord {...word} size={size0} onWaiting={waiting} onFallback={fallback} kind="goal" colors={info.team.colors} start={B.delay} fallback={<Word word="GOAAAL" size={size0} t={t} t0={B.delay} gap={gap} land={land} curve={LAND} mode="shout" stops={gs} glow={pastel(c1)} />} />
       </m.div>
       {/* once at the top: who scored, and the score */}
       <m.div className={styles.topLine} style={{ left: 68, opacity: pTop }}>
         <span className={styles.topName}>{info.team.name}</span>
-        <span className={styles.topSub}>Scores · {minText(info.minute)}</span>
+        <span className={styles.topSub}>Scores � {minText(info.minute)}</span>
       </m.div>
       <m.div className={styles.strip} style={{ opacity: pTop }}>
         <ScoreStrip info={info} roll={roll} rolls />
@@ -289,14 +292,14 @@ function RedArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
         <Story t={t} T={T} p={p} info={info} g={g} followed={followed} red line="linear-gradient(90deg, #FF2D2D, #8E0A10)" />
         <m.div className={styles.bigCard} style={{ x: cardX, y: cardY, scale: cardS, rotate: cardR, opacity: cardO }} />
         <m.div className={styles.word} style={{ y: wordY, height: size0, scale: wordScale }}>
-          <GoalWord {...word} kind="red" colors={['#FF2D2D', '#8E0A10']} start={HIT + SLAM_WORD.after} fallback={<Word word="RED CARD" size={size0} t={t} t0={HIT + SLAM_WORD.after} gap={SLAM_WORD.gap} land={T.duration} curve={T.ease} mode="slam" stops="#FF6A5E 0%, #FF2D2D 50%, #C2101A 100%" />} />
+          <GoalWord {...word} size={size0} kind="red" colors={['#FF2D2D', '#8E0A10']} start={HIT + SLAM_WORD.after} fallback={<Word word="RED CARD" size={size0} t={t} t0={HIT + SLAM_WORD.after} gap={SLAM_WORD.gap} land={T.duration} curve={T.ease} mode="slam" stops="#FF6A5E 0%, #FF2D2D 50%, #C2101A 100%" />} />
         </m.div>
         <m.div className={styles.topCrest} style={{ opacity: pTop }}>
           <Crest team={info.team} size={22} />
         </m.div>
         <m.div className={styles.topLine} style={{ left: 90, opacity: pTop }}>
           <span className={styles.topName}>{info.team.name}</span>
-          <span className={styles.topSub}>Down to ten · {minText(info.minute)}</span>
+          <span className={styles.topSub}>Down to ten � {minText(info.minute)}</span>
         </m.div>
         <m.div className={styles.strip} style={{ opacity: pTop }}>
           <ScoreStrip info={info} roll={pTop} rolls={false} />
@@ -386,7 +389,7 @@ function Story({ t, T, p, info, g, followed, red, line }: { t: MotionValue<numbe
   const cY = useTransform(() => 10 * (1 - pC.get()));
   const maxW = g.W - 36;
   const lastSize = Math.min(40, (40 * maxW) / Math.max(textWidth(600, 40, -0.03, info.last), 1));
-  const dot = <span className={styles.muted}>·</span>;
+  const dot = <span className={styles.muted}>�</span>;
   let meta: ReactNode = null;
   if (red) {
     meta = (
@@ -461,7 +464,7 @@ function ScoreStrip({ info, roll, rolls }: { info: MomentInfo; roll: MotionValue
     <>
       <Crest team={info.home} size={18} />
       <Digit prev={info.before[0]} cur={info.score[0]} rolls={homeRolls} roll={roll} />
-      <span className={styles.dash}>–</span>
+      <span className={styles.dash}>-</span>
       <Digit prev={info.before[1]} cur={info.score[1]} rolls={awayRolls} roll={roll} />
       <Crest team={info.away} size={18} />
     </>
@@ -479,3 +482,5 @@ function Digit({ prev, cur, rolls, roll }: { prev: number; cur: number; rolls: b
     </span>
   );
 }
+
+

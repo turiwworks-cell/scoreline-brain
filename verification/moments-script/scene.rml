@@ -1,0 +1,17 @@
+<Rive version="1" kind="fragment">
+<Artboard width="390" height="340" name="Moments" id="0:2" styleId="0:90" viewModelId="0:40" defaultStateMachineId="0:7" clip="true">
+<LayoutComponentStyle id="0:90"/><Shape name="Replay hit area" id="0:20"><Rectangle width="390" height="340" originX="0" originY="0"/><Fill><SolidColor colorValue="01000000"/></Fill></Shape><ScriptedDrawable scriptAssetId="0:80" name="Moments" id="0:12"/>
+<StateMachine name="Moments" id="0:7"><StateMachineListenerSingle targetId="0:20" listenerTypeValue="click" name="Test replay"><ListenerViewModelChange><BindablePropertyTrigger propertyValue="1"><DataBindContext sourcePathIds="0:40-0:45" propertyKey="686" direction="true"/></BindablePropertyTrigger></ListenerViewModelChange></StateMachineListenerSingle><StateMachineLayer name="Layer" id="0:8"><AnyState x="100" y="-100"/><ExitState x="300" y="-100"/><EntryState/></StateMachineLayer></StateMachine>
+</Artboard>
+<ViewModel defaultInstanceId="0:41" name="MomentsVM" id="0:40">
+<ViewModelPropertyString name="kind" id="0:42"/><ViewModelPropertyColor name="color1" id="0:43"/><ViewModelPropertyColor name="color2" id="0:44"/><ViewModelPropertyTrigger name="play" id="0:45"/><ViewModelPropertyNumber name="phase" id="0:46"/>
+<ViewModelInstance exports="true" name="Default" id="0:41">
+<ViewModelInstanceString propertyValue="goal" viewModelPropertyId="0:42"/><ViewModelInstanceColor propertyValue="FF0055A4" viewModelPropertyId="0:43"/><ViewModelInstanceColor propertyValue="FFEF4135" viewModelPropertyId="0:44"/><ViewModelInstanceTrigger viewModelPropertyId="0:45"/><ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:46"/>
+</ViewModelInstance></ViewModel>
+<ScriptAsset file="moments.luau" name="moments" id="0:80"/>
+
+</Rive>
+
+
+
+
