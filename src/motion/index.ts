@@ -22,4 +22,5 @@ export { MotionProvider } from './MotionProvider';
 export { Shared, type SharedProps } from './Shared';
 export { sharedMatch, sharedMatchGroup, sharedPlayer, sharedPlayerGroup, type MatchPart, type SharedEnd } from './sharedIds';
 export { flightCount, fly, isFlying, landAll, restingBox, type FlightRequest } from './flight';
+export { bez, clamp, ease, env, lerp, prog } from './curve';
 export * from './moments';

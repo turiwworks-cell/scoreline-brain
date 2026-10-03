@@ -6,6 +6,7 @@ import { useLayoutMode } from './layoutMode';
 import { ListPane } from './ListPane';
 import { PhoneStack } from './PhoneStack';
 import { resolve } from './resolve';
+import { Stage } from './Stage';
 import { ThreePane } from './ThreePane';
 import { TwoPane } from './TwoPane';
 import { useNavFocus } from './useNavFocus';
@@ -56,6 +57,8 @@ export function Shell() {
     <main ref={root} className={styles.shell} data-layout={layout} data-testid="app-shell" aria-label="Scoreline">
       <ListPane key="list" layout={layout} shifted={phone && !!r.match} covered={phone && !!(r.match || r.player)} list={r.list} openId={r.match?.id} />
       {phone ? <PhoneStack key="phone" r={r} /> : layout === 'two' ? <TwoPane key="two" r={r} /> : <ThreePane key="three" r={r} />}
+      {/* the phone plays toasts and scenes over everything; the panes play them inside (Part 18) */}
+      {phone && <Stage key="stage" slot="all" />}
       <p key="announcer" className={styles.announcer} aria-live="polite">
         {said}
       </p>

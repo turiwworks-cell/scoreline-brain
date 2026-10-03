@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CURVES } from '../../motion';
+import { CURVES } from './tokens';
 import { bez, clamp, ease, env, lerp, prog } from './curve';
 
 describe('curves', () => {

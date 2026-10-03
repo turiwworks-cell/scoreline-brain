@@ -6,14 +6,16 @@ import { MatchScreen } from '../screens/MatchScreen';
 import { PlayerScreen } from '../screens/PlayerScreen';
 import type { Resolved } from './resolve';
 import { Screen } from './Screen';
+import { Stage } from './Stage';
 import styles from './Shell.module.css';
 
 /**
  * The match pane of TwoPane and ThreePane. A new match swaps in at once (the Lua desktop does)
  * while its blocks cascade and its crests and score fly from the card. With `sheet` (tablet) the
- * player rises over it as a sheet.
+ * player rises over it as a sheet. Goal and red card scenes play over it (`stage`, Part 18); on the
+ * tablet its toasts too.
  */
-export function MatchPane({ r, sheet }: { r: Resolved; sheet: boolean }) {
+export function MatchPane({ r, sheet, stage }: { r: Resolved; sheet: boolean; stage: 'all' | 'scene' }) {
   const player = sheet ? r.player : null;
   return (
     <div className={styles.pane} data-pane="match">
@@ -45,6 +47,7 @@ export function MatchPane({ r, sheet }: { r: Resolved; sheet: boolean }) {
           </AnimatePresence>
         </>
       )}
+      <Stage slot={stage} />
     </div>
   );
 }

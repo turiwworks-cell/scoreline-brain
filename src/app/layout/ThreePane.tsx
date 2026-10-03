@@ -13,6 +13,7 @@ import { PlayerScreen } from '../screens/PlayerScreen';
 import { MatchPane } from './MatchPane';
 import type { Resolved } from './resolve';
 import { Screen } from './Screen';
+import { Stage } from './Stage';
 import styles from './Shell.module.css';
 import third from './ThirdPane.module.css';
 
@@ -58,7 +59,7 @@ export function ThreePane({ r }: { r: Resolved }) {
   };
   return (
     <>
-      <MatchPane r={r} sheet={false} />
+      <MatchPane r={r} sheet={false} stage="scene" />
       <div ref={paneRef} className={styles.pane} data-pane="insights">
         <div className={third.switch}>
           <Tabs variant="segment" items={ITEMS} value={tab} onChange={select} aria-label="Insights" idBase="insights" />
@@ -146,6 +147,8 @@ export function ThreePane({ r }: { r: Resolved }) {
             </Screen>
           )}
         </AnimatePresence>
+        {/* goal and red card notifications play in the third pane (drawDesktop, luau:7081) */}
+        <Stage slot="toast" />
       </div>
     </>
   );
