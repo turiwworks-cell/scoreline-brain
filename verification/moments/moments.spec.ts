@@ -70,6 +70,7 @@ test('redHome plays the red card scene; Escape closes it', async ({ page }) => {
   await expect(scene.getByText(/^Down to ten · /)).toBeVisible({ timeout: 6000 });
   await expect(scene.getByText('Sent off', { exact: true })).toBeVisible();
   if (hasSignedMoments) await expect(scene.locator('canvas')).toBeVisible();
+  await page.screenshot({ path: 'test-results/app-red-' + page.viewportSize()!.width + '.png' });
   await page.keyboard.press('Escape');
   await expect(scene).toHaveCount(0, { timeout: 2000 });
 });
@@ -116,4 +117,3 @@ test('the toast leaves on its own after its hold', async ({ page }) => {
   // entrance 0.6 s + toastHold 4.5 s, then 0.4 s out
   await expect(toast).toHaveCount(0, { timeout: 8000 });
 });
-
