@@ -66,7 +66,7 @@ const geoOf = (W: number, H: number): Geo => {
   return { W, H, floor, ky: floor / DESIGN_FLOOR, cx: W / 2 };
 };
 
-/** The scene's box, measured before paint and on resize (390 x 844 where nothing lays out, as in tests). */
+/** The scene's box, measured before paint and on resize (390 × 844 where nothing lays out, as in tests). */
 function useBox(ref: RefObject<HTMLElement | null>): Geo {
   const [size, setSize] = useState<[number, number]>([390, 844]);
   useLayoutEffect(() => {
@@ -230,7 +230,7 @@ function GoalArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
       {/* once at the top: who scored, and the score */}
       <m.div className={styles.topLine} style={{ left: 68, opacity: pTop }}>
         <span className={styles.topName}>{info.team.name}</span>
-        <span className={styles.topSub}>Scores � {minText(info.minute)}</span>
+        <span className={styles.topSub}>Scores · {minText(info.minute)}</span>
       </m.div>
       <m.div className={styles.strip} style={{ opacity: pTop }}>
         <ScoreStrip info={info} roll={roll} rolls />
@@ -300,7 +300,7 @@ function RedArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
         </m.div>
         <m.div className={styles.topLine} style={{ left: 90, opacity: pTop }}>
           <span className={styles.topName}>{info.team.name}</span>
-          <span className={styles.topSub}>Down to ten � {minText(info.minute)}</span>
+          <span className={styles.topSub}>Down to ten · {minText(info.minute)}</span>
         </m.div>
         <m.div className={styles.strip} style={{ opacity: pTop }}>
           <ScoreStrip info={info} roll={pTop} rolls={false} />
@@ -390,7 +390,7 @@ function Story({ t, T, p, info, g, followed, red, line }: { t: MotionValue<numbe
   const cY = useTransform(() => 10 * (1 - pC.get()));
   const maxW = g.W - 36;
   const lastSize = Math.min(40, (40 * maxW) / Math.max(textWidth(600, 40, -0.03, info.last), 1));
-  const dot = <span className={styles.muted}>�</span>;
+  const dot = <span className={styles.muted}>·</span>;
   let meta: ReactNode = null;
   if (red) {
     meta = (
@@ -465,7 +465,7 @@ function ScoreStrip({ info, roll, rolls }: { info: MomentInfo; roll: MotionValue
     <>
       <Crest team={info.home} size={18} />
       <Digit prev={info.before[0]} cur={info.score[0]} rolls={homeRolls} roll={roll} />
-      <span className={styles.dash}>-</span>
+      <span className={styles.dash}>–</span>
       <Digit prev={info.before[1]} cur={info.score[1]} rolls={awayRolls} roll={roll} />
       <Crest team={info.away} size={18} />
     </>
@@ -483,5 +483,3 @@ function Digit({ prev, cur, rolls, roll }: { prev: number; cur: number; rolls: b
     </span>
   );
 }
-
-

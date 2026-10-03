@@ -6,7 +6,7 @@ const Graphic = lazy(() => import('./WordGraphic'));
 
 export type GoalWordProps = {
   kind: 'goal' | 'red';
-  /** Host font size; maps the fixed 390 x 340 word artboard uniformly. */
+  /** Host font size; maps the fixed 390 × 340 word artboard uniformly. */
   size?: number;
   colors: readonly [string, string];
   time: MotionValue<number>;
@@ -25,5 +25,4 @@ export function GoalWord(props: GoalWordProps) {
     <Suspense fallback={props.fallback}><Graphic {...props} source={momentsSource} /></Suspense>
   ) : props.fallback;
 }
-
 

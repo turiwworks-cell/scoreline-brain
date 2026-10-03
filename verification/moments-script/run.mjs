@@ -32,4 +32,3 @@ process.stdout.write(run.stdout ?? '');
 process.stderr.write(run.stderr ?? '');
 assert.equal(run.status, 0, 'Rive Luau tests failed');
 console.log('PASS: reference drawing + 9 exact glyphs + Rive Luau lifecycle tests');
-

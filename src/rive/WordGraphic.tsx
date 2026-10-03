@@ -67,4 +67,3 @@ export default function WordGraphic(props: GoalWordProps & { source: string }) {
     </span>
   );
 }
-
