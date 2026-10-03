@@ -2,7 +2,7 @@ name: Part 20 moments validation
 on:
   push:
     branches: [codex/part-20-moments]
-    paths: ['src/**', 'rive/**', 'verification/moments-script/**', '.github/workflows/part20-moments.yml']
+    paths: ['src/**', 'rive/**', 'public/rive/**', 'verification/rive/**', 'verification/moments-script/**', '.github/workflows/part20-moments.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -25,6 +25,9 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Goal, red and toast regression at phone, tablet and desktop widths
         run: npx playwright test -c playwright.moments.config.ts --reporter=line
+      - name: Actual signed editor exports and real runtime lifecycle
+        if: always()
+        run: npx playwright test -c playwright.rive.config.ts --reporter=line
       - uses: actions/upload-artifact@v4
         if: always()
         with:
