@@ -58,7 +58,11 @@ Rejected (don't revisit):
 ## 3. Rive: what stays, what moves
 
 **Stays in Rive.** Two small files, each kept apart from the app code:
-- `public/rive/live-icon.riv`: the existing Live icon artboard and state machine (`islive`).
+- `public/rive/live-icon.riv`: the existing complete animated Live button and state machine.
+  Part 20 preserves its outer capsule and calendar motion. Its default View Model exposes
+  Boolean `islive` and String `count` bound to the calendar text. The DOM supplies the button's
+  hit target/accessibility and a complete fallback; after Rive is ready it suppresses its own
+  glass rim and counter. The 443 x 152 artboard is displayed proportionally at 38 px high.
 - `public/rive/moments.riv`: one artboard with a state machine for the goal word (letters slam
   in, flare, glint) and the red-card hit.
 

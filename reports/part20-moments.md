@@ -1,4 +1,7 @@
 # Part 20 — standalone word moments
+
+**Historical extraction report.** Signed Moments export validation and the current Live correction status are recorded in [part20-editor-exports.md](part20-editor-exports.md). The status and evidence below describe the initial handoff before editor exports were received.
+
 Status: **code and editor handoff complete; signed exports and web-runtime acceptance pending**.
 This is not a completed M3 asset acceptance or an integration approval.
 
