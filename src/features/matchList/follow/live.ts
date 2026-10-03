@@ -4,6 +4,7 @@
 
 import { useEffect, useReducer, useRef } from 'react';
 import { liveMinute, type Match, type MatchEvent, type Moment, type PlayerAction } from '../../../domain';
+import { appMoments, holdMoments } from '../../../motion';
 import { scorelineStore } from '../../../store';
 import { goalFeed, watchMoments } from '../goalFeed';
 import { clockText, goalAct, pushAct, subAct, type Act, type Followed } from './model';
@@ -120,8 +121,9 @@ export function useFollowLive(f: Followed | null, matchId: number | undefined, n
       // a match that was reloaded (a new snapshot) shouldn't replay old events
       if (seenEvents.size > 400) seenEvents = new Set(m.events.map((e) => e.id));
     });
+    const letGo = holdMoments();
     const stopMoments = watchMoments(
-      scorelineStore,
+      appMoments().delivered,
       (mo) => {
         const m = scorelineStore.getState().domain.matches[mo.matchId];
         if (!m || mo.matchId !== matchId) return;
@@ -139,6 +141,7 @@ export function useFollowLive(f: Followed | null, matchId: number | undefined, n
     return () => {
       off();
       stopMoments();
+      letGo();
       clearTimeout(release.current);
     };
   }, [f?.team, f?.n, matchId]); // eslint-disable-line react-hooks/exhaustive-deps

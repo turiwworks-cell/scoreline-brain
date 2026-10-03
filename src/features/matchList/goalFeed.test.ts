@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { Moment } from '../../domain';
-import { createGoalFeed, watchMoments, type MomentSource } from './goalFeed';
+import { parseEvent, parseFeed, type Moment } from '../../domain';
+import { demoFeedJson } from '../../domain/testing/demo';
+import { appMoments } from '../../motion';
+import { scorelineStore } from '../../store';
+import { createGoalFeed, watchAppGoals, watchMoments, type MomentSource } from './goalFeed';
 import { markLife } from './goalFeel';
 
 function source(initial: Moment[] = []) {
@@ -122,5 +125,41 @@ describe('goal feed', () => {
     expect(feed.mark(3)).toBeUndefined();
     s.push({ id: 'c', kind: 'red', matchId: 3, side: 'home', score: [0, 0], minute: 3 } as Moment);
     expect(heard).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('the app’s goals arrive through the MomentDirector', () => {
+  it('marks a goal when delivered, holds it while the tab is hidden, and starts over on restart', () => {
+    scorelineStore.getState().actions.resetFeed(parseFeed(demoFeedJson()), Date.now());
+    let now = 1;
+    const feed = createGoalFeed({ now: () => now });
+    const stop = watchAppGoals(feed);
+    const goal = (id: string, seq: number) => scorelineStore.getState().actions.applyEvent(parseEvent({ match: 2, id, seq, kind: 'goal', side: 'away', minute: 70, score: [0, 2] })!, Date.now());
+    const vis = Object.getOwnPropertyDescriptor(Document.prototype, 'visibilityState')!;
+    const setHidden = (hidden: boolean) => {
+      Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => (hidden ? 'hidden' : 'visible') });
+      document.dispatchEvent(new Event('visibilitychange'));
+    };
+    try {
+      setHidden(true);
+      goal('feed-a', 500);
+      expect(feed.mark(2)).toBeUndefined();
+      expect(scorelineStore.getState().moments).toEqual([]);
+      now = 9;
+      setHidden(false);
+      expect(feed.mark(2)).toMatchObject({ t: 9, side: 'away' });
+
+      scorelineStore.getState().actions.resetFeed(parseFeed(demoFeedJson()), Date.now());
+      expect(feed.marks().size).toBe(0);
+      expect(appMoments().getSnapshot().stage).toBeNull();
+      goal('feed-a', 500);
+      expect(feed.mark(2)).toBeDefined();
+    } finally {
+      stop();
+      delete (document as { visibilityState?: unknown }).visibilityState;
+      Object.defineProperty(Document.prototype, 'visibilityState', vis);
+      scorelineStore.getState().actions.resetFeed(parseFeed(demoFeedJson()), Date.now());
+    }
+    expect(appMoments().running).toBe(false);
   });
 });

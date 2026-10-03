@@ -1,7 +1,8 @@
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { createMemoryRouter } from 'react-router';
 import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
-import { parseFeed } from '../domain';
+import { parseEvent, parseFeed } from '../domain';
+import { appMoments } from '../motion';
 import { scorelineStore } from '../store';
 import { App } from './App';
 import { appRoutes } from './router';
@@ -75,5 +76,23 @@ describe('routes', () => {
     expect(screenEl('list')?.hasAttribute('inert')).toBe(true);
     expect(screenEl('match')?.hasAttribute('inert')).toBe(true);
     expect(screenEl('player')?.hasAttribute('inert')).toBe(false);
+  });
+});
+
+describe('moments (Part 17)', () => {
+  test('the open match’s goal plays as a scene and is announced through aria-live', async () => {
+    renderAt('/match/501/facts');
+    await screen.findByRole('heading', { level: 1, name: 'Arsenal – Chelsea' });
+    const ev = parseEvent({ match: 501, id: 'app-goal', seq: 2, kind: 'goal', side: 'home', minute: 61, name: 'Saka', score: [2, 0] });
+    act(() => scorelineStore.getState().actions.applyEvent(ev!, Date.now()));
+    const region = screen.getByTestId('moment-announcer');
+    expect(region.getAttribute('aria-live')).toBe('polite');
+    expect(region.textContent).toBe("Goal for Arsenal, Saka, 61'. Arsenal 2–0 Chelsea.");
+    expect(appMoments().getSnapshot().stage).toMatchObject({ kind: 'scene', variant: 'goal' });
+    act(() => appMoments().dismiss());
+    // the shell holds the director only while it is mounted
+    cleanup();
+    expect(appMoments().running).toBe(false);
+    expect(appMoments().getSnapshot().stage).toBeNull();
   });
 });

@@ -1,11 +1,12 @@
 // The list's memory of fresh goals. The domain derives goal moments once per event (deduped by
-// event id, ARCHITECTURE §4.2); this watches the store's moment queue and keeps, per match, when
-// the latest one landed and for which side, so the cards and rows can play their choreography
-// from it. It only reads: the queue belongs to the MomentDirector (Part 17), which empties it.
+// event id, ARCHITECTURE §4.2) and the MomentDirector (Part 17) takes them off the store's queue
+// and delivers them (later, while the tab is hidden); this watches what it delivers and keeps,
+// per match, when the latest goal landed and for which side, so the cards and rows can play their
+// choreography from it.
 
 import { useSyncExternalStore } from 'react';
 import type { Moment, Side } from '../../domain';
-import { scorelineStore } from '../../store';
+import { holdMoments, appMoments } from '../../motion';
 import { markLife, type GoalMark } from './goalFeel';
 
 type Listener = () => void;
@@ -43,9 +44,9 @@ export interface MomentSource {
 const SEEN_CAP = 400;
 
 /**
- * Calls `handle` once for each moment that appears in a store's queue from now on. The queue is
- * the MomentDirector's to empty (Part 17); this only looks, and remembers ids so a moment is never
- * seen twice. Returns the unsubscribe.
+ * Calls `handle` once for each moment that appears in a moment log from now on (the director's
+ * `delivered`, or any store-shaped source). It only looks, and remembers ids so a moment is never
+ * seen twice; a new `session` forgets them. Returns the unsubscribe.
  */
 export function watchMoments(source: MomentSource, handle: (moment: Moment) => void, onReset?: () => void): () => void {
   const seen = new Set<string>();
@@ -130,9 +131,14 @@ export function createGoalFeed(clock: Clock = performanceClock): GoalFeed {
 /** The app's feed. */
 export const goalFeed = createGoalFeed();
 
-/** Starts reading the app store's moments for as long as `feed` is the app's own. */
+/** Starts the app's MomentDirector and reads the goals it delivers into `feed`. */
 export function watchAppGoals(feed: GoalFeed = goalFeed): () => void {
-  return feed.watch(scorelineStore);
+  const off = feed.watch(appMoments().delivered);
+  const release = holdMoments();
+  return () => {
+    off();
+    release();
+  };
 }
 
 /** One match's latest goal; re-renders only when that match scores. */

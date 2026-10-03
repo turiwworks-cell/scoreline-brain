@@ -9,6 +9,7 @@ import { resolve } from './resolve';
 import { ThreePane } from './ThreePane';
 import { TwoPane } from './TwoPane';
 import { useNavFocus } from './useNavFocus';
+import { useMoments } from './useMoments';
 import { useScreenTitle } from './useScreenTitle';
 import { useSharedFlights } from './useSharedFlights';
 import styles from './Shell.module.css';
@@ -45,6 +46,8 @@ export function Shell() {
   });
   const announce = useCallback(() => setSaid(titleRef.current), []);
 
+  const moment = useMoments(r);
+
   useSharedFlights(r, location.key);
   useNavFocus(r, location.key, navType, root, announce);
 
@@ -55,6 +58,10 @@ export function Shell() {
       {phone ? <PhoneStack key="phone" r={r} /> : layout === 'two' ? <TwoPane key="two" r={r} /> : <ThreePane key="three" r={r} />}
       <p key="announcer" className={styles.announcer} aria-live="polite">
         {said}
+      </p>
+      {/* goals, red cards, kick-offs and full time, as the MomentDirector delivers them (Part 17) */}
+      <p key="moments" className={styles.announcer} aria-live="polite" aria-atomic="true" data-testid="moment-announcer">
+        {moment ? <span key={moment.n}>{moment.text}</span> : null}
       </p>
     </main>
   );
