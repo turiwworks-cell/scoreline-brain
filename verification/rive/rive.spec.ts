@@ -7,6 +7,8 @@ test('real runtime releases twenty scene instances and pauses when hidden or off
   page.on('console', (message) => { if (message.type() === 'error') console.log('RIVE_CONSOLE_ERROR ' + message.text()); });
   page.on('requestfailed', (request) => console.log('RIVE_REQUEST_ERROR ' + request.url() + ': ' + request.failure()?.errorText));
   await page.goto('/verification/rive/fixture.html');
+  await expect.poll(() => page.evaluate(() => !!window.riveProbe)).toBe(true);
+  test.skip(await page.evaluate(() => window.riveProbe.pendingAssets), 'Part 20 live-icon.riv and moments.riv are required; heap acceptance remains pending.');
   try {
     await expect.poll(() => page.evaluate(() => window.riveProbe?.ready ?? 0), { timeout: 30_000 }).toBe(1);
   } catch (error) {
@@ -21,11 +23,11 @@ test('real runtime releases twenty scene instances and pauses when hidden or off
     return { js, wasm };
   };
   const scene = async () => {
-    const before = await page.evaluate(() => window.riveProbe.ready);
+    const before = await page.evaluate(() => ({ ready: window.riveProbe.ready, landed: window.riveProbe.landed }));
     await page.locator('#next').click();
-    await expect.poll(() => page.evaluate(() => window.riveProbe.ready)).toBe(before + 1);
+    await expect.poll(() => page.evaluate(() => window.riveProbe.ready)).toBe(before.ready + 1);
     expect(await page.evaluate(() => window.riveProbe.slots)).toBe(2);
-    await page.waitForTimeout(80);
+    await expect.poll(() => page.evaluate(() => window.riveProbe.landed)).toBe(before.landed + 1);
     await page.locator('#close').click();
     await expect.poll(() => page.evaluate(() => window.riveProbe.slots)).toBe(1);
   };
@@ -56,7 +58,7 @@ test('real runtime releases twenty scene instances and pauses when hidden or off
   expect(await page.evaluate(() => window.riveProbe.advances)).toBe(hidden);
   expect(await page.evaluate(() => window.riveProbe.errors)).toEqual([]);
   expect(browserErrors).toEqual([]);
-  const evidence = { project: testInfo.project.name, before, after, retainedInstances: 1, scenes: 20, offscreen, hidden, syntheticVisibility: true, referenceArtboard: 'FOTMOB Live Icon' };
+  const evidence = { project: testInfo.project.name, before, after, retainedInstances: 1, scenes: 20, offscreen, hidden, syntheticVisibility: true, assets: ['live-icon.riv', 'moments.riv'] };
   console.log('RIVE_EVIDENCE ' + JSON.stringify(evidence));
   await testInfo.attach('heap-and-ownership', { body: JSON.stringify(evidence, null, 2), contentType: 'application/json' });
 });

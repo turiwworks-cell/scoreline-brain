@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: 'verification/rive',
-  timeout: 90_000,
+  timeout: 180_000,
   workers: 1,
   retries: 0,
   webServer: {

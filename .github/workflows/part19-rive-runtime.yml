@@ -1,0 +1,31 @@
+name: Part 19 real Rive acceptance
+on:
+  push:
+    branches: [codex/part-19-rive]
+    paths: ['verification/rive/**', 'playwright.rive.config.ts', 'public/rive/**', '.github/workflows/part19-rive-runtime.yml']
+  workflow_dispatch:
+jobs:
+  rive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx tsc -p verification/rive/tsconfig.json
+      - run: npx eslint verification/rive playwright.rive.config.ts
+      - run: npx playwright install --with-deps chromium
+      - run: |
+          mkdir -p .verification
+          PLAYWRIGHT_JSON_OUTPUT_NAME=.verification/rive.json npx playwright test -c playwright.rive.config.ts --reporter=line,json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: part19-real-rive
+          path: |
+            .verification/rive.json
+            test-results/
+          retention-days: 7
