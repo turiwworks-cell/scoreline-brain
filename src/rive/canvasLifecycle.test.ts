@@ -20,6 +20,10 @@ class Fake implements RiveInstance {
   constructor(public options: RiveOptions) { instances.push(this); }
 }
 const mounted: ReturnType<typeof mountCanvas>[] = [];
+const entry = (canvas: HTMLCanvasElement, isIntersecting: boolean): IntersectionObserverEntry => ({
+  target: canvas, isIntersecting, boundingClientRect: canvas.getBoundingClientRect(),
+  intersectionRect: new DOMRect(), rootBounds: null, time: 0, intersectionRatio: isIntersecting ? 1 : 0,
+});
 const paint = async () => { const all = mock.paints.splice(0); all.forEach((fn) => fn()); await Promise.resolve(); await Promise.resolve(); };
 const setup = () => {
   const canvas = document.createElement('canvas');
@@ -51,12 +55,12 @@ describe('Rive canvas ownership', () => {
   });
   it('pauses offscreen and while hidden; hidden resizes never draw', async () => {
     const s = setup(); const inst = await load(); vi.clearAllMocks();
-    intersect([{ target: s.canvas, isIntersecting: false } as IntersectionObserverEntry], {} as IntersectionObserver);
+    intersect([entry(s.canvas, false)], {} as IntersectionObserver);
     expect(inst.pause).toHaveBeenCalled(); expect(inst.stopRendering).toHaveBeenCalled();
     hidden = true; document.dispatchEvent(new Event('visibilitychange'));
     resize([], {} as ResizeObserver);
     expect(inst.startRendering).not.toHaveBeenCalled(); expect(inst.resizeDrawingSurfaceToCanvas).not.toHaveBeenCalled();
-    intersect([{ target: s.canvas, isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver);
+    intersect([entry(s.canvas, true)], {} as IntersectionObserver);
     expect(inst.startRendering).not.toHaveBeenCalled();
     hidden = false; document.dispatchEvent(new Event('visibilitychange'));
     expect(inst.startRendering).toHaveBeenCalledTimes(1); expect(inst.resizeDrawingSurfaceToCanvas).toHaveBeenCalledTimes(1);

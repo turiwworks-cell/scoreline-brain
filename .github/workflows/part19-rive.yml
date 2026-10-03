@@ -48,7 +48,20 @@ jobs:
           for (const [key, chunk] of Object.entries(manifest)) if (chunk.isEntry) visit(key);
           const files = [...initial].filter(file => file.endsWith('.js')).map(file => ({file, gzip: zlib.gzipSync(fs.readFileSync('dist/' + file)).byteLength}));
           fs.writeFileSync('.verification/bundle.json', JSON.stringify({initialBytes: files.reduce((n,f) => n + f.gzip, 0), files}, null, 2));
+          console.log(fs.readFileSync('.verification/bundle.json', 'utf8'));
           JS
+      - name: Cache real Rive package for local verification
+        if: matrix.label == 'part19'
+        run: tar -czf .verification/rive-runtime.tgz -C node_modules/@rive-app webgl2
+      - uses: actions/upload-artifact@v4
+        with:
+          name: part19-build-${{ matrix.label }}
+          path: |
+            .verification/bundle.json
+            .verification/rive-runtime.tgz
+            .verification/unit.json
+            dist/.vite/manifest.json
+          retention-days: 7
       - run: npx playwright install --with-deps chromium
       - name: Production browser suite
         continue-on-error: true
