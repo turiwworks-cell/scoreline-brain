@@ -158,8 +158,9 @@ const WARM = '#F7F2EA';
 
 function GoalArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
   const [riveActive, setRiveActive] = useState(false);
-  const waiting = useCallback(() => { setRiveActive(true); word.onWaiting(); }, [word.onWaiting]);
-  const fallback = useCallback(() => { setRiveActive(false); word.onFallback(); }, [word.onFallback]);
+  const { onWaiting, onFallback } = word;
+  const waiting = useCallback(() => { setRiveActive(true); onWaiting(); }, [onWaiting]);
+  const fallback = useCallback(() => { setRiveActive(false); onFallback(); }, [onFallback]);
   const B = p.beats!;
   const c1 = info.team.colors[0];
   const u = useBeat(t, T, B.up);
