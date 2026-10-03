@@ -1,6 +1,7 @@
 /*
  * Placeholder screens (Part 9). Just enough to prove the shell: navigation, panes, scrolling,
- * focus and the two shared elements. Parts 10–15 replace them with the real screens.
+ * focus and the two shared elements. Parts 10–15 replace them with the real screens; the match
+ * screen's Lineup tab keeps its faces until Part 13.
  * Content of a shared element is styled through its own classes (see motion/Shared.tsx).
  */
 
@@ -58,41 +59,6 @@
   color: var(--c-text);
 }
 
-/* ---- match ---------------------------------------------------------------------------------- */
-
-.hero {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  justify-items: center;
-  row-gap: 10px;
-  padding: 8px 0 22px;
-}
-
-.heroScore {
-  display: block;
-  font: var(--type-score);
-  letter-spacing: var(--track-5);
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.heroName {
-  font: var(--type-name);
-  letter-spacing: var(--track-1);
-  text-align: center;
-}
-
-.heroMeta {
-  font: var(--type-body);
-  color: var(--c-muted);
-}
-
-.tabs {
-  margin-bottom: 18px;
-}
-
 .block {
   height: 64px;
   margin-bottom: 10px;
@@ -102,8 +68,11 @@
   color: var(--c-muted);
 }
 
+/* ---- the Lineup tab until Part 13 ---------------------------------------------------------- */
+
 .lineup {
   display: grid;
+  margin: 0 var(--gutter);
   grid-template-columns: 1fr 1fr;
   gap: 18px;
 }

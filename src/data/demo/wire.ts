@@ -166,7 +166,8 @@ function squadsJson(): Json {
  * and earlier results stay demo data and never need a place in the contract.
  */
 export function feedJson(sim: DemoSim): Json {
-  const leagues: Json[] = LEAGUES.map((l) => ({ id: l.id, country: l.country, name: l.name, matchday: l.matchday }));
+  // the Lua's demo leagues set no `q`, so their tables marked the top two (`L.q or 2`, luau:5724)
+  const leagues: Json[] = LEAGUES.map((l) => ({ id: l.id, country: l.country, name: l.name, matchday: l.matchday, qualify: 2, qualifyLabel: 'Qualify · top two' }));
   const feed: Json = {
     version: 2,
     days: [...DAYS],

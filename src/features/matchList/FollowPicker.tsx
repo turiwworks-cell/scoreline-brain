@@ -1,11 +1,10 @@
 import { memo, useMemo, type CSSProperties } from 'react';
 import { playerKey, type Team } from '../../domain';
 import { selectTeam, useScoreline } from '../../store';
-import { feel, PlayerPhoto, RollLabel } from '../../ui';
+import { feel, PlayerPhoto, RollLabel, textWidth, useFontVersion } from '../../ui';
 import { fitSize } from './cardLayout';
 import { knownPicks } from './follow/cells';
 import { sameFollowed, type Followed } from './follow/model';
-import { textWidth, useFontVersion } from './measure';
 import { selectPlayers } from './selectors';
 import styles from './Follow.module.css';
 

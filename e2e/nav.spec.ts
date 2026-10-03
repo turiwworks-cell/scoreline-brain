@@ -128,15 +128,17 @@ test('each pane keeps its own scroll', async ({ page }, info) => {
     await screenOf(page, 'list').evaluate((el) => el.scrollTo(0, el.scrollHeight));
     const listY = await scrollTop(page, 'list');
     expect(listY).toBeGreaterThan(0);
-    await card(page, 7).click();
-    await expect(titled(page, 'match', 'Ivory Coast – Mali')).toBeVisible();
+    // a match in play: its tabs are long enough to scroll 120 px on a phone (Part 11's real
+    // screens; Ivory Coast – Mali before kick-off scrolls 8 px on Facts and none on Stats)
+    await card(page, 5).click();
+    await expect(titled(page, 'match', 'Ireland – Poland')).toBeVisible();
     await settled(page);
     expect(await scrollTop(page, 'match')).toBe(0);
     await screenOf(page, 'match').evaluate((el) => el.scrollTo(0, 120));
     await page.waitForTimeout(100);
     // a tab switch leaves the scroll alone
     await pressTab(page, 'match', 'Stats');
-    await expect(page).toHaveURL(/\/match\/7\/stats\?demo$/);
+    await expect(page).toHaveURL(/\/match\/5\/stats\?demo$/);
     await expect.poll(() => scrollTop(page, 'match')).toBe(120);
 
     await page.goBack();
@@ -144,7 +146,7 @@ test('each pane keeps its own scroll', async ({ page }, info) => {
     await settled(page);
     await expect.poll(() => scrollTop(page, 'list')).toBe(listY);
     await page.goForward();
-    await expect(titled(page, 'match', 'Ivory Coast – Mali')).toBeVisible();
+    await expect(titled(page, 'match', 'Ireland – Poland')).toBeVisible();
     await settled(page);
     await expect.poll(() => scrollTop(page, 'match')).toBe(120);
   } else {

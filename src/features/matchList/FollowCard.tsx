@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNod
 import { minText, nameOf, playerKey, scoreStr, type Match, type NextFixture, type Team } from '../../domain';
 import { sharedPlayer } from '../../motion';
 import { selectMatch, selectTeam, useScoreline } from '../../store';
-import { Crest, EventTags, feel, Icon, KitDisc, MatchClock, mix, pastel, PlayerPhoto, RatingBadge, SoftLight, Tag, tagList, tagLayout } from '../../ui';
+import { Crest, EventTags, feel, Icon, KitDisc, MatchClock, mix, pastel, PlayerPhoto, RatingBadge, SoftLight, Tag, tagList, tagLayout, textWidth, useFontVersion } from '../../ui';
 import { fitSize } from './cardLayout';
 import { bandCells, eveningNote, type Cell } from './follow/cells';
 import { useNowMs } from './follow/clock';
@@ -10,7 +10,6 @@ import { useCardFrames } from './follow/cardFrames';
 import { goalFeed } from './goalFeed';
 import { countdown, followHeight, followPhase, goalLine, goalsBy, nextView, onPitch, playerFlags, playerStats, RED_SECONDS, sideOf, type Flags, type Followed, type PStats } from './follow/model';
 import type { FollowLive } from './follow/live';
-import { textWidth, useFontVersion } from './measure';
 import { selectFollowMatchId, selectNext, selectPlayers } from './selectors';
 import styles from './Follow.module.css';
 

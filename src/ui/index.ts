@@ -1,5 +1,5 @@
 export { Button, RoundButton, type ButtonProps, type RoundButtonProps } from './Button';
-export { luma, mix, pastel } from './color';
+export { luma, matchStops, mix, pastel } from './color';
 export { Crest, type CrestProps } from './Crest';
 export { feel, roll, spotRadius, withFeel } from './feel';
 export { defaultFlag, FLAGS, flagOf, type CrestTeam } from './flags';
@@ -20,3 +20,4 @@ export { tagLayout, tagList, type TagCounts } from './tagLayout';
 export { EventTags, SubOffTag, Tag, type EventTagsProps, type SubOffTagProps, type TagProps } from './Tags';
 export { Tabs, type TabItem, type TabsProps } from './Tabs';
 export { subscribeSecond } from './ticker';
+export { textWidth, useFontVersion } from './measure';

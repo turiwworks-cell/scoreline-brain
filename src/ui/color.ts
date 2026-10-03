@@ -40,3 +40,15 @@ export function pastel(hex: string): string {
   }
   return c;
 }
+
+/**
+ * A match's colours as four stops at 0, 42, 62 and 100 % (matchStops, luau:2495): the home team's
+ * first colour, then each side's second mixed toward warm white, then the away team's first, all
+ * lightened so black type reads on them. The live cards run them top to bottom, the goal's score
+ * chip left to right.
+ */
+export function matchStops(home: { colors: readonly [string, string] }, away: { colors: readonly [string, string] }): readonly [string, string, string, string] {
+  const [h1, h2] = home.colors;
+  const [a1, a2] = away.colors;
+  return [pastel(h1), pastel(mix(h2, '#F7F2EA', 0.35)), pastel(mix(a2, '#F7F2EA', 0.35)), pastel(a1)];
+}

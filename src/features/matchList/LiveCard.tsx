@@ -2,10 +2,9 @@ import { memo, useLayoutEffect, useRef, useState, useSyncExternalStore, type CSS
 import { m } from 'motion/react';
 import { liveMinute, minLabel, scoreStr, type Match, type Team } from '../../domain';
 import { Shared, sharedMatch, transition } from '../../motion';
-import { Crest, feel, subscribeSecond } from '../../ui';
+import { Crest, feel, subscribeSecond, textWidth, useFontVersion } from '../../ui';
 import { cardMetrics, minuteSize, nameChoice, type CardMetrics } from './cardLayout';
 import { cardColors } from './cardColors';
-import { textWidth, useFontVersion } from './measure';
 import styles from './Live.module.css';
 
 /*

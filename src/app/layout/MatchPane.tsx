@@ -2,7 +2,7 @@ import { AnimatePresence, m } from 'motion/react';
 import { LAYER, paneSwap, scrim, sheetRise } from '../../motion';
 import { playerKeyOf } from '../nav/url';
 import { PickAMatch } from '../screens/Missing';
-import { MatchPlaceholder } from '../screens/MatchPlaceholder';
+import { MatchScreen } from '../screens/MatchScreen';
 import { PlayerPlaceholder } from '../screens/PlayerPlaceholder';
 import type { Resolved } from './resolve';
 import { Screen } from './Screen';
@@ -30,7 +30,7 @@ export function MatchPane({ r, sheet }: { r: Resolved; sheet: boolean }) {
           animate="in"
           exit="out"
         >
-          {r.match ? <MatchPlaceholder match={r.match} chrome="none" /> : <PickAMatch />}
+          {r.match ? <MatchScreen match={r.match} chrome="none" /> : <PickAMatch />}
         </Screen>
       </AnimatePresence>
       {sheet && (

@@ -1,0 +1,162 @@
+/*
+ * The Stats tab (stats, luau:5327). --ch / --ca are the sides' colours (sideColors); --v is the
+ * home possession and --f a stat's home share, both moving while the tab opens.
+ */
+
+.stats {
+  position: relative;
+}
+
+/* crests 20 px at 18 and W - 38, names M 13 at 46 and right on W - 46, centred on y 10 */
+.teams {
+  position: relative;
+  height: 20px;
+  margin: 0 var(--gutter) 12px;
+}
+.crestHome {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.crestAway {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.nameHome,
+.nameAway {
+  position: absolute;
+  top: 1.5px;
+  max-width: calc(50% - 34px);
+  overflow: hidden;
+  font: var(--fw-m) var(--fs-13) / 17px var(--font-sans);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--c-text);
+}
+.nameHome {
+  left: 28px;
+}
+.nameAway {
+  right: 28px;
+}
+
+/* the numbers: L 60, -0.05 em, then "%" R 22 2 px after, on a baseline 46.4 down; 65 in all */
+.possNums {
+  display: flex;
+  justify-content: space-between;
+  height: 51px;
+  margin: 0 var(--gutter) 14px;
+}
+.possSide {
+  display: flex;
+  align-items: baseline;
+  color: var(--c-text);
+}
+.possSide[data-dim] {
+  color: var(--c-dim);
+}
+.possNum {
+  font: var(--type-score);
+  letter-spacing: var(--track-5);
+  line-height: 51px;
+  font-variant-numeric: tabular-nums;
+}
+.pct {
+  margin-left: 2px;
+  font: var(--fw-r) var(--fs-22) / normal var(--font-sans);
+}
+
+/* the split: 46 tall, 4 apart, the outer corners 8 and the inner 3 */
+.possBars {
+  display: flex;
+  gap: 4px;
+  height: 46px;
+  margin: 0 var(--gutter) 12px;
+}
+.possHome {
+  width: calc((100% - 4px) * var(--v, 50) / 100);
+  border-radius: 8px 3px 3px 8px;
+  background: var(--ch);
+}
+.possAway {
+  flex: 1 1 0;
+  border-radius: 3px 8px 8px 3px;
+  background: var(--ca);
+}
+
+.note {
+  height: 13.7px;
+  margin: 0 var(--gutter) 34px;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 13.7px;
+  white-space: nowrap;
+  color: var(--c-muted);
+}
+
+/* ---- a top stat: 58.15 tall with its rule at the bottom (luau:5364) -------------------------- */
+
+.statRow {
+  position: relative;
+  box-sizing: border-box;
+  height: 58.15px;
+  margin: 0 var(--gutter);
+  border-bottom: 1px solid var(--c-hair);
+}
+
+/* M 17, the baseline at 29 */
+.statValue {
+  position: absolute;
+  top: 12.08px;
+  font: var(--fw-m) var(--fs-17) / 22px var(--font-sans);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text);
+}
+.statValue[data-side='home'] {
+  left: 0;
+}
+.statValue[data-side='away'] {
+  right: 0;
+}
+
+/* centred on the pane, its baseline half a pixel above the values' */
+.statName {
+  position: absolute;
+  left: 50%;
+  top: 17.99px;
+  transform: translateX(-50%);
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 13.7px;
+  white-space: nowrap;
+  color: var(--c-muted);
+}
+
+/* 4 px bars at y 43.15, 3 apart; the side with less at 28 % */
+.statBars {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 43.15px;
+  display: flex;
+  gap: 3px;
+  height: 4px;
+}
+.statHome {
+  width: calc((100% - 3px) * var(--f, 0.5));
+  border-radius: 2px;
+  background: var(--ch);
+}
+.statAway {
+  flex: 1 1 0;
+  border-radius: 2px;
+  background: var(--ca);
+}
+.statHome[data-less],
+.statAway[data-less] {
+  opacity: 0.28;
+}
