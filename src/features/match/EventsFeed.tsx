@@ -1,5 +1,5 @@
 import { memo, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { cubicBezier, m, type Variants } from 'motion/react';
+import { cubicBezier, m, useReducedMotion, type Variants } from 'motion/react';
 import { minText, type Match, type Team } from '../../domain';
 import { timing, transition } from '../../motion';
 import { useScoreline } from '../../store';
@@ -54,6 +54,8 @@ export const EventsFeed = memo(function EventsFeed({ match, home, away, onReplay
   const items = useMemo(() => feedItems({ teams, players }, { home: hid, away: aid, events }), [teams, players, hid, aid, events]);
   const minute = useMatchMinute(match);
   const [evAll, setEvAll] = useState(false);
+  // with reduced motion a new row is simply there (transforms jump, ARCHITECTURE §5)
+  const still = useReducedMotion() === true;
 
   // when this feed first saw each event (the Lua's e.t0): those there when it opened count as old.
   // Stamped while rendering, the moment a new list of events comes in.
@@ -101,14 +103,16 @@ export const EventsFeed = memo(function EventsFeed({ match, home, away, onReplay
       if (after) after.style.transform = '';
       feed.style.clipPath = '';
     };
-    let raf = 0;
-    if (!(g.until > clock())) {
+    const left = g.until - clock();
+    if (still || !(left > 0)) {
       rest();
-      // rows chosen while one was still opening, and the motion ended unseen (a hidden tab, a
-      // re-render at its end): choose them again
-      if (g.until > -Infinity) raf = requestAnimationFrame(() => setAt(clock()));
-      return () => cancelAnimationFrame(raf);
+      // the rows were chosen while one was still opening: choose them again once it has (at once
+      // when that passed unseen, in a hidden tab or a re-render at the motion's end)
+      if (g.until === -Infinity) return;
+      const timer = setTimeout(() => setAt(clock()), Math.max(0, left) * 1000);
+      return () => clearTimeout(timer);
     }
+    let raf = 0;
     const frameRows: FrameRow[] = rows.map((r, j) => ({
       h: slots[j]?.offsetHeight ?? 0,
       start: r.kind === 'e' ? (startOf.get(r.key) ?? OLD) : OLD,
@@ -136,7 +140,7 @@ export const EventsFeed = memo(function EventsFeed({ match, home, away, onReplay
     return () => cancelAnimationFrame(raf);
     // rowsKey and the starts stand for `rows` and `startOf`, which are new objects every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rowsKey, starts.join('|'), evAll, g.until, g.growing, g.foldT]);
+  }, [rowsKey, starts.join('|'), evAll, g.until, g.growing, g.foldT, still]);
 
   if (items.length === 0) {
     return (

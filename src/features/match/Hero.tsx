@@ -1,5 +1,5 @@
 import { Fragment, memo, useEffect, useMemo, useRef } from 'react';
-import { animate, m } from 'motion/react';
+import { animate, m, useReducedMotion } from 'motion/react';
 import type { Match, Side, Team } from '../../domain';
 import { CASCADE, cascade, CURVES, Shared, sharedMatch } from '../../motion';
 import { useScoreline } from '../../store';
@@ -117,14 +117,15 @@ function HeroClock({ match }: { match: Pick<Match, 'status' | 'clock'> }) {
 function BigNumber({ value, dim }: { value: number; dim: boolean }) {
   const ref = useRef<HTMLSpanElement>(null);
   const prev = useRef(value);
+  const still = useReducedMotion() === true;
   useEffect(() => {
     const el = ref.current;
     const up = value > prev.current;
     prev.current = value;
-    if (!el || !up) return;
+    if (!el || !up || still) return;
     const a = animate(el, { scale: [1 + HERO_BUMP.amp, 1] }, { duration: HERO_BUMP.dur, ease: CURVES.glide });
     return () => a.stop();
-  }, [value]);
+  }, [value, still]);
   return (
     <span ref={ref} className={styles.score} data-dim={dim ? '' : undefined}>
       {value}
