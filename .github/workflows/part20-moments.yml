@@ -17,12 +17,12 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npx playwright install --with-deps chromium
       - name: Typecheck, lint and whole unit suite (one worker avoids the known demo timeout)
         run: npm run typecheck && npm run lint && npm run test -- --maxWorkers=1
       - run: npm run build
       - name: Reference extraction verification (Luau execution is tested separately with Rive CLI)
         run: node verification/moments-script/run.mjs --prepare-only
-      - run: npx playwright install --with-deps chromium
       - name: Goal, red and toast regression at phone, tablet and desktop widths
         run: npx playwright test -c playwright.moments.config.ts --reporter=line
       - name: Actual signed editor exports and real runtime lifecycle

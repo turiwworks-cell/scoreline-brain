@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 
 /*
@@ -9,6 +10,7 @@ import { expect, test, type Page } from '@playwright/test';
  */
 
 const errors: string[] = [];
+const hasSignedMoments = existsSync('public/rive/moments.riv');
 
 test.beforeEach(async ({ page }) => {
   errors.length = 0;
@@ -53,6 +55,7 @@ test('goalHome plays the goal scene; a first tap shows it all, the next closes i
   else await expect(page.locator('[data-pane="match"] [data-testid="moment-scene"]')).toBeVisible();
   // the story lands: scorer, minute, commentary
   await expect(scene.getByText('Commentary')).toBeVisible({ timeout: 6000 });
+  if (hasSignedMoments) await expect(scene.locator('canvas')).toBeVisible();
   await page.screenshot({ path: `test-results/moments-goal-${box.width}.png` });
   await scene.click({ position: { x: 40, y: box.height / 2 } });
   await scene.click({ position: { x: 40, y: box.height / 2 } });
@@ -66,6 +69,7 @@ test('redHome plays the red card scene; Escape closes it', async ({ page }) => {
   await expect(scene).toHaveAttribute('data-variant', 'red');
   await expect(scene.getByText(/^Down to ten · /)).toBeVisible({ timeout: 6000 });
   await expect(scene.getByText('Sent off', { exact: true })).toBeVisible();
+  if (hasSignedMoments) await expect(scene.locator('canvas')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(scene).toHaveCount(0, { timeout: 2000 });
 });
@@ -112,3 +116,4 @@ test('the toast leaves on its own after its hold', async ({ page }) => {
   // entrance 0.6 s + toastHold 4.5 s, then 0.4 s out
   await expect(toast).toHaveCount(0, { timeout: 8000 });
 });
+

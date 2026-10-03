@@ -28,7 +28,7 @@ describe('Live icon binding and hit target', () => {
   it('replaces the whole glass button and counter only after native artwork is ready', async () => {
     mock.source = '/rive/live-icon.riv';
     const view = render(<LiveIcon live count={8} onChange={vi.fn()} className="m-glass live" fallback={<span>Live</span>}><span>8</span></LiveIcon>);
-    await waitFor(() => expect(mock.canvas).not.toBeNull());
+    await waitFor(() => expect(view.container.querySelector('canvas')).not.toBeNull());
     const button = view.getByRole('button', { name: 'Live, 8 in play' });
     expect(button.classList.contains('m-glass')).toBe(true);
     act(() => mock.canvas!.onReady?.());

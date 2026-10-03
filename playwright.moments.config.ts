@@ -13,7 +13,7 @@ export default defineConfig({
   },
   use: {
     baseURL: 'http://127.0.0.1:4175',
-    launchOptions: process.env.PW_CHROMIUM_PATH ? { executablePath: process.env.PW_CHROMIUM_PATH } : {},
+    launchOptions: { args: ['--enable-unsafe-swiftshader'], ...(process.env.PW_CHROMIUM_PATH ? { executablePath: process.env.PW_CHROMIUM_PATH } : {}) },
   },
   projects: [
     { name: 'phone-390x844', use: { viewport: { width: 390, height: 844 } } },
@@ -21,3 +21,4 @@ export default defineConfig({
     { name: 'desktop-1280x892', use: { viewport: { width: 1280, height: 892 } } },
   ],
 });
+
