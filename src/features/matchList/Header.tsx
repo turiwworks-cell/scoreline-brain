@@ -1,4 +1,5 @@
-import { LiveDot, RoundButton } from '../../ui';
+import { RoundButton } from '../../ui';
+import { LiveIcon } from '../../rive/LiveIcon';
 import styles from './Header.module.css';
 
 /*
@@ -27,16 +28,16 @@ export type LiveToggleProps = {
 /** Live on / off. A toggle button: the green capsule is its pressed state. */
 export function LiveToggle({ on, count, onToggle }: LiveToggleProps) {
   return (
-    <button type="button" className={`m-glass ${styles.live}`} aria-pressed={on} aria-label={`Live, ${count} in play`} onClick={onToggle}>
+    <LiveIcon live={on} count={count} onChange={onToggle} className={`m-glass ${styles.live}`} fallback={
       <span className={styles.capsule} aria-hidden="true">
-        {/* off: a ring pulses out from the dot every 1.8 s; on: the dot is ink on the green */}
-        <LiveDot pulse={!on} ink={on} />
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="3" fill="currentColor" /><circle cx="7" cy="7" r="6" stroke="currentColor" opacity={on ? 0 : 0.35} /></svg>
         <span>Live</span>
       </span>
+    }>
       <span className={styles.count} aria-hidden="true">
         {count}
       </span>
-    </button>
+    </LiveIcon>
   );
 }
 

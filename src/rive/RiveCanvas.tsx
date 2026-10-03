@@ -1,0 +1,29 @@
+import { useEffect, useLayoutEffect, useRef, type CSSProperties } from 'react';
+import { mountCanvas } from './canvasLifecycle';
+import type { CanvasBinding, RiveInstance } from './types';
+
+export type RiveCanvasProps = {
+  source: string;
+  className?: string;
+  style?: CSSProperties;
+  bind(instance: RiveInstance): CanvasBinding | void;
+  onReady?(): void;
+  onError?(error: unknown): void;
+};
+
+export function RiveCanvas(props: RiveCanvasProps) {
+  const canvas = useRef<HTMLCanvasElement>(null);
+  const latest = useRef(props);
+  useLayoutEffect(() => { latest.current = props; });
+  useEffect(() => {
+    if (!canvas.current) return;
+    const life = mountCanvas(canvas.current, {
+      source: props.source,
+      bind: (instance) => latest.current.bind(instance),
+      ready: () => latest.current.onReady?.(),
+      error: (error) => latest.current.onError?.(error),
+    });
+    return () => life.dispose();
+  }, [props.source]);
+  return <canvas ref={canvas} className={props.className} aria-hidden="true" tabIndex={-1} style={{ ...props.style, pointerEvents: 'none' }} />;
+}

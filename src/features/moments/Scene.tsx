@@ -1,5 +1,7 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
-import { m, useMotionValueEvent, useTransform, type MotionValue } from 'motion/react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
+import { m, useMotionValue, useMotionValueEvent, useTransform, type MotionValue } from 'motion/react';
+import { GoalWord, type GoalWordProps } from '../../rive/GoalWord';
+import { createWordClock } from '../../rive/wordClock';
 import { minText } from '../../domain';
 import { bez, clamp, CURVES, ease, goalLetters, lerp, prog, timing, type MomentDirector, type Presentation, type Timing } from '../../motion';
 import { Crest, Icon, KitDisc, matchStops, mix, pastel, RoundButton, SoftLight, Star, textWidth, useFontVersion, type PhotoSources } from '../../ui';
@@ -88,6 +90,15 @@ export function Scene({ p, info, d, photo, followed }: SceneProps) {
   const root = useRef<HTMLDivElement>(null);
   const g = useBox(root);
   const { t, out } = useStageTime(p, d.clock);
+  const [firstStart] = useState(p.startedAt);
+  const skipped = p.startedAt !== firstStart || p.phase === 'out';
+  const [wordClock] = useState(() => createWordClock(p.beats!.up, p.beats!.full));
+  const wordSignal = useMotionValue(0);
+  const storyTime = useTransform(() => { wordSignal.get(); return wordClock.time(t.get(), skipped); });
+  const waiting = useCallback(() => { wordClock.waiting(); wordSignal.set(wordSignal.get() + 1); }, [wordClock, wordSignal]);
+  const phase = useCallback((n: number) => { wordClock.phase(n, t.get()); wordSignal.set(wordSignal.get() + 1); }, [wordClock, wordSignal, t]);
+  const fallback = useCallback(() => { wordClock.fallback(); wordSignal.set(wordSignal.get() + 1); }, [wordClock, wordSignal]);
+  const word: WordBridge = { time: t, full: p.beats!.full, skipped, onWaiting: waiting, onPhase: phase, onFallback: fallback };
   const [T] = useState(() => timing('goal'));
   const red = p.variant === 'red';
 
@@ -118,7 +129,7 @@ export function Scene({ p, info, d, photo, followed }: SceneProps) {
       <m.div className={styles.sceneFade} style={{ opacity: base }}>
         {/* keyed by the box: a resize lays the choreography out again */}
         <div key={`${g.W}x${g.H}`} className={styles.sceneArt} aria-hidden="true">
-          {red ? <RedArt t={t} T={T} p={p} info={info} g={g} photo={photo} followed={followed} /> : <GoalArt t={t} T={T} p={p} info={info} g={g} photo={photo} followed={followed} />}
+          {red ? <RedArt t={storyTime} T={T} p={p} info={info} g={g} photo={photo} followed={followed} word={word} /> : <GoalArt t={storyTime} T={T} p={p} info={info} g={g} photo={photo} followed={followed} word={word} />}
         </div>
         <RoundButton
           className={styles.sceneClose}
@@ -135,7 +146,8 @@ export function Scene({ p, info, d, photo, followed }: SceneProps) {
   );
 }
 
-type ArtProps = { t: MotionValue<number>; T: Timing; p: Presentation; info: MomentInfo; g: Geo; photo: PhotoSources | undefined; followed: boolean };
+type WordBridge = Pick<GoalWordProps, 'time' | 'full' | 'skipped' | 'onWaiting' | 'onPhase' | 'onFallback'>;
+type ArtProps = { t: MotionValue<number>; T: Timing; p: Presentation; info: MomentInfo; g: Geo; photo: PhotoSources | undefined; followed: boolean; word: WordBridge };
 
 /** bez(T.c, prog(t, at, T.dur)) as a motion value. */
 function useBeat(t: MotionValue<number>, T: Timing, at: number, dur = T.duration) {
@@ -144,7 +156,7 @@ function useBeat(t: MotionValue<number>, T: Timing, at: number, dur = T.duration
 
 const WARM = '#F7F2EA';
 
-function GoalArt({ t, T, p, info, g, photo, followed }: ArtProps) {
+function GoalArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
   const B = p.beats!;
   const c1 = info.team.colors[0];
   const u = useBeat(t, T, B.up);
@@ -209,7 +221,7 @@ function GoalArt({ t, T, p, info, g, photo, followed }: ArtProps) {
         <SoftLight color={pastel(c1)} alpha={0.55} cx="50%" cy={170} rx={115} ry={65} />
       </m.div>
       <m.div className={styles.word} style={{ y: wordY, height: size0, scale: wordScale }}>
-        <Word word="GOAAAL" size={size0} t={t} t0={B.delay} gap={gap} land={land} curve={LAND} mode="shout" stops={gs} glow={pastel(c1)} />
+        <GoalWord {...word} kind="goal" colors={info.team.colors} start={B.delay} fallback={<Word word="GOAAAL" size={size0} t={t} t0={B.delay} gap={gap} land={land} curve={LAND} mode="shout" stops={gs} glow={pastel(c1)} />} />
       </m.div>
       {/* once at the top: who scored, and the score */}
       <m.div className={styles.topLine} style={{ left: 68, opacity: pTop }}>
@@ -224,7 +236,7 @@ function GoalArt({ t, T, p, info, g, photo, followed }: ArtProps) {
   );
 }
 
-function RedArt({ t, T, p, info, g, photo, followed }: ArtProps) {
+function RedArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
   const B = p.beats!;
   const u = useBeat(t, T, B.up);
   // shake: hard on the hit, then gone
@@ -277,7 +289,7 @@ function RedArt({ t, T, p, info, g, photo, followed }: ArtProps) {
         <Story t={t} T={T} p={p} info={info} g={g} followed={followed} red line="linear-gradient(90deg, #FF2D2D, #8E0A10)" />
         <m.div className={styles.bigCard} style={{ x: cardX, y: cardY, scale: cardS, rotate: cardR, opacity: cardO }} />
         <m.div className={styles.word} style={{ y: wordY, height: size0, scale: wordScale }}>
-          <Word word="RED CARD" size={size0} t={t} t0={HIT + SLAM_WORD.after} gap={SLAM_WORD.gap} land={T.duration} curve={T.ease} mode="slam" stops="#FF6A5E 0%, #FF2D2D 50%, #C2101A 100%" />
+          <GoalWord {...word} kind="red" colors={['#FF2D2D', '#8E0A10']} start={HIT + SLAM_WORD.after} fallback={<Word word="RED CARD" size={size0} t={t} t0={HIT + SLAM_WORD.after} gap={SLAM_WORD.gap} land={T.duration} curve={T.ease} mode="slam" stops="#FF6A5E 0%, #FF2D2D 50%, #C2101A 100%" />} />
         </m.div>
         <m.div className={styles.topCrest} style={{ opacity: pTop }}>
           <Crest team={info.team} size={22} />

@@ -1,0 +1,67 @@
+name: Part 19 validation
+on:
+  push:
+    branches: [codex/part-19-rive]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: baseline
+            ref: 74f8edad99245ef3b6186a2b79be408fd3fa2a71
+          - label: part19
+            ref: codex/part-19-rive
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: mkdir -p .verification
+      - name: Typecheck and lint
+        run: npm run typecheck && npm run lint
+      - name: Unit suite
+        continue-on-error: true
+        run: npx vitest run --maxWorkers=1 --reporter=json --outputFile=.verification/unit.json
+      - name: Production build and initial bundle
+        run: |
+          npm run build -- --manifest
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          import zlib from 'node:zlib';
+          const manifest = JSON.parse(fs.readFileSync('dist/.vite/manifest.json', 'utf8'));
+          const initial = new Set();
+          function visit(key) {
+            const chunk = manifest[key];
+            if (!chunk || initial.has(chunk.file)) return;
+            initial.add(chunk.file);
+            for (const child of chunk.imports ?? []) visit(child);
+          }
+          for (const [key, chunk] of Object.entries(manifest)) if (chunk.isEntry) visit(key);
+          const files = [...initial].filter(file => file.endsWith('.js')).map(file => ({file, gzip: zlib.gzipSync(fs.readFileSync('dist/' + file)).byteLength}));
+          fs.writeFileSync('.verification/bundle.json', JSON.stringify({initialBytes: files.reduce((n,f) => n + f.gzip, 0), files}, null, 2));
+          JS
+      - run: npx playwright install --with-deps chromium
+      - name: Production browser suite
+        continue-on-error: true
+        run: PLAYWRIGHT_JSON_OUTPUT_NAME=.verification/browser.json npx playwright test --workers=1 --retries=0 --reporter=json
+      - name: Moment interactions
+        continue-on-error: true
+        run: PLAYWRIGHT_JSON_OUTPUT_NAME=.verification/moments.json npx playwright test -c playwright.moments.config.ts --reporter=json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: part19-${{ matrix.label }}
+          path: |
+            .verification/*.json
+            dist/.vite/manifest.json
+            test-results/
+          retention-days: 7

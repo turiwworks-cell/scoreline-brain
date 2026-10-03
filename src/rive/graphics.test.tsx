@@ -1,0 +1,88 @@
+import { act, cleanup, fireEvent, render } from '@testing-library/react';
+import { motionValue } from 'motion/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { LiveIcon } from './LiveIcon';
+import LiveGraphic from './LiveGraphic';
+import WordGraphic from './WordGraphic';
+import type { RiveCanvasProps } from './RiveCanvas';
+import type { Property, RiveInstance, ViewModel } from './types';
+
+const mock = vi.hoisted(() => ({ canvas: null as RiveCanvasProps | null }));
+vi.mock('./RiveCanvas', () => ({ RiveCanvas: (props: RiveCanvasProps) => { mock.canvas = props; return <canvas aria-hidden="true" style={{ pointerEvents: 'none' }} />; } }));
+vi.mock('./assets', () => ({ liveIconSource: null, momentsSource: null }));
+
+function property<T>(value: T) {
+  const listeners = new Set<() => void>();
+  const p: Property<T> & { emit(): void; listeners: Set<() => void> } = { value, listeners, on: (fn) => { listeners.add(fn); }, off: (fn) => { listeners.delete(fn); }, emit: () => { for (const fn of listeners) fn(); } };
+  return p;
+}
+function fixture() {
+  const live = property(false); const kind = property(''); const c1 = property(0); const c2 = property(0); const phase = property(0);
+  const trigger = vi.fn();
+  const vm: ViewModel = { boolean: () => live, string: () => kind, color: (name) => name === 'color1' ? c1 : c2, number: () => phase, trigger: () => ({ trigger }) };
+  const instance: RiveInstance = { stateMachineNames: ['State Machine 1'], viewModelInstance: vm, play: vi.fn(), pause: vi.fn(), startRendering: vi.fn(), stopRendering: vi.fn(), resizeDrawingSurfaceToCanvas: vi.fn(), cleanup: vi.fn() };
+  return { instance, live, kind, c1, c2, phase, trigger };
+}
+afterEach(() => { cleanup(); mock.canvas = null; vi.restoreAllMocks(); });
+describe('Live icon binding and hit target', () => {
+  it('keeps a DOM button, static fallback and controlled pressed state', () => {
+    const change = vi.fn();
+    const view = render(<LiveIcon live={false} count={3} onChange={change} fallback={<svg aria-hidden="true" />} />);
+    const button = view.getByRole('button', { name: 'Live, 3 in play' });
+    expect(button.getAttribute('aria-pressed')).toBe('false');
+    expect(button.querySelector('svg')).not.toBeNull(); expect(button.querySelector('canvas')).toBeNull();
+    fireEvent.click(button); expect(change).toHaveBeenCalledWith(true);
+    view.rerender(<LiveIcon live count={4} onChange={change} fallback={<svg />} />);
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+  });
+  it('syncs URL changes to islive, Rive changes back, and suppresses write echoes', () => {
+    const change = vi.fn(); const f = fixture();
+    const view = render(<LiveGraphic source="/rive/live-icon.riv" live={false} onChange={change} fallback={<svg />} />);
+    const binding = mock.canvas!.bind(f.instance)!;
+    expect(f.live.listeners.size).toBe(1);
+    view.rerender(<LiveGraphic source="/rive/live-icon.riv" live onChange={change} fallback={<svg />} />);
+    expect(f.live.value).toBe(true); f.live.emit(); expect(change).not.toHaveBeenCalled();
+    f.live.value = false; f.live.emit(); expect(change).toHaveBeenCalledWith(false);
+    binding.cleanup?.(); expect(f.live.listeners.size).toBe(0);
+  });
+  it('fails closed on a missing Boolean contract and keeps the fallback', () => {
+    const view = render(<LiveGraphic source="/rive/live-icon.riv" live={false} onChange={vi.fn()} fallback={<span>Static live</span>} />);
+    const f = fixture(); const invalid = { ...f.instance, viewModelInstance: null };
+    expect(() => mock.canvas!.bind(invalid)).toThrow('islive');
+    act(() => mock.canvas!.onError?.(new Error('no WebGL')));
+    expect(view.getByText('Static live')).toBeTruthy(); expect(view.container.querySelector('canvas')).toBeNull();
+  });
+});
+describe('goal word View Model contract', () => {
+  const setup = () => {
+    const f = fixture(); const time = motionValue(0); const onPhase = vi.fn(); const onWaiting = vi.fn(); const onFallback = vi.fn();
+    const view = render(<WordGraphic source="/rive/moments.riv" kind="goal" colors={['#123456', '#654321']} time={time} start={0.1} full={4} skipped={false} onWaiting={onWaiting} onPhase={onPhase} onFallback={onFallback} fallback={<span>GOAAAL</span>} />);
+    const binding = mock.canvas!.bind(f.instance)!;
+    return { ...f, time, onPhase, onWaiting, onFallback, view, binding };
+  };
+  it('sets kind and ARGB colors before firing play once on the stage beat', () => {
+    const s = setup();
+    expect(s.kind.value).toBe('goal'); expect(s.c1.value).toBe(0xff123456); expect(s.c2.value).toBe(0xff654321);
+    expect(s.trigger).not.toHaveBeenCalled(); expect(s.binding.shouldPlay?.()).toBe(false);
+    act(() => s.time.set(0.1)); expect(s.trigger).toHaveBeenCalledTimes(1);
+    act(() => s.time.set(0.2)); expect(s.trigger).toHaveBeenCalledTimes(1); expect(s.onWaiting).toHaveBeenCalledTimes(1);
+    s.binding.cleanup?.();
+  });
+  it('reports phases, freezes the landed word on done, and removes listeners', () => {
+    const s = setup(); act(() => s.time.set(0.1));
+    s.phase.value = 1; s.phase.emit(); expect(s.onPhase).toHaveBeenCalledWith(1);
+    s.phase.value = 2; s.phase.emit(); expect(s.onPhase).toHaveBeenCalledWith(2);
+    expect(s.instance.pause).toHaveBeenCalled(); expect(s.instance.stopRendering).toHaveBeenCalled(); expect(s.binding.shouldPlay?.()).toBe(false);
+    s.binding.cleanup?.(); expect(s.phase.listeners.size).toBe(0); expect(s.onFallback).toHaveBeenCalled();
+  });
+  it('falls back at the scene deadline if the phase handshake never arrives', () => {
+    const s = setup(); act(() => s.time.set(4));
+    expect(s.onFallback).toHaveBeenCalled(); expect(s.view.container.querySelector('canvas')).toBeNull();
+    expect(s.trigger).not.toHaveBeenCalled(); s.binding.cleanup?.();
+  });
+  it('does not fire play while hidden and resumes from the current stage time', () => {
+    let hidden = true; vi.spyOn(document, 'hidden', 'get').mockImplementation(() => hidden);
+    const s = setup(); act(() => s.time.set(0.5)); expect(s.trigger).not.toHaveBeenCalled();
+    hidden = false; s.binding.resume?.(); expect(s.trigger).toHaveBeenCalledTimes(1); s.binding.cleanup?.();
+  });
+});

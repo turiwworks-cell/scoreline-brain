@@ -1,6 +1,7 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useNavigationType } from 'react-router';
-import { selectFeaturedMatchId, selectMatchIdOfTeam, useScoreline } from '../../store';
+import { selectFeaturedMatchId, selectLiveMatchIds, selectMatchIdOfTeam, useScoreline } from '../../store';
+import { preloadRive } from '../../rive/preload';
 import { canonicalPath, parseNav } from '../nav/url';
 import { useLayoutMode } from './layoutMode';
 import { ListPane } from './ListPane';
@@ -27,6 +28,8 @@ export function Shell() {
   const layout = useLayoutMode();
   const nav = useMemo(() => parseNav(location.pathname, location.search, location.state), [location.pathname, location.search, location.state]);
   const featured = useScoreline(selectFeaturedMatchId);
+  const hasLiveMatch = useScoreline(selectLiveMatchIds).length > 0;
+  useEffect(() => preloadRive(hasLiveMatch), [hasLiveMatch]);
   const teamMatch = useScoreline(selectMatchIdOfTeam(nav.player?.team ?? ''));
   const r = useMemo(() => resolve(nav, layout, { featured, teamMatch }), [nav, layout, featured, teamMatch]);
 
