@@ -60,7 +60,7 @@ export function Shell() {
         {said}
       </p>
       {/* goals, red cards, kick-offs and full time, as the MomentDirector delivers them (Part 17) */}
-      <p key="moments" className={styles.announcer} aria-live="polite" aria-atomic="true" data-testid="moment-announcer">
+      <p key="moments" className={styles.announcer} role="status" aria-atomic="true" data-testid="moment-announcer">
         {moment ? <span key={moment.n}>{moment.text}</span> : null}
       </p>
     </main>

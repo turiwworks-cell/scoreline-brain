@@ -86,7 +86,8 @@ describe('moments (Part 17)', () => {
     const ev = parseEvent({ match: 501, id: 'app-goal', seq: 2, kind: 'goal', side: 'home', minute: 61, name: 'Saka', score: [2, 0] });
     act(() => scorelineStore.getState().actions.applyEvent(ev!, Date.now()));
     const region = screen.getByTestId('moment-announcer');
-    expect(region.getAttribute('aria-live')).toBe('polite');
+    // role=status is a polite live region (kept apart from the shell's title announcer)
+    expect(region.getAttribute('role')).toBe('status');
     expect(region.textContent).toBe("Goal for Arsenal, Saka, 61'. Arsenal 2–0 Chelsea.");
     expect(appMoments().getSnapshot().stage).toMatchObject({ kind: 'scene', variant: 'goal' });
     act(() => appMoments().dismiss());

@@ -73,7 +73,7 @@ card or the shell is mounted, and it stops cleanly with no timers when the last 
 
 **Shell.** `app/layout/useMoments.ts` sends the director what is on screen (`openId`, `front`,
 `followedMatchId` from the follow preference and `selectMatchIdOfTeam`). The shell renders a second
-visually hidden `aria-live="polite" aria-atomic` region (`data-testid="moment-announcer"`). Each
+visually hidden `role="status" aria-atomic` region (`data-testid="moment-announcer"`). `role="status"` is a polite live region, but it carries no `aria-live` attribute, so it stays separate from the shell's title announcer, which `e2e/nav.spec.ts` finds by `[aria-live="polite"]`. Each
 announcement is keyed by its counter, so the same words are read again when they repeat.
 
 ## Integration contract for Part 18
@@ -162,7 +162,24 @@ New unit tests (`motion/moments/director.test.ts`, 16; plus 1 in `goalFeed.test.
   - In the app, the open match's goal plays a scene and fills the polite region with
     “Goal for Arsenal, Saka, 61'. Arsenal 2–0 Chelsea.”
 
-Browser suite: see below.
+**Browser suite.** The full production suite ran once with one worker and zero retries: 183 cases,
+5.7 min, **163 passed, 13 skipped, 7 failed**. The 13 skips are the same as at M2.
+
+- **Caused by this part, now fixed.** `nav.spec.ts` “focus follows navigation” failed at 900 and 1280 in
+  a strict-mode violation: `[aria-live="polite"]` matched both the title region and the new moment
+  region. The moment region now uses `role="status"`. The test was not edited. After the fix, that test
+  passed at all three widths on one targeted run (3/3), and the App unit tests, typecheck and lint pass.
+  The full suite was **not** repeated after this one-line change.
+- **Baseline failures, unchanged and not investigated.**
+  - `lineup.spec.ts` “markers rise line by line, forwards first” failed at 390, 900 and 1280. This is the
+    same failure as in the M2 report.
+  - `nav.spec.ts` “each pane keeps its own scroll” failed at 900 and 1280 (expected 300, received 0).
+    This is the same intermittent pane-scroll symptom reported in Parts 15 and M2. It passed in the M2
+    run.
+
+**Live check.** In the production preview at 390 × 844 (`/match/1/facts?demo=fast`), the moment region
+announced the demo's goals as they happened (for example “Goal for France, Olise, 62'. France 3–1
+Argentina.”), with no page errors.
 
 ## Bundle
 
