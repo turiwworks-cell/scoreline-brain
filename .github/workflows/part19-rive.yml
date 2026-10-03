@@ -72,6 +72,7 @@ jobs:
           npx tsc -p verification/rive/tsconfig.json
           PLAYWRIGHT_JSON_OUTPUT_NAME=.verification/rive.json npx playwright test -c playwright.rive.config.ts --reporter=line,json
       - name: Moment interactions
+        if: success() || failure()
         run: PLAYWRIGHT_JSON_OUTPUT_NAME=.verification/moments.json npx playwright test -c playwright.moments.config.ts --reporter=json
       - name: Report verification counts
         if: always()

@@ -38,7 +38,7 @@ describe('Live icon binding and hit target', () => {
   it('syncs URL changes to islive, Rive changes back, and suppresses write echoes', () => {
     const change = vi.fn(); const f = fixture();
     const view = render(<LiveGraphic source="/rive/live-icon.riv" live={false} onChange={change} fallback={<svg />} />);
-    const binding = mock.canvas!.bind(f.instance)!;
+    const binding = mock.canvas!.bind(f.instance, () => {})!;
     expect(f.live.listeners.size).toBe(1);
     view.rerender(<LiveGraphic source="/rive/live-icon.riv" live onChange={change} fallback={<svg />} />);
     expect(f.live.value).toBe(true); f.live.emit(); expect(change).not.toHaveBeenCalled();
@@ -48,7 +48,7 @@ describe('Live icon binding and hit target', () => {
   it('fails closed on a missing Boolean contract and keeps the fallback', () => {
     const view = render(<LiveGraphic source="/rive/live-icon.riv" live={false} onChange={vi.fn()} fallback={<span>Static live</span>} />);
     const f = fixture(); const invalid = { ...f.instance, viewModelInstance: null };
-    expect(() => mock.canvas!.bind(invalid)).toThrow('islive');
+    expect(() => mock.canvas!.bind(invalid, () => {})).toThrow('islive');
     act(() => mock.canvas!.onError?.(new Error('no WebGL')));
     expect(view.getByText('Static live')).toBeTruthy(); expect(view.container.querySelector('canvas')).toBeNull();
   });
@@ -57,7 +57,7 @@ describe('goal word View Model contract', () => {
   const setup = () => {
     const f = fixture(); const time = motionValue(0); const onPhase = vi.fn(); const onWaiting = vi.fn(); const onFallback = vi.fn();
     const view = render(<WordGraphic source="/rive/moments.riv" kind="goal" colors={['#123456', '#654321']} time={time} start={0.1} full={4} skipped={false} onWaiting={onWaiting} onPhase={onPhase} onFallback={onFallback} fallback={<span>GOAAAL</span>} />);
-    const binding = mock.canvas!.bind(f.instance)!;
+    const binding = mock.canvas!.bind(f.instance, () => { if (!document.hidden) binding.resume?.(); })!;
     return { ...f, time, onPhase, onWaiting, onFallback, view, binding };
   };
   it('sets kind and ARGB colors before firing play once on the stage beat', () => {

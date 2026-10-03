@@ -15,7 +15,7 @@ export default function WordGraphic(props: GoalWordProps & { source: string }) {
     return () => { off(); latest.current.onFallback(); };
   }, [props.time]);
   const fail = () => { latest.current.onFallback(); setFailed(true); };
-  const bind = (instance: RiveInstance) => {
+  const bind = (instance: RiveInstance, requestSync: () => void) => {
     const vm = instance.viewModelInstance;
     const kind = vm?.string('kind');
     const c1 = vm?.color('color1');
@@ -43,15 +43,14 @@ export default function WordGraphic(props: GoalWordProps & { source: string }) {
       const current = latest.current;
       // Existing scenes keep their director timers while hidden. Never start/advance in the background.
       if (document.hidden) return;
-      if (!done && phase.value < 1 && current.time.get() >= current.full) { fail(); return; }
+      if (!done && phase.value < 1 && current.time.get() >= current.full) { done = true; fail(); return; }
       if (!started && current.time.get() >= current.start) {
         started = true;
         play.trigger();
-        instance.play(instance.stateMachineNames[0]);
-        instance.startRendering();
       }
     };
-    step.current = advance;
+    // The canvas owner decides whether this request may advance or resume rendering.
+    step.current = requestSync;
     return {
       shouldPlay: () => started && !done,
       resume: advance,

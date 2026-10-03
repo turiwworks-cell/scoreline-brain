@@ -6,7 +6,7 @@ export type CanvasOptions = {
   source: string;
   artboard?: string;
   advance?(): void;
-  bind(instance: RiveInstance): CanvasBinding | void;
+  bind(instance: RiveInstance, requestSync: () => void): CanvasBinding | void;
   ready(): void;
   error(error: unknown): void;
 };
@@ -60,7 +60,7 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
         // Bind the selected machine before any playback. The v2 default may be a linear timeline.
         instance.reset({ artboard: options.artboard, stateMachine: machine, autoplay: false, autoBind: true });
         instance.stopRendering();
-        binding = options.bind(instance) ?? undefined;
+        binding = options.bind(instance, sync) ?? undefined;
         bound = true;
       } catch (error) { fail(error); return; }
     }
@@ -68,13 +68,14 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
       instance.resizeDrawingSurfaceToCanvas();
       dirtySize = false;
     }
-    if (paused) {
-      binding?.resume?.();
-      if (binding?.shouldPlay?.() !== false) {
-        instance.play(machine);
-        instance.startRendering();
-        paused = false;
-      }
+    binding?.resume?.();
+    if (binding?.shouldPlay?.() === false) {
+      if (!paused) { instance.pause(); instance.stopRendering(); }
+      paused = true;
+    } else if (paused) {
+      instance.play(machine);
+      instance.startRendering();
+      paused = false;
     }
     if (!announced && !failed) { announced = true; options.ready(); }
   };

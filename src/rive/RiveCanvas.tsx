@@ -8,7 +8,7 @@ export type RiveCanvasProps = {
   onAdvance?(): void;
   className?: string;
   style?: CSSProperties;
-  bind(instance: RiveInstance): CanvasBinding | void;
+  bind(instance: RiveInstance, requestSync: () => void): CanvasBinding | void;
   onReady?(): void;
   onError?(error: unknown): void;
 };
@@ -23,7 +23,7 @@ export function RiveCanvas(props: RiveCanvasProps) {
       source: props.source,
       artboard: props.artboard,
       advance: () => latest.current.onAdvance?.(),
-      bind: (instance) => latest.current.bind(instance),
+      bind: (instance, requestSync) => latest.current.bind(instance, requestSync),
       ready: () => latest.current.onReady?.(),
       error: (error) => latest.current.onError?.(error),
     });

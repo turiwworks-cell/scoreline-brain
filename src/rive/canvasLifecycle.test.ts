@@ -28,7 +28,7 @@ const paint = async () => { const all = mock.paints.splice(0); all.forEach((fn) 
 const setup = () => {
   const canvas = document.createElement('canvas');
   const binding = { cleanup: vi.fn(), resume: vi.fn() };
-  const options = { source: '/rive/moments.riv', bind: vi.fn(() => binding), ready: vi.fn(), error: vi.fn() };
+  const options = { source: '/rive/moments.riv', bind: vi.fn<(instance: RiveInstance, sync: () => void) => typeof binding>(() => binding), ready: vi.fn(), error: vi.fn() };
   const life = mountCanvas(canvas, options); mounted.push(life);
   return { canvas, binding, options, life };
 };
@@ -53,7 +53,7 @@ describe('Rive canvas ownership', () => {
     expect(inst.reset.mock.invocationCallOrder[0]).toBeLessThan(s.options.bind.mock.invocationCallOrder[0]!);
     expect(inst.options.tabIndex).toBe(-1);
     expect(inst.options.shouldDisableRiveListeners).toBe(true);
-    expect(s.options.bind).toHaveBeenCalledWith(inst);
+    expect(s.options.bind).toHaveBeenCalledWith(inst, expect.any(Function));
     expect(s.binding.resume).toHaveBeenCalled(); expect(s.options.ready).toHaveBeenCalledTimes(1);
     expect(mock.slots!.count).toBe(1);
   });
@@ -68,6 +68,22 @@ describe('Rive canvas ownership', () => {
     expect(inst.startRendering).not.toHaveBeenCalled();
     hidden = false; document.dispatchEvent(new Event('visibilitychange'));
     expect(inst.startRendering).toHaveBeenCalledTimes(1); expect(inst.resizeDrawingSurfaceToCanvas).toHaveBeenCalledTimes(1);
+  });
+  it('a word-clock request cannot restart an offscreen canvas', async () => {
+    const s = setup();
+    let requestSync!: () => void;
+    let playing = false;
+    s.options.bind.mockImplementation((_instance, sync) => { requestSync = sync; return { ...s.binding, shouldPlay: () => playing }; });
+    const inst = await load();
+    vi.clearAllMocks();
+    intersect([entry(s.canvas, false)], {} as IntersectionObserver);
+    playing = true;
+    requestSync();
+    expect(inst.play).not.toHaveBeenCalled();
+    expect(inst.startRendering).not.toHaveBeenCalled();
+    intersect([entry(s.canvas, true)], {} as IntersectionObserver);
+    expect(inst.play).toHaveBeenCalledTimes(1);
+    expect(inst.startRendering).toHaveBeenCalledTimes(1);
   });
   it('cleans binding, instance and observers exactly once', async () => {
     const s = setup(); const inst = await load(); s.life.dispose(); s.life.dispose();

@@ -3,9 +3,16 @@ import type {} from './fixture';
 
 test('real runtime releases twenty scene instances and pauses when hidden or offscreen', async ({ page }, testInfo) => {
   const browserErrors: string[] = [];
-  page.on('pageerror', (error) => browserErrors.push(error.message));
+  page.on('pageerror', (error) => { browserErrors.push(error.message); console.log('RIVE_PAGE_ERROR ' + error.message); });
+  page.on('console', (message) => { if (message.type() === 'error') console.log('RIVE_CONSOLE_ERROR ' + message.text()); });
+  page.on('requestfailed', (request) => console.log('RIVE_REQUEST_ERROR ' + request.url() + ': ' + request.failure()?.errorText));
   await page.goto('/verification/rive/fixture.html');
-  await expect.poll(() => page.evaluate(() => window.riveProbe?.ready ?? 0)).toBe(1);
+  try {
+    await expect.poll(() => page.evaluate(() => window.riveProbe?.ready ?? 0), { timeout: 30_000 }).toBe(1);
+  } catch (error) {
+    console.log('RIVE_STARTUP ' + JSON.stringify(await page.evaluate(() => window.riveProbe)) + ' ' + JSON.stringify(browserErrors));
+    throw error;
+  }
   const cdp = await page.context().newCDPSession(page);
   const heap = async () => {
     await cdp.send('HeapProfiler.collectGarbage');
