@@ -97,7 +97,7 @@ export function Scene({ p, info, d, photo, followed }: SceneProps) {
   // Escape closes it, like the close button
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') d.dismiss(p.key);
+      if (e.key === 'Escape' && !e.defaultPrevented) d.dismiss(p.key);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -122,7 +122,7 @@ export function Scene({ p, info, d, photo, followed }: SceneProps) {
         </div>
         <RoundButton
           className={styles.sceneClose}
-          aria-label="Close"
+          aria-label={red ? 'Close red card' : 'Close goal'}
           onClick={(e) => {
             e.stopPropagation();
             d.dismiss(p.key);

@@ -47,15 +47,18 @@ function setup(view: MomentView, slot: StageSlot = 'all', reduced = false) {
   running.push(d);
   const onOpenMatch = vi.fn();
   const isFollowed = vi.fn((team: string, n: number) => team === 'fra' && n === 20);
-  render(
+  const tree = (s: StageSlot) => (
     <>
       <IconSprite />
-      <MomentStage slot={slot} director={d} onOpenMatch={onOpenMatch} isFollowed={isFollowed} reducedMotion={reduced} />
-    </>,
+      <MomentStage slot={s} director={d} onOpenMatch={onOpenMatch} isFollowed={isFollowed} reducedMotion={reduced} />
+    </>
   );
+  const rendered = render(tree(slot));
   let seq = 500;
   const api = {
     d,
+    /** mounts the stage as another slot (a layout change moves it) */
+    reslot: (s: StageSlot) => rendered.rerender(tree(s)),
     onOpenMatch,
     stage: () => d.getSnapshot().stage,
     advance(s: number) {
@@ -124,13 +127,18 @@ describe('the scene', () => {
     const a = setup({ openId: 1, front: true });
     a.goal(1);
     const started = a.stage()!.startedAt;
-    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Close goal' }));
     expect(a.stage()!.phase).toBe('out');
     expect(a.stage()!.startedAt).toBe(started);
 
     a.advance(1);
     expect(screen.queryByTestId('moment-scene')).toBeNull();
     a.goal(1);
+    // an Escape something else already handled (a sheet, a menu) leaves the scene alone
+    const handled = new KeyboardEvent('keydown', { key: 'Escape', cancelable: true });
+    handled.preventDefault();
+    window.dispatchEvent(handled);
+    expect(a.stage()!.phase).toBe('in');
     fireEvent.keyDown(window, { key: 'Escape' });
     expect(a.stage()!.phase).toBe('out');
   });
@@ -202,6 +210,25 @@ describe('the toast', () => {
     expect(a.stage()!.phase).toBe('in');
     expect(a.stage()!.held).toBe(false);
     expect(a.onOpenMatch).not.toHaveBeenCalled();
+  });
+
+  it('a toast that goes while pressed lets go of the director', () => {
+    const a = setup({ front: false });
+    a.goal(2);
+    fireEvent.pointerDown(screen.getByRole('button', { name: /Open match/ }), { pointerId: 1, button: 0, clientX: 100, clientY: 100 });
+    expect(a.stage()!.held).toBe(true);
+    a.reslot('scene');
+    expect(screen.queryByTestId('moment-toast')).toBeNull();
+    expect(a.stage()!.held).toBe(false);
+    a.advance(toastCloseAfter() + TOAST_OUT + 0.01);
+    expect(a.stage()).toBeNull();
+  });
+
+  it('a moment with nobody named says the team once', () => {
+    setup({ front: false });
+    const e = parseEvent({ seq: 950, match: 2, id: 'r9', kind: 'red', side: 'home', minute: 70 });
+    act(() => scorelineStore.getState().actions.applyEvent(e!, Date.now()));
+    expect(screen.getByRole('button', { name: /Open match/ }).getAttribute('aria-label')).toBe("Red card, 70', England. England 0–1 Brazil. Open match");
   });
 
   it('Escape sends it away', () => {

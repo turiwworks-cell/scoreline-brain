@@ -1,8 +1,8 @@
 # Part 18 — Toast and scene (DOM)
 
 Branch: `claude/part-18`, from `origin/codex/part-15-16-integration` at `61135e0` (the integrated
-checkpoint, which already carries Part 17). Implementation commit `2e7a68e`; this report is the commit
-after it. `main` was not changed, nothing was merged and no PR was opened. No dependency was added.
+checkpoint, which already carries Part 17). Implementation commit `2e7a68e`, report `d52655b`, review fixes
+in the commit after it. `main` was not changed, nothing was merged and no PR was opened. No dependency was added.
 Part 19 has not been started.
 
 ## What it does
@@ -89,6 +89,9 @@ import each other). `features/matchList/curve.ts` now re-exports it, so no list 
 - On the desktop the toast sits over the third pane's Player / Tables / Leaders switch, as the Lua
   draws it. That may want moving in the design pass.
 - When a keyboard user has focus on the toast and it leaves, focus falls back to the page.
+- A phone scene covers the screen but does not take focus, so keyboard focus can stay on a control
+  under it. A 7.5 s celebration that closes on its own should not pull focus; the close button and
+  Escape remain, and the polite region announces the moment.
 - The stage ships in the initial bundle (+7.09 KB gzip, below). It is needed only when a moment plays,
   so it is a candidate for a lazy chunk in Part 21's budget work.
 
@@ -100,16 +103,16 @@ import each other). `features/matchList/curve.ts` now re-exports it, so no list 
 | --- | --- | --- |
 | `npm run typecheck` | clean | clean |
 | `npm run lint` | clean | clean |
-| `npx vitest run --maxWorkers=1` | 64 files, 554 tests: **553 passed, 1 failed** | 66 files, 573 tests: **572 passed, 1 failed** |
+| `npx vitest run --maxWorkers=1` | 64 files, 554 tests: **553 passed, 1 failed** | `2e7a68e`: 66 files, 573 tests: **572 passed, 1 failed**. After the review fixes: 66 files, 575 tests: **575 passed** |
 | `npm run build` | passes | passes |
 
 The one unit failure is the same test before and after, and it is not Part 18's:
 `src/data/demo/demoSource.test.ts` › "a complete matchday plays through the store with no backend"
-times out at about 5.4 s against Vitest's 5 s default. It also fails when run on its own, on the
-unchanged checkpoint. Part 17 reported it passing in its environment, so this is this machine's speed.
-It was not changed.
+took about 5.4 s against Vitest's 5 s default. It also failed when run on its own, on the unchanged
+checkpoint. It passed in the run after the review fixes, and Part 17 reported it passing. So it is an
+intermittent timeout that depends on this machine's speed. It was not changed.
 
-The 19 new tests all pass:
+The 19 tests added with `2e7a68e` all pass. The review added 2 more (below):
 
 - `model.test.ts` (6): scorer, assist, first and last names, the score before and after a home or away
   goal, a goal with no event, a red card, an unknown match, and the labels and summary counts.
@@ -203,14 +206,45 @@ Initial production JavaScript, gzip, measured the same way on both builds:
 Part 18 adds **+7.09 KB**, all of it in `index`. The 180 KB budget was already exceeded and still
 is. The lazy chunks (`data`, `demo`, `DevKit`, `Insights`) are unchanged.
 
+## Opus review (ARCHITECTURE: diffs touching `app/` and `motion/`)
+
+The review covered `claude/part-18` at `d52655b` against `61135e0`.
+
+- **Contract.** Only the public surface is used: `useMomentStage`, `appMoments`, `tap` / `dismiss` /
+  `hold` with the presentation's `key`, `beats`, `startedAt`, `phase` / `outAt`, `TOAST_OUT`, and
+  `summarize`. Each showing is keyed by `key`. Nothing in `motion/moments/` changed, and the stage
+  holds nothing.
+- **Choreography.** Every value derives from `startedAt` and `outAt` on the director's clock. The
+  first-tap jump and the `'out'` exits follow from that, and the section timings come from the tokens.
+- **Responsive placement.** Phone over everything (z 4, above the layers); tablet inside the match
+  pane; desktop with scenes in the match pane and toasts in the third pane. All of it stays under the
+  pane rim.
+- **Cleanup.** The rAF loop, the ResizeObserver, the Escape listener and the toast's leave animation
+  all stop on unmount.
+
+**Fixed in review** (each with a test that fails on `d52655b`):
+
+1. **Cleanup:** a toast that unmounted while pressed never sent `hold(false)`. The director then
+   stayed held, and the presentation never closed on its own. Rotating a tablet with a finger on the
+   toast would do it, because the layout change moves the stage to another mount. It now lets go on
+   unmount.
+2. **Accessibility:** with nobody named (a red card or a disallowed goal without a player), the toast's
+   label repeated the team ("Red card, 70', England, England"). It now names the team once.
+3. **Accessibility:** the scene's close button now says "Close goal" or "Close red card", not "Close".
+4. **Interaction:** the scene's window-level Escape ignored whether another component had already
+   handled that Escape. It now leaves a `defaultPrevented` Escape alone.
+
+After the fixes: typecheck and lint clean; unit suite 575/575; dev-panel check 15/15 at all three
+widths.
+
 ## Readiness for integration
 
-Ready to integrate after review. `features/moments` and the `app/layout` wiring touch nothing in
+Reviewed (below) and ready to integrate. `features/moments` and the `app/layout` wiring touch nothing in
 `motion/moments/`, and the Part 17 contract is used as written. The one shared change is the curve
 maths moving to `motion/curve.ts`, with a re-export at the old path. ARCHITECTURE asks for Opus review
 of diffs touching `app/` and `motion/`. Open items, all pre-existing or deferred:
 
 - The line-up entrance, pane-scroll and Stats browser failures.
-- The `demoSource` unit timeout on this machine.
+- The intermittent `demoSource` unit timeout on this machine.
 - The bundle budget.
 - The design-pass items above.

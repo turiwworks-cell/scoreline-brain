@@ -58,6 +58,17 @@ export function Toast({ p, info, d, reduced, photo, followed, onOpen }: ToastPro
   const press = useRef<{ id: number; x0: number; y0: number; lastY: number; lastT: number; vy: number; moved: boolean } | null>(null);
   const dragged = useRef(false);
   const settle = () => void animate(drag, 0, SPRING_BACK);
+  // a toast that goes while a finger is on it (a layout change moves the stage) lets go of it
+  const hold = useRef({ d, key: p.key });
+  useEffect(() => {
+    hold.current = { d, key: p.key };
+  });
+  useEffect(
+    () => () => {
+      if (press.current) hold.current.d.hold(false, hold.current.key);
+    },
+    [],
+  );
   const down = (e: PointerEvent<HTMLButtonElement>) => {
     if (leaving || e.button !== 0) return;
     e.currentTarget.setPointerCapture?.(e.pointerId);
@@ -107,7 +118,8 @@ export function Toast({ p, info, d, reduced, photo, followed, onOpen }: ToastPro
   const summary = p.kind === 'summary';
   const red = p.variant === 'red';
   const tint = !info ? '#85847F' : red ? 'var(--c-red-glow)' : info.team.colors[0];
-  const label = summary ? summaryLabel(p) : `${kindLabel(p.moment.kind)}, ${minText(p.moment.minute)}${info ? `, ${info.name}, ${info.team.name}` : ''}`;
+  const who = info ? (named(info) ? `, ${info.name}, ${info.team.name}` : `, ${info.team.name}`) : '';
+  const label = summary ? summaryLabel(p) : `${kindLabel(p.moment.kind)}, ${minText(p.moment.minute)}${who}`;
   const scoreLine = info ? `${info.home.name} ${scoreStr(info.score[0], info.score[1])} ${info.away.name}` : '';
   const aria = `${label}. ${scoreLine}${scoreLine ? '. ' : ''}${summary ? 'Dismiss' : 'Open match'}`;
 
@@ -142,6 +154,9 @@ export function Toast({ p, info, d, reduced, photo, followed, onOpen }: ToastPro
   );
 }
 
+/** The event names someone other than the team (the team's name then gives way to his). */
+const named = (info: MomentInfo) => info.n > 0 || info.name !== info.team.name;
+
 function summaryLabel(p: Presentation): string {
   return `${p.reason === 'away' ? 'While you were away' : 'Meanwhile'}: ${summaryLine(p.moments)}`;
 }
@@ -160,7 +175,7 @@ function MomentBody({ p, info, photo, followed, pPhoto, pName }: { p: Presentati
   const teamY = useTransform(pName, (v) => -8 * v);
   const teamO = useTransform(pName, (v) => 1 - v);
   const nameY = useTransform(pName, (v) => 10 * (1 - v));
-  const swap = info.n > 0 || info.name !== info.team.name;
+  const swap = named(info);
   const nameSize = fit(17, textWidth(600, 17, -0.01, info.name), NAME_W);
   const teamSize = fit(17, textWidth(600, 17, -0.01, info.team.name), NAME_W);
   return (
