@@ -169,13 +169,18 @@ New unit tests (`motion/moments/director.test.ts`, 16; plus 1 in `goalFeed.test.
   a strict-mode violation: `[aria-live="polite"]` matched both the title region and the new moment
   region. The moment region now uses `role="status"`. The test was not edited. After the fix, that test
   passed at all three widths on one targeted run (3/3), and the App unit tests, typecheck and lint pass.
-  The full suite was **not** repeated after this one-line change.
+  The full suite was repeated on the final commit; see below.
 - **Baseline failures, unchanged and not investigated.**
   - `lineup.spec.ts` “markers rise line by line, forwards first” failed at 390, 900 and 1280. This is the
     same failure as in the M2 report.
   - `nav.spec.ts` “each pane keeps its own scroll” failed at 900 and 1280 (expected 300, received 0).
     This is the same intermittent pane-scroll symptom reported in Parts 15 and M2. It passed in the M2
     run.
+
+**Final-commit rerun (`8bae35d`, after the live-region fix).** Full production suite, 1 worker, 0 retries, 183 cases, 5.3 min: **166 passed, 13 skipped, 4 failed**. No new failures.
+
+- `nav.spec.ts` “focus follows navigation” passes at all three widths (the Part 17 regression is fixed).
+- Pre-existing, all in the M2 / Part 15 reports: `lineup.spec.ts` “markers rise line by line, forwards first” at 390, 900 and 1280 (same as M2); `nav.spec.ts` “each pane keeps its own scroll” at 900 only (intermittent; failed at 900 and 1280 in the earlier Part 17 run and passed at both in M2). Neither touches the moment code, and neither was investigated or changed.
 
 **Live check.** In the production preview at 390 × 844 (`/match/1/facts?demo=fast`), the moment region
 announced the demo's goals as they happened (for example “Goal for France, Olise, 62'. France 3–1
