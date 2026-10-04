@@ -6,7 +6,7 @@ const content = (page: Page, tab: string) => pane(page).locator(`[data-insights=
 
 async function settle(page: Page) {
   await expect
-    .poll(() => page.evaluate(() => document.querySelectorAll('[data-shared-copy], [data-shared-flying], [data-present="false"]').length))
+    .poll(() => page.evaluate(() => document.querySelectorAll('[data-present="false"]').length))
     .toBe(0);
 }
 
@@ -96,7 +96,7 @@ test.describe('desktop insights', () => {
     ).toBe(0);
   });
 
-  test('opening a leader flies their face, close returns to leaders with focus', async ({ page }) => {
+  test('opening a leader opens the player in place, close returns to leaders with focus', async ({ page }) => {
     await page.evaluate(() => {
       const w = window as unknown as { __leaderFlight: string[]; __leaderSource: boolean };
       w.__leaderFlight = [];
@@ -115,10 +115,9 @@ test.describe('desktop insights', () => {
     await row.click();
     await expect(pane(page).getByRole('heading', { name: 'Kylian Mbappé', exact: true })).toBeVisible();
     await expect(tabs(page).getByRole('tab', { name: 'Player', exact: true })).toHaveAttribute('aria-selected', 'true');
-    await expect
-      .poll(() => page.evaluate(() => (window as unknown as { __leaderFlight: string[] }).__leaderFlight))
-      .toEqual(expect.arrayContaining(['player:fra:10:photo@face', 'player:fra:10:photo@bust']));
-    expect(await page.evaluate(() => (window as unknown as { __leaderSource: boolean }).__leaderSource)).toBe(true);
+    // nothing flies from the leader's face (review of 2026-10-04)
+    expect(await page.evaluate(() => (window as unknown as { __leaderFlight: string[] }).__leaderFlight)).toEqual([]);
+    expect(await page.evaluate(() => (window as unknown as { __leaderSource: boolean }).__leaderSource)).toBe(false);
     await settle(page);
     await pane(page).getByRole('button', { name: 'Close player', exact: true }).click();
     await expect(content(page, 'leaders')).toBeVisible();

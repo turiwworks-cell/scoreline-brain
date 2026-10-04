@@ -1,7 +1,7 @@
 import { Fragment, memo, useEffect, useMemo, useRef } from 'react';
 import { animate, m, useReducedMotion } from 'motion/react';
 import type { Match, Side, Team } from '../../domain';
-import { CASCADE, cascade, CURVES, Shared, sharedMatch } from '../../motion';
+import { CASCADE, cascade, CURVES } from '../../motion';
 import { useScoreline } from '../../store';
 import { Crest, feel, textWidth, useFontVersion } from '../../ui';
 import { useHeroClock } from './clock';
@@ -64,9 +64,9 @@ export const Hero = memo(function Hero({ match, home, away, matchday, width, onO
         const team = side === 'home' ? home : away;
         return (
           <m.div key={side} className={styles.side} style={{ top: i === 0 ? META_H + 1 : awayTop, height: rowH }} variants={c} custom={i + 1} {...CASCADE}>
-            <Shared id={sharedMatch(match.id, side)} end="hero" className={styles.crest}>
+            <span className={styles.crest}>
               <Crest team={team} size={38} />
-            </Shared>
+            </span>
             <div className={styles.block} style={{ top: (rowH - blockH) / 2 }}>
               <p className={styles.name}>{team.name}</p>
               {lines.map((line, li) => (
@@ -87,14 +87,14 @@ export const Hero = memo(function Hero({ match, home, away, matchday, width, onO
       <span className={styles.rule} style={{ top: awayTop + a.rowH }} />
       {!scheduled && (
         <m.div className={styles.scoreBlock} style={{ top: META_H + 1, height: awayTop + a.rowH - META_H - 1 }} variants={c} custom={1} {...CASCADE}>
-          <Shared id={sharedMatch(match.id, 'score')} end="hero" className={styles.scoreCol}>
+          <span className={styles.scoreCol}>
             <span className={styles.scoreCell} style={{ height: h.rowH }}>
               <BigNumber value={match.score[0]} dim={trails('home')} />
             </span>
             <span className={styles.scoreCell} style={{ height: a.rowH }}>
               <BigNumber value={match.score[1]} dim={trails('away')} />
             </span>
-          </Shared>
+          </span>
         </m.div>
       )}
     </div>

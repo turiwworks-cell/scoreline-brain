@@ -1,5 +1,4 @@
-import { sharedMatchGroup, sharedPlayerGroup, type SharedEnd, type TimingKey } from '../../motion';
-import { DEFAULT_TAB, samePlayer, type ListState, type MatchRef, type Nav, type PlayerRef, type PlayerStep } from '../nav/url';
+import { DEFAULT_TAB, type ListState, type MatchRef, type Nav, type PlayerRef, type PlayerStep } from '../nav/url';
 import type { LayoutMode } from './layoutMode';
 
 /*
@@ -51,36 +50,4 @@ export function stackDepth(r: Resolved): number {
   if (r.layout === 'phone') return (r.match ? 1 : 0) + (r.player ? 1 : 0);
   if (r.layout === 'two') return r.player ? 1 : 0;
   return 0;
-}
-
-export interface FlightPlan {
-  readonly group: string;
-  readonly from: SharedEnd;
-  readonly to: SharedEnd;
-  readonly timing: TimingKey;
-  readonly durationScale?: number;
-  /** open: from what was pressed to the new screen; close: back into what opened it */
-  readonly direction: 'open' | 'close';
-}
-
-/**
- * The shared-element flights a navigation calls for. A screen that leaves sends its elements back
- * to their card or face; a screen that arrives takes them from there. On the panes a switch does
- * both at once. No flights on the first render or when the layout itself changed (a resize).
- */
-export function planFlights(prev: Resolved | undefined, next: Resolved): FlightPlan[] {
-  if (!prev || prev.layout !== next.layout) return [];
-  const plans: FlightPlan[] = [];
-  if (prev.match?.id !== next.match?.id) {
-    if (prev.match) plans.push({ group: sharedMatchGroup(prev.match.id), from: 'hero', to: 'card', timing: 'screen', direction: 'close' });
-    if (next.match) plans.push({ group: sharedMatchGroup(next.match.id), from: 'card', to: 'hero', timing: 'screen', direction: 'open' });
-  }
-  // an arrow glides the page to the next player (luau:5948): no face flies
-  if (!samePlayer(prev.player ?? undefined, next.player ?? undefined) && !(next.step && prev.player && next.player)) {
-    if (prev.player) {
-      plans.push({ group: sharedPlayerGroup(prev.player.team, prev.player.n), from: 'bust', to: 'face', timing: 'player', durationScale: 0.7, direction: 'close' });
-    }
-    if (next.player) plans.push({ group: sharedPlayerGroup(next.player.team, next.player.n), from: 'face', to: 'bust', timing: 'player', direction: 'open' });
-  }
-  return plans;
 }

@@ -2,7 +2,7 @@ import { memo, useEffect, useRef, type MouseEvent } from 'react';
 import { m } from 'motion/react';
 import { minText, nameOf, playerKey, scoreStr, type MatchEvent, type StandingRow, type League } from '../../domain';
 import type { InsightGoal, InsightLeader } from '../../domain/insights';
-import { CASCADE, cascade, Shared, sharedPlayer, timing } from '../../motion';
+import { CASCADE, cascade, timing } from '../../motion';
 import { selectMatch, selectPlayer, selectPlayers, selectTeam, useScoreline, type ScorelineState } from '../../store';
 import {
   Crest,
@@ -151,9 +151,9 @@ const LeaderRow = memo(function LeaderRow({
         {index + 1}
       </span>
       {team && (
-        <Shared id={sharedPlayer(it.team, it.n)} end="face" className={styles.photo}>
+        <span className={styles.photo}>
           <PhotoTile team={team} n={it.n} size={52} alt="" loading="lazy" {...photoProps(playerPhoto(photos.manifest, it.team, it.n))} />
-        </Shared>
+        </span>
       )}
       <span className={styles.leaderName}>
         <span>{name}</span>

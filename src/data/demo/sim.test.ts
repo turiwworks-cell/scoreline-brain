@@ -50,7 +50,8 @@ describe('DemoSim', () => {
     const b = play(new DemoSim({ seed: 42 }));
     expect(JSON.stringify(a)).toBe(JSON.stringify(b));
     expect(a.events.length).toBeGreaterThan(100);
-  });
+    // a whole evening, minute by minute: about 5 s on a slow runner, over the 5 s default
+  }, 20_000);
 
   it('the default seed is the Lua seed', () => {
     expect(JSON.stringify(play(new DemoSim()))).toBe(JSON.stringify(play(new DemoSim({ seed: LUA_SEED }))));

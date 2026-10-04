@@ -69,7 +69,8 @@ describe('DemoSource', () => {
     }
     conn.disconnect();
     expect(scheduler.pending).toBe(0);
-  });
+    // a whole evening, minute by minute: about 5 s on a slow runner, over the 5 s default
+  }, 20_000);
 
   it('runs in real time by default: one tick of 6 match seconds every 6 s', () => {
     const { scheduler, feeds, start } = recorded({ follow: null });

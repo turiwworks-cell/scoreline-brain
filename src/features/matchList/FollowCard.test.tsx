@@ -98,18 +98,20 @@ describe('while he plays', () => {
     expect(screen.getByText('#2')).toBeTruthy();
   });
 
-  it('closed: the card shrinks to its short form and the face becomes the shared end', () => {
+  it('closed: the card shrinks to its short form', () => {
     card({ open: false });
     expect(root().dataset.open).toBe('false');
     expect(root().hasAttribute('data-short')).toBe(true);
-    expect(document.querySelectorAll('[data-shared-end="face"]')).toHaveLength(1);
-    expect(document.querySelector('[data-shared-end="face"]')!.className).toMatch(/faceBox/);
   });
 
-  it('hidden under the picker: no shared face at all', () => {
+  it('hidden under the picker', () => {
     card({ hidden: true });
-    expect(document.querySelectorAll('[data-shared-end]')).toHaveLength(0);
     expect(root().hidden).toBe(true);
+  });
+
+  it('nothing on it is marked to fly to the player page: he opens the same from everywhere', () => {
+    card({ open: false });
+    expect(document.querySelectorAll('[data-shared], [data-shared-end]')).toHaveLength(0);
   });
 });
 

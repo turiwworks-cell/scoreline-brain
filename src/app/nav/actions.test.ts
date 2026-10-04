@@ -2,7 +2,7 @@ import { createMemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it } from 'vitest';
 import { appRoutes } from '../router';
 import { createNavActions } from './actions';
-import { takePendingTrigger, triggerFor } from './focusMemory';
+import { triggerFor } from './focusMemory';
 
 function setup(path = '/?demo') {
   // routes without the shell: these tests only read the router's state
@@ -103,8 +103,6 @@ describe('nav actions', () => {
     const from = loc().key;
     nav.openMatch(2, { from: card });
     await tick();
-    expect(takePendingTrigger()).toBe(card);
-    expect(takePendingTrigger()).toBeNull();
     expect(triggerFor(from)).toBe(card);
     // the card re-rendered: its focus key finds the new one
     card.remove();

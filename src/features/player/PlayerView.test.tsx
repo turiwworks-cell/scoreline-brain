@@ -43,9 +43,9 @@ function setup(props: Partial<PlayerViewProps> = {}) {
 }
 
 describe('the player view', () => {
-  it('shows the bust as the shared end, the giant number, his name and facts', () => {
+  it('shows the bust, the giant number, his name and facts', () => {
     const { container } = setup();
-    const end = container.querySelector('[data-shared="player:fra:10:photo"][data-shared-end="bust"]')!;
+    const end = container.querySelector('[data-pv="bust"]')!;
     expect(end.querySelector('img')?.getAttribute('src')).toBe('/img/players/fra/10-bust@1x.webp');
     expect(end.querySelector('source[type="image/avif"]')).toBeTruthy();
     expect(container.querySelector('[data-pv="number"]')?.textContent).toBe('10');
@@ -55,14 +55,14 @@ describe('the player view', () => {
 
   it('a player without a photo gets the kit disc, and no giant number', () => {
     const { container } = setup({ team: 'arg', n: 7 });
-    expect(container.querySelector('[data-shared-end="bust"] [data-kit-disc]')).toBeTruthy();
+    expect(container.querySelector('[data-pv="bust"] [data-kit-disc]')).toBeTruthy();
     expect(container.querySelector('[data-pv="number"]')).toBeNull();
   });
 
   it('a photo that fails to load falls back to the kit disc', () => {
     const { container } = setup();
-    fireEvent.error(container.querySelector('[data-shared-end="bust"] img')!);
-    expect(container.querySelector('[data-shared-end="bust"] [data-kit-disc]')).toBeTruthy();
+    fireEvent.error(container.querySelector('[data-pv="bust"] img')!);
+    expect(container.querySelector('[data-pv="bust"] [data-kit-disc]')).toBeTruthy();
   });
 
   it('calls back, follows and steps', () => {
@@ -100,11 +100,11 @@ describe('the player view', () => {
   it('a clock tick does not rebuild the hero', () => {
     vi.useFakeTimers();
     const { container } = setup();
-    const img = container.querySelector('[data-shared-end="bust"] img');
+    const img = container.querySelector('[data-pv="bust"] img');
     act(() => {
       vi.advanceTimersByTime(3000);
     });
-    expect(container.querySelector('[data-shared-end="bust"] img')).toBe(img);
+    expect(container.querySelector('[data-pv="bust"] img')).toBe(img);
     vi.useRealTimers();
   });
 

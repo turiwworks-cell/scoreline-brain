@@ -33,11 +33,3 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Shared elements (src/motion/Shared.tsx): an end is hidden while its copy flies (flight.ts). */
-.m-shared {
-  display: inline-block;
-  vertical-align: middle;
-}
-[data-shared-flying] {
-  visibility: hidden !important;
-}

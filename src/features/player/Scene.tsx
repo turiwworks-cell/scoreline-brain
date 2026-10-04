@@ -1,6 +1,5 @@
 import { memo, useState } from 'react';
 import { m, useTransform, type MotionValue } from 'motion/react';
-import { Shared, sharedPlayer } from '../../motion';
 import { inkCentre, KitDisc, mix, SoftLight, useFontVersion, type PhotoSources } from '../../ui';
 import type { CrestTeam } from '../../ui';
 import { CUT_H, HERO, LINE_Y, NUMBER } from './layout';
@@ -8,10 +7,13 @@ import type { Opening } from './motion';
 import styles from './PlayerView.module.css';
 
 /*
- * The hero (luau:5851–5995): the bust centred on the page, cut sharp just above its soft edge,
- * standing on a line of light with the giant shirt number behind him. The bust is the shared
- * element his face grows into (Part 9's flight); it has no animation of its own on the element
- * the flight copies.
+ * The hero (luau:5851–5995): the bust centred on the page, standing on a line of light with the
+ * giant shirt number behind him, cut at the line.
+ *
+ * The cut is a window that stays on the line while the picture inside it grows from 0.9 (the
+ * entrance, motion.ts). The picture is drawn 6 % larger than the Lua's cell (--bust-zoom), so
+ * even at 0.9 its opaque part reaches below the line: the edge of the file never shows above it
+ * (review of 2026-10-04: "we see the cut-off part under the player").
  */
 
 /** Pixels the bust slides when he is reached by an arrow (36 × direction, luau:5948). */
@@ -77,11 +79,13 @@ export const Hero = memo(function Hero({ team, n, photo, opening, dir }: HeroPro
   return (
     <>
       {shown && <GiantNumber n={n} slide={numberSlide} />}
-      <m.div className={styles.hero} style={{ x: slide, opacity: alpha, scale: opening.heroScale }} data-pv="hero">
-        <Shared id={sharedPlayer(team.id, n)} end="bust" className={shown ? styles.bust : styles.kit}>
-          {shown ? <Picture photo={shown} className={styles.bustImg} priority onError={() => setFailed(shown.src)} /> : <KitDisc team={team} n={n} size={92} />}
-        </Shared>
-      </m.div>
+      <div className={styles.hero} data-pv="hero">
+        <m.div className={styles.heroArt} style={{ x: slide, opacity: alpha, scale: opening.heroScale }}>
+          <span className={shown ? styles.bust : styles.kit} data-pv="bust">
+            {shown ? <Picture photo={shown} className={styles.bustImg} priority onError={() => setFailed(shown.src)} /> : <KitDisc team={team} n={n} size={92} />}
+          </span>
+        </m.div>
+      </div>
     </>
   );
 });

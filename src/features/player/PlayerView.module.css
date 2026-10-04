@@ -7,6 +7,8 @@
 
 .page {
   --bar-top: max(50px, env(safe-area-inset-top));
+  /* the bust is drawn this much larger than the Lua's cell (Scene.tsx): see the cut, below */
+  --bust-zoom: 1.06;
   position: relative;
   min-height: 100%;
   padding-bottom: calc(40px + env(safe-area-inset-bottom));
@@ -52,21 +54,30 @@
   filter: blur(8px);
 }
 
-/* ---- the bust: the cell 280 × 350 at (55, 90), cut at 318 of 360 --------------------------------- */
+/* ---- the bust: the cell 280 × 350 at (55, 90), cut on the line (318 of 360) --------------------- */
+/* the cut: a window from the top of the page to the line, which never moves or scales */
 .hero {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 399.1667px;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* the cell, which grows from 0.9 about its middle as he opens (luau:5965) */
+.heroArt {
   position: absolute;
   top: 90px;
   left: calc(50% - 140px);
   width: 280px;
-  height: 309.1667px;
+  height: 350px;
   transform-origin: 50% 40%;
 }
 .bust {
   display: block;
-  position: relative;
-  width: 280px;
-  height: 309.1667px;
-  overflow: hidden;
+  position: absolute;
+  inset: 0;
   pointer-events: none;
 }
 .bustImg {
@@ -77,6 +88,9 @@
   height: 350px;
   max-width: none;
   user-select: none;
+  /* larger than the Lua's cell from his head down, so the file's edge stays under the line */
+  transform: scale(var(--bust-zoom));
+  transform-origin: 50% 0;
 }
 /* no photo: a 92 px kit disc at the middle of the cell (luau:5985) */
 .kit {
@@ -205,6 +219,8 @@
   width: 280px;
   height: 350px;
   max-width: none;
+  transform: scale(var(--bust-zoom));
+  transform-origin: 50% 0;
 }
 .glassTint {
   position: absolute;

@@ -113,10 +113,9 @@ describe('a match that has started', () => {
     expect(onOpenPlayer).toHaveBeenLastCalledWith({ team: 'fra', n: Number(sub.dataset.player!.split(':')[1]) }, sub);
   });
 
-  it('keeps the chips’ focus keys and the shared face end the navigation reads', () => {
+  it('keeps the chips’ focus keys, which focus returns to after the player page', () => {
     const { container } = setup(1);
-    const chip = container.querySelector('[data-focus-key="chip-fra-10"]')!;
-    expect(chip.querySelector('[data-shared="player:fra:10:photo"][data-shared-end="face"]')).toBeTruthy();
+    expect(container.querySelector('[data-focus-key="chip-fra-10"]')).toBeTruthy();
   });
 
   it('moves between the sides with the arrow keys', () => {

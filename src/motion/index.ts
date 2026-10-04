@@ -20,8 +20,5 @@ export {
 export { CASCADE, cascade, LAYER, paneSwap, playerPage, pushBase, pushLayer, scrim, sheetRise, transition, type CascadeOptions, type TransitionOptions } from './variants';
 export { play, stop, type PlayOptions } from './play';
 export { MotionProvider } from './MotionProvider';
-export { Shared, type SharedProps } from './Shared';
-export { sharedMatch, sharedMatchGroup, sharedPlayer, sharedPlayerGroup, type MatchPart, type SharedEnd } from './sharedIds';
-export { flightCount, fly, isFlying, landAll, restingBox, type FlightRequest } from './flight';
 export { bez, clamp, ease, env, lerp, prog } from './curve';
 export * from './moments';

@@ -1,7 +1,7 @@
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
 
 /*
- * Part 9: routes, layouts, scroll, focus and the shared-element flights, at every width the
+ * Part 9: routes, layouts, scroll and focus (nothing flies between screens), at every width the
  * projects run (phone 390, tablet 900, desktop 1280). The demo feed (?demo) supplies the data:
  * match 1 is France – Argentina (with lineups), match 2 England – Brazil.
  */
@@ -24,7 +24,7 @@ const pressTab = (page: Page, screen: string, name: string) => screenOf(page, sc
  */
 async function settled(page: Page) {
   await expect
-    .poll(() => page.evaluate(() => document.querySelectorAll('[data-shared-copy], [data-shared-flying], [data-present="false"]').length), { timeout: 5000 })
+    .poll(() => page.evaluate(() => document.querySelectorAll('[data-present="false"]').length), { timeout: 5000 })
     .toBe(0);
 }
 
@@ -214,40 +214,33 @@ test('focus follows navigation', async ({ page }, info) => {
   await expect(chip(page, 'fra-10')).toBeFocused();
 });
 
-test('card ↔ hero and face ↔ bust fly both ways', async ({ page }) => {
+test('nothing flies between screens: the match pushes in, the player grows in at the centre', async ({ page }) => {
   await open(page, '/?demo');
-  await flown(page);
-
   await card(page, 2).click();
   await expect(titled(page, 'match', 'England – Brazil')).toBeVisible();
   await settled(page);
-  let f = await flown(page);
-  for (const part of ['home', 'score', 'away']) expect(f.ends).toEqual(expect.arrayContaining([`match:2:${part}@card`, `match:2:${part}@hero`]));
-  expect(f.copies).toBeGreaterThanOrEqual(6);
-  // landed: the hero shows, nothing hidden
-  await expect(screenOf(page, 'match').locator('[data-shared-end="hero"]').first()).toBeVisible();
-
-  await page.goBack();
-  await expect(titled(page, 'match', 'England – Brazil')).toHaveCount(0);
-  await settled(page);
-  f = await flown(page);
-  expect(f.ends).toEqual(expect.arrayContaining(['match:2:score@hero', 'match:2:score@card']));
+  // no shared ends, so no crest or score left the card to fly to the hero (review of 2026-10-04)
+  expect((await flown(page)).ends).toEqual([]);
+  await expect(page.locator('[data-shared], [data-shared-end], [data-shared-copy]')).toHaveCount(0);
 
   await open(page, '/match/1/lineup?demo');
-  await flown(page);
-  await chip(page, 'fra-10').click();
-  await expect(titled(page, 'player', 'Kylian Mbappé')).toBeVisible();
+  // the bust starts at 0.9 about its middle and grows to 1 (luau:5965), whatever opened it
+  const first = await page.evaluate(
+    () =>
+      new Promise<number>((done) => {
+        document.querySelector<HTMLElement>('[data-screen="match"][data-present="true"] [data-focus-key="chip-fra-10"]')!.click();
+        requestAnimationFrame(() => {
+          const el = document.querySelector('[data-pv="hero"] > *');
+          done(el ? new DOMMatrix(getComputedStyle(el).transform).a : -1);
+        });
+      }),
+  );
+  expect(first).toBeGreaterThanOrEqual(0.89);
+  expect(first).toBeLessThan(1);
+  const art = page.locator('[data-pv="hero"] > *').first();
   await settled(page);
-  f = await flown(page);
-  expect(f.ends).toEqual(expect.arrayContaining(['player:fra:10:photo@face', 'player:fra:10:photo@bust']));
-  await expect(screenOf(page, 'player').locator('[data-shared-end="bust"]')).toBeVisible();
-
-  await page.goBack();
-  await expect(screenOf(page, 'player')).toHaveCount(0);
-  await settled(page);
-  f = await flown(page);
-  expect(f.ends).toEqual(expect.arrayContaining(['player:fra:10:photo@bust', 'player:fra:10:photo@face']));
-  await expect(chip(page, 'fra-10').locator('[data-shared-end="face"]')).toBeVisible();
+  await expect.poll(() => art.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).a)).toBeCloseTo(1, 2);
+  expect((await flown(page)).ends).toEqual([]);
 });
 
 test('rapid taps and interrupted navigation end in one clean state', async ({ page }, info) => {
@@ -301,7 +294,6 @@ test('rapid taps and interrupted navigation end in one clean state', async ({ pa
   await expect(page).toHaveURL(/\/match\/1\/lineup\?demo$/);
   await settled(page);
   await expect(screenOf(page, 'player')).toHaveCount(0);
-  await expect(page.locator('[data-shared-overlay] *')).toHaveCount(0);
 });
 
 test('no horizontal overflow on any screen', async ({ page }) => {

@@ -1,6 +1,5 @@
 import { memo, useRef, type CSSProperties } from 'react';
 import { scoreStr, type Match, type Team } from '../../domain';
-import { Shared, sharedMatch } from '../../motion';
 import { Crest, feel, MatchClock } from '../../ui';
 import type { GoalFeed } from './goalFeed';
 import { useRowFrames } from './rowFrames';
@@ -48,14 +47,14 @@ export const MatchRow = memo(function MatchRow({ match, home, away, current, onO
       </span>
       {[home, away].map((team, i) => (
         <span key={i} className={styles.team} style={{ top: 15 + i * 29 }} data-trails={trails[i] ? '' : undefined} aria-hidden="true">
-          <Shared id={sharedMatch(match.id, i === 0 ? 'home' : 'away')} end="card" className={styles.crestEnd}>
+          <span className={styles.crestEnd}>
             <Crest team={team} size={16} />
-          </Shared>
+          </span>
           <span className={styles.teamName}>{team.name}</span>
         </span>
       ))}
       {started && (
-        <Shared id={sharedMatch(match.id, 'score')} end="card" className={styles.scores}>
+        <span className={styles.scores}>
           {[h, a].map((v, i) => (
             <span key={i} className={styles.score} data-trails={trails[i] ? '' : undefined} style={{ ['--bump' as string]: `var(--bump-${i === 0 ? 'h' : 'a'}, 1)`, ['--mk' as string]: `var(--mk-${i === 0 ? 'h' : 'a'}, 0)` } as CSSProperties}>
               <span className={styles.pop}>
@@ -66,7 +65,7 @@ export const MatchRow = memo(function MatchRow({ match, home, away, current, onO
               </span>
             </span>
           ))}
-        </Shared>
+        </span>
       )}
     </button>
   );

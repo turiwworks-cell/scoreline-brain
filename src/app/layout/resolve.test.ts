@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Nav } from '../nav/url';
 import { layoutFor } from './layoutMode';
-import { planFlights, resolve, stackDepth, type Resolved } from './resolve';
+import { resolve, stackDepth, type Resolved } from './resolve';
 
 const list = { day: 0, live: false };
 const at = (n: Partial<Nav>): Nav => ({ list, ...n });
@@ -47,31 +47,3 @@ describe('resolve', () => {
   });
 });
 
-describe('planFlights', () => {
-  const r = (n: Partial<Nav>, layout: Resolved['layout'] = 'phone') => resolve(at(n), layout, lookup);
-
-  it('opening a match flies card → hero, closing it hero → card', () => {
-    expect(planFlights(r({}), r({ match: { id: 2, tab: 'facts' } }))).toEqual([{ group: 'match:2', from: 'card', to: 'hero', timing: 'screen', direction: 'open' }]);
-    expect(planFlights(r({ match: { id: 2, tab: 'facts' } }), r({}))).toEqual([{ group: 'match:2', from: 'hero', to: 'card', timing: 'screen', direction: 'close' }]);
-  });
-
-  it('switching panes closes one and opens the other; a tab change flies nothing', () => {
-    const a = r({ match: { id: 1, tab: 'facts' } }, 'three');
-    const b = r({ match: { id: 2, tab: 'facts' } }, 'three');
-    expect(planFlights(a, b).map((p) => `${p.direction}:${p.group}`)).toEqual(['close:match:1', 'open:match:2']);
-    expect(planFlights(a, r({ match: { id: 1, tab: 'stats' } }, 'three'))).toEqual([]);
-  });
-
-  it('a player opens face → bust and closes bust → face in 0.7 of the time', () => {
-    const m = { id: 1, tab: 'lineup' as const };
-    const open = planFlights(r({ match: m }), r({ player: { team: 'fra', n: 10 }, under: m }));
-    expect(open).toEqual([{ group: 'player:fra:10', from: 'face', to: 'bust', timing: 'player', direction: 'open' }]);
-    const close = planFlights(r({ player: { team: 'fra', n: 10 }, under: m }), r({ match: m }));
-    expect(close).toEqual([{ group: 'player:fra:10', from: 'bust', to: 'face', timing: 'player', durationScale: 0.7, direction: 'close' }]);
-  });
-
-  it('nothing flies on the first render or when the layout changes', () => {
-    expect(planFlights(undefined, r({ match: { id: 1, tab: 'facts' } }))).toEqual([]);
-    expect(planFlights(r({}, 'phone'), r({ match: { id: 1, tab: 'facts' } }, 'two'))).toEqual([]);
-  });
-});

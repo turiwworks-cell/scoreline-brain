@@ -13,7 +13,6 @@ import { TwoPane } from './TwoPane';
 import { useNavFocus } from './useNavFocus';
 import { useMoments } from './useMoments';
 import { useScreenTitle } from './useScreenTitle';
-import { useSharedFlights } from './useSharedFlights';
 import styles from './Shell.module.css';
 
 /**
@@ -52,7 +51,6 @@ export function Shell() {
 
   const moment = useMoments(r);
 
-  useSharedFlights(r, location.key);
   useNavFocus(r, location.key, navType, root, announce);
 
   const phone = layout === 'phone';

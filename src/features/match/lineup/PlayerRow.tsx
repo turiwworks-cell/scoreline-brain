@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { m, useReducedMotion } from 'motion/react';
 import type { Player, Team } from '../../../domain';
-import { sharedPlayer, Shared, transition } from '../../../motion';
+import { transition } from '../../../motion';
 import { EventTags, PhotoTile, RatingBadge, Star, Tag, textWidth, useFontVersion, withFeel, type PhotoSources } from '../../../ui';
 import { fullName, roleOf, type Marks } from './model';
 import styles from './Lineup.module.css';
@@ -55,9 +55,9 @@ export const PlayerRow = memo(function PlayerRow({ team, n, player, name, replac
         data-player={`${team.id}:${n}`}
         {...withFeel({ onClick: (e: { currentTarget: Element }) => onOpen(n, e.currentTarget) })}
       >
-        <Shared id={sharedPlayer(team.id, n)} end="face" className={styles.rowShared}>
+        <span className={styles.rowShared}>
           <PhotoTile size={52} team={team} n={n} src={photo?.src} srcSet={photo?.srcSet} sources={photo?.sources} alt="" loading="lazy" />
-        </Shared>
+        </span>
         {photo && <span className={styles.rowNum}>{n}</span>}
         <span className={styles.rowName}>
           <span className={styles.rowFull} style={{ fontSize: size }}>

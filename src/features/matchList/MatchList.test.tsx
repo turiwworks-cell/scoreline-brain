@@ -144,17 +144,12 @@ describe('the player you follow', () => {
     expect(onOpenPlayer).toHaveBeenCalledWith({ team: 'arg', n: 10 }, card);
   });
 
-  it('opens and closes, keeping one shared face for the flight', () => {
+  it('opens and closes the follow card', () => {
     setup();
     const toggle = screen.getByRole('button', { name: 'Show less' });
-    const face = () => Array.from(document.querySelectorAll('[data-shared="player:arg:10:photo"]'));
-    expect(face()).toHaveLength(1);
-    expect(face()[0]!.className).toMatch(/chest|kit/);
     fireEvent.click(toggle);
     expect(screen.getByRole('button', { name: 'Show more' }).getAttribute('aria-expanded')).toBe('false');
     expect(document.querySelector('[data-open="false"]')).toBeTruthy();
-    expect(face()).toHaveLength(1);
-    expect(face()[0]!.className).toMatch(/faceBox/);
   });
 
   it('Change opens the picker, a chip follows someone else, Unfollow leaves the picker open', () => {

@@ -32,7 +32,7 @@ const flown = (page: Page) =>
   });
 
 async function settled(page: Page, withPlayer = true) {
-  await expect.poll(() => page.evaluate(() => document.querySelectorAll('[data-shared-copy], [data-shared-flying], [data-present="false"]').length)).toBe(0);
+  await expect.poll(() => page.evaluate(() => document.querySelectorAll('[data-present="false"]').length)).toBe(0);
   if (!withPlayer) return;
   // his bust has landed (a direct link grows it from 0.9) and the cascade is in
   await expect
@@ -62,16 +62,21 @@ async function open(page: Page, url: string, on: 'player' | 'match' | 'list' = '
   if (on === 'list') await expect(page.getByTestId('app-shell')).toBeVisible();
   else await expect((on === 'player' ? screenOf(page) : matchScreen(page)).getByRole('heading', { level: 1 })).toBeAttached();
   await page.evaluate(() => document.fonts.ready);
-  await expect.poll(() => page.evaluate(() => document.querySelectorAll('[data-shared-copy], [data-shared-flying], [data-present="false"]').length)).toBe(0);
+  await expect.poll(() => page.evaluate(() => document.querySelectorAll('[data-present="false"]').length)).toBe(0);
   if (on === 'player') await settled(page);
 }
 
 test('the bust, the line of light and the sheet sit where the Lua puts them', async ({ page }, info) => {
   await open(page, '/player/fra/10?demo');
   const s = screenOf(page);
-  // the bust cell: 280 wide, centred, 90 under the top, cut at 318 of 360 = 309.17 tall
-  const hero = await box(page, '[data-shared-end="bust"]');
-  near(hero, { cx: hero.pw / 2, y: 90, w: 280, h: 309.17 });
+  // measured once the bust has grown in
+  await expect.poll(() => s.locator('[data-pv="hero"] > *').first().evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).a)).toBeCloseTo(1, 3);
+  // the bust cell: 280 × 350, centred, 90 under the top; the cut is a window that ends on the
+  // line (318 of 360 = 399.17) and holds still while the cell grows in
+  const hero = await box(page, '[data-pv="bust"]');
+  near(hero, { cx: hero.pw / 2, y: 90, w: 280, h: 350 });
+  const cut = await box(page, '[data-pv="hero"]');
+  near({ bottom: cut.y + cut.h }, { bottom: 399.17 });
   // the line of light on the cut, the giant number centred by its ink
   const line = await box(page, '[data-pv="horizon"] [class*="hair"]');
   near({ y: line.y + 0.5 }, { y: 399.17 });
@@ -98,25 +103,25 @@ test('the bust, the line of light and the sheet sit where the Lua puts them', as
 
 test('real photos for France and Argentina, the kit disc for everyone else', async ({ page }) => {
   await open(page, '/player/fra/10?demo');
-  const img = screenOf(page).locator('[data-shared-end="bust"] img');
+  const img = screenOf(page).locator('[data-pv="bust"] img');
   await expect(img).toBeVisible();
   const src = await img.evaluate((el: HTMLImageElement) => el.currentSrc);
   expect(src).toMatch(/\/img\/players\/fra\/10-bust@[12]x\.(avif|webp)$/);
   expect(await img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true);
   await page.goto('/player/ita/10?demo');
-  await expect(screenOf(page).locator('[data-shared-end="bust"] [data-kit-disc]')).toBeVisible();
+  await expect(screenOf(page).locator('[data-pv="bust"] [data-kit-disc]')).toBeVisible();
   await expect(screenOf(page).locator('[data-pv="number"]')).toHaveCount(0);
   await expect(page.locator('img[src*="/img/players/ita/"]')).toHaveCount(0);
 });
 
-test('opens from the line-up with his face flying into the bust; back flies it home and restores focus', async ({ page }, info) => {
+test('opens from the line-up in place, nothing flying from his face; back restores focus', async ({ page }, info) => {
   const layout = layoutOf(info);
   await open(page, '/match/1/lineup?demo', 'match');
   await chip(page, 'fra-10').click();
   await expect(screenOf(page).getByRole('heading', { level: 1, name: 'Kylian Mbappé' })).toBeVisible();
   await settled(page);
-  expect(await flown(page)).toEqual(expect.arrayContaining(['player:fra:10:photo@face', 'player:fra:10:photo@bust']));
-  await expect(screenOf(page).locator('[data-shared-end="bust"]')).toBeVisible();
+  expect(await flown(page)).toEqual([]);
+  await expect(screenOf(page).locator('[data-pv="bust"]')).toBeVisible();
   // the match underneath keeps its tab (phone) or stays in its pane
   if (layout === 'three') await expect(matchScreen(page).getByRole('tab', { name: 'Lineup', selected: true })).toBeVisible();
   if (layout === 'two') await screenOf(page).getByRole('button', { name: 'Close' }).click();
@@ -126,7 +131,7 @@ test('opens from the line-up with his face flying into the bust; back flies it h
   await settled(page, false);
   await expect(matchScreen(page).getByRole('tab', { name: 'Lineup', selected: true })).toBeVisible();
   await expect(chip(page, 'fra-10')).toBeFocused();
-  expect(await flown(page)).toEqual(expect.arrayContaining(['player:fra:10:photo@bust', 'player:fra:10:photo@face']));
+  expect(await flown(page)).toEqual([]);
 });
 
 test('opens from the follow card in the list, and from a scorer in the match hero', async ({ page }, info) => {
@@ -137,7 +142,7 @@ test('opens from the follow card in the list, and from a scorer in the match her
   await follow.click();
   await expect(screenOf(page).getByRole('heading', { level: 1, name: 'Lionel Messi' })).toBeVisible();
   await settled(page);
-  expect(await flown(page)).toEqual(expect.arrayContaining(['player:arg:10:photo@face', 'player:arg:10:photo@bust']));
+  expect(await flown(page)).toEqual([]);
   // his numbers come from his own match
   await expect(screenOf(page).locator('[data-pv="match"]')).toHaveAttribute('data-played', 'yes');
   if (layout === 'phone') {
@@ -195,11 +200,11 @@ test('a direct link works for a player in a match that has not started, and for 
 test('a clock tick does not replay the entrance or rebuild the hero', async ({ page }) => {
   await open(page, '/player/fra/10?demo');
   await page.evaluate(() => {
-    const e = document.querySelector('[data-shared-end="bust"] img')!;
+    const e = document.querySelector('[data-pv="bust"] img')!;
     (window as unknown as { __img: Element }).__img = e;
   });
   await page.waitForTimeout(2500);
-  expect(await page.evaluate(() => (window as unknown as { __img: Element }).__img === document.querySelector('[data-shared-end="bust"] img'))).toBe(true);
+  expect(await page.evaluate(() => (window as unknown as { __img: Element }).__img === document.querySelector('[data-pv="bust"] img'))).toBe(true);
   await expect(screenOf(page).locator('[data-pv="facts"]')).toHaveCSS('opacity', '1');
 });
 
@@ -210,7 +215,7 @@ test.describe('reduced motion', () => {
     await chip(page, 'fra-10').click();
     await expect(screenOf(page).getByRole('heading', { level: 1, name: 'Kylian Mbappé' })).toBeVisible();
     expect(await flown(page)).toEqual([]);
-    await expect(screenOf(page).locator('[data-shared-end="bust"]')).toBeVisible();
+    await expect(screenOf(page).locator('[data-pv="bust"]')).toBeVisible();
     await expect(screenOf(page).locator('[data-pv="hero"]')).toHaveCSS('opacity', '1');
   });
 });

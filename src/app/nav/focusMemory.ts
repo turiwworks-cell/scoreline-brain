@@ -1,8 +1,7 @@
 /*
  * What opened each screen, per history entry: navigation actions record the pressed element under
- * the location they leave; going back to that location returns focus there, and the shared
- * element flies back into it. If the element itself is gone (re-rendered), its `data-focus-key`
- * finds the new one.
+ * the location they leave; going back to that location returns focus there. If the element itself
+ * is gone (re-rendered), its `data-focus-key` finds the new one.
  */
 
 interface Trigger {
@@ -12,11 +11,9 @@ interface Trigger {
 
 const MAX = 60;
 const byLocation = new Map<string, Trigger>();
-let pending: Element | null = null;
 
 /** Records `el` as what was pressed to leave `locationKey`. */
 export function rememberTrigger(locationKey: string, el: Element | null): void {
-  pending = el;
   if (!el) return;
   byLocation.delete(locationKey);
   byLocation.set(locationKey, { el, focusKey: el.closest('[data-focus-key]')?.getAttribute('data-focus-key') ?? null });
@@ -32,13 +29,6 @@ export function triggerFor(locationKey: string): HTMLElement | null {
   // the one on a screen that is staying, if a leaving screen still holds another
   const all = [...document.querySelectorAll<HTMLElement>('[data-focus-key]')].filter((el) => el.dataset.focusKey === t.focusKey);
   return all.find((el) => !el.closest('[data-present="false"]')) ?? all[0] ?? null;
-}
-
-/** The element pressed for the navigation now being shown, once. */
-export function takePendingTrigger(): Element | null {
-  const el = pending;
-  pending = null;
-  return el;
 }
 
 /** Whether focus can go to `el` and the user can see it. */

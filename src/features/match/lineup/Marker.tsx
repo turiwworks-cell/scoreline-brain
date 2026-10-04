@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { m, useReducedMotion } from 'motion/react';
 import type { Player, Team } from '../../../domain';
-import { sharedPlayer, Shared, transition } from '../../../motion';
+import { transition } from '../../../motion';
 import { EventTags, Glass, KitDisc, PlayerPhoto, RatingBadge, Star, SubOffTag, textWidth, useFontVersion, withFeel, type PhotoSources } from '../../../ui';
 import { PITCH, type Slot } from './formation';
 import type { Marks } from './model';
@@ -74,13 +74,13 @@ export const Marker = memo(function Marker({ team, slot, name, marks, rating, be
       >
         <span className={styles.markerBody} data-sent-off={sentOff ? '' : undefined}>
           {photo ? (
-            <Shared id={sharedPlayer(team.id, n)} end="face" className={styles.face}>
+            <span className={styles.face}>
               <PlayerPhoto team={team} n={n} width={PITCH.face} src={photo.src} srcSet={photo.srcSet} sources={photo.sources} alt="" loading="eager" />
-            </Shared>
+            </span>
           ) : (
-            <Shared id={sharedPlayer(team.id, n)} end="face" className={styles.kit}>
+            <span className={styles.kit}>
               <KitDisc team={team} n={n} size={38} />
-            </Shared>
+            </span>
           )}
           <Glass radius={PITCH.plate / 2} className={styles.plate} style={{ left: 38 - w / 2, width: w }}>
             {followed && <Star className={styles.pstar} />}

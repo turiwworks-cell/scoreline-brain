@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolve, planFlights } from '../layout/resolve';
+import { resolve } from '../layout/resolve';
 import { parseNav } from './url';
 
 describe('stepping to a team-mate', () => {
@@ -8,12 +8,9 @@ describe('stepping to a team-mate', () => {
     expect(parseNav('/player/fra/10', '', { step: 7 }).step).toBeUndefined();
     expect(parseNav('/match/1/facts', '', { step: 1 }).step).toBeUndefined();
   });
-  it('slides: no face flies between two players, but opening one still flies', () => {
-    const a = resolve(parseNav('/player/fra/10', ''), 'phone', {});
+  it('carries the direction through to what is on screen, so the page slides', () => {
     const b = resolve(parseNav('/player/fra/11', '', { step: -1 }), 'phone', {});
     expect(b.step).toBe(-1);
-    expect(planFlights(a, b)).toEqual([]);
-    const list = resolve(parseNav('/', ''), 'phone', {});
-    expect(planFlights(list, a).map((p) => p.direction)).toEqual(['open']);
+    expect(resolve(parseNav('/player/fra/10', ''), 'phone', {}).step).toBeUndefined();
   });
 });

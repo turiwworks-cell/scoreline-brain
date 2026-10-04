@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { minText, nameOf, playerKey, scoreStr, type Match, type NextFixture, type Team } from '../../domain';
-import { sharedPlayer } from '../../motion';
 import { selectMatch, selectTeam, useScoreline } from '../../store';
 import { Crest, EventTags, feel, Icon, KitDisc, MatchClock, mix, pastel, PlayerPhoto, RatingBadge, SoftLight, Tag, tagList, tagLayout, textWidth, useFontVersion, type PhotoSources } from '../../ui';
 import { fitSize } from './cardLayout';
@@ -40,8 +39,6 @@ export type FollowCardProps = {
 
 export type PhotoOf = (team: Team, n: number) => PhotoSources | undefined;
 
-/** The attributes a shared element carries (Shared.tsx), for one that is an end only some of the time. */
-const sharedEnd = (id: string, active: boolean) => (active ? { 'data-shared': id, 'data-shared-end': 'face' } : {});
 
 export function FollowCard({ followed, live, open, hidden, onToggle, onOpenPlayer, photoOf }: FollowCardProps) {
   const { team: teamId, n } = followed;
@@ -88,7 +85,6 @@ export function FollowCard({ followed, live, open, hidden, onToggle, onOpenPlaye
   const files = photoOf?.(team, n);
   const photo = files !== undefined && photoFailed !== files.src ? files : undefined;
   const after = phase === 'post' || phase === 'red';
-  const faceId = sharedPlayer(teamId, n);
 
   const style = {
     '--full': full,
@@ -125,7 +121,7 @@ export function FollowCard({ followed, live, open, hidden, onToggle, onOpenPlaye
           {/* the chest-up photo, standing on the stats band */}
           {photo ? (
             <span className={styles.chestPos}>
-              <span className={styles.chest} {...sharedEnd(faceId, open && !hidden)}>
+              <span className={styles.chest}>
                 <picture>
                   {photo.sources.map((s) => (
                     <source key={s.type} type={s.type} srcSet={s.srcSet} sizes="144px" />
@@ -146,7 +142,7 @@ export function FollowCard({ followed, live, open, hidden, onToggle, onOpenPlaye
             </span>
           ) : (
             <span className={styles.kitPos}>
-              <span className={styles.kit} {...sharedEnd(faceId, open && !hidden)}>
+              <span className={styles.kit}>
                 <KitDisc team={team} n={n} size={88} />
               </span>
             </span>
@@ -196,7 +192,7 @@ export function FollowCard({ followed, live, open, hidden, onToggle, onOpenPlaye
         </span>
 
         <span className={`${styles.layer} ${styles.closed}`}>
-          <span className={styles.faceBox} {...sharedEnd(faceId, !open && !hidden)}>
+          <span className={styles.faceBox}>
             <PlayerPhoto team={team} n={n} width={54} src={photo?.src} srcSet={photo?.srcSet} sources={photo?.sources} alt="" />
           </span>
           <span className={`${styles.text} ${styles.cName}`} style={{ fontSize: closedSize }}>

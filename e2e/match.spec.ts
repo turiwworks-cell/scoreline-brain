@@ -26,7 +26,7 @@ function near(actual: Record<string, number>, want: Record<string, number>, tol 
 
 /** No flight running and the screen's cascade landed (the pane is the last block in). */
 async function settled(page: Page) {
-  await expect.poll(() => page.evaluate(() => document.querySelectorAll('[data-shared-copy], [data-shared-flying], [data-present="false"]').length)).toBe(0);
+  await expect.poll(() => page.evaluate(() => document.querySelectorAll('[data-present="false"]').length)).toBe(0);
   await expect
     .poll(() => panel(page).evaluate((el) => [getComputedStyle(el).opacity, getComputedStyle(el).transform, getComputedStyle(el.firstElementChild!).transform].join(' ')))
     .toBe('1 none none');
