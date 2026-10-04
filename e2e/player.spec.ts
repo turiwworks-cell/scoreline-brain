@@ -219,3 +219,21 @@ test.describe('reduced motion', () => {
     await expect(screenOf(page).locator('[data-pv="hero"]')).toHaveCSS('opacity', '1');
   });
 });
+
+test('a page shorter than the screen still pulls down under a finger and springs back (luau:8803)', async ({ page, context }, info) => {
+  test.skip(layoutOf(info) !== 'phone', 'a touch gesture on the phone layout');
+  await open(page, '/player/ita/1?demo');
+  const cdp = await context.newCDPSession(page);
+  await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 1 });
+  const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', y = 0) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x: 190, y }] });
+  const heading = screenOf(page).getByRole('heading', { level: 1 });
+  const top = async () => (await heading.boundingBox())!.y;
+  const rest = await top();
+  await touch('touchStart', 300);
+  for (let y = 320; y <= 500; y += 20) await touch('touchMove', y);
+  // 200 px of finger, 0.4 of it for the page; the bar stays where it is
+  expect((await top()) - rest).toBeCloseTo(80, 0);
+  expect((await screenOf(page).locator('[data-pv="bar"]').boundingBox())!.y).toBeCloseTo(0, 0);
+  await touch('touchEnd');
+  await expect.poll(top).toBeCloseTo(rest, 0);
+});

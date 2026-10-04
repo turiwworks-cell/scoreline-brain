@@ -19,6 +19,8 @@
 .backdrop {
   position: sticky;
   top: 0;
+  /* stays put while the page is pulled past an edge (useElasticEdges.ts) */
+  translate: 0 calc(var(--pull, 0px) * -1);
   z-index: 0;
   height: 0;
   pointer-events: none;
@@ -189,6 +191,8 @@
 .bar {
   position: sticky;
   top: 0;
+  /* stays put while the page is pulled past an edge (useElasticEdges.ts) */
+  translate: 0 calc(var(--pull, 0px) * -1);
   z-index: 6;
   height: 96px;
   margin-bottom: -96px;

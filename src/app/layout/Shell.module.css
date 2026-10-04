@@ -26,6 +26,11 @@
 .screen::-webkit-scrollbar {
   display: none;
 }
+/* a page pulled past its top or bottom follows the finger (useElasticEdges.ts); its sticky bars
+   take the pull back off, so they stay where they are, as the Lua draws them outside the scroll */
+.screen[data-pull] > * {
+  translate: 0 var(--pull, 0px);
+}
 
 /* ------------------------------------------------------------------------------------------
  * Phone: the list at the base, match and player layers pushed on top.

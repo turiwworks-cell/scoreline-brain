@@ -29,6 +29,8 @@
 .top {
   position: sticky;
   top: 0;
+  /* stays put while the page is pulled past an edge (useElasticEdges.ts) */
+  translate: 0 calc(var(--pull, 0px) * -1);
   z-index: 4;
   box-sizing: border-box;
   height: calc(max(62px, env(safe-area-inset-top)) + 97px);
