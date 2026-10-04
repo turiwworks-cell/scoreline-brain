@@ -5,11 +5,12 @@ import { riveLoader } from '../../src/rive/loader';
 // Inspection page only. It loads the actual signed editor export, not the Luau fixture.
 await riveLoader.runtime();
 const which = new URLSearchParams(location.search).get('asset') === 'live' ? 'live' : 'moments';
-const source = which === 'live' ? '/verification/rive/exports/live-icon.original.riv' : '/rive/moments.riv';
+const candidate = new URLSearchParams(location.search).has('candidate');
+const source = which === 'live' ? (candidate ? '/verification/rive/exports/live-icon.candidate.riv' : '/verification/rive/exports/live-icon.original.riv') : '/rive/moments.riv';
 const canvas = document.querySelector('#asset');
 canvas.style.width = which === 'live' ? '443px' : '390px';
 canvas.style.height = which === 'live' ? '152px' : '340px';
-const probe = { ready: false, errors: [], phases: [], contents: null, properties: null, bounds: null, advances: 0 };
+const probe = { ready: false, errors: [], phases: [], contents: null, properties: null, bounds: null, advances: 0, source };
 window.editorProbe = probe;
 const buffer = await riveLoader.file(source);
 const instance = new Rive({
@@ -44,5 +45,7 @@ window.editorAsset = {
   phase() { return instance.viewModelInstance?.number('phase')?.value; },
   live(value) { instance.viewModelInstance.boolean('islive').value = value; },
   liveValue() { return instance.viewModelInstance?.boolean('islive')?.value; },
+  count(value) { instance.viewModelInstance.string('count').value = value; },
+  countValue() { return instance.viewModelInstance?.string('count')?.value; },
   cleanup() { instance.cleanup(); },
 };
