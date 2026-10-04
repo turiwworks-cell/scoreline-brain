@@ -120,7 +120,11 @@
   position: relative;
   margin-top: 1px;
   height: calc(var(--full) * var(--k) * 1px);
-  overflow: hidden;
+  /* the closing edge cuts the rows (clipBot, luau:4019), and only it: a row sliding in after a day
+     change (18 px across, 6 px down) is not cut at the sides, and the last row's rule is not hidden
+     under the bottom edge until the row has landed, as it was with overflow: hidden. Open, the
+     clip lies 12 px below the last row; it closes in with the group. */
+  clip-path: inset(-12px -40px calc(-12px * var(--k)) -40px);
 }
 .group[data-collapsed] .rows {
   visibility: hidden;
