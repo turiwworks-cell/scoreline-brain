@@ -1,0 +1,111 @@
+name: Scoreline Windows launcher
+on:
+  push:
+    branches: [codex/part-20-moments]
+    paths: ['Open-Scoreline.cmd', 'scripts/Start-Scoreline.ps1', '.github/workflows/scoreline-launcher.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  launcher:
+    runs-on: windows-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Actual Windows PowerShell and CMD launcher, install, restart and occupied port
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $stage = Join-Path $env:RUNNER_TEMP 'Scoreline quick open'
+          New-Item -ItemType Directory -Path $stage -Force | Out-Null
+          Get-ChildItem -LiteralPath $env:GITHUB_WORKSPACE -Force |
+            Where-Object { $_.Name -ne '.git' } |
+            Copy-Item -Destination $stage -Recurse -Force
+          $env:SCORELINE_NO_PAUSE = '1'
+          $wrapper = Join-Path $stage 'Open-Scoreline.cmd'
+          $script = Join-Path $stage 'scripts\Start-Scoreline.ps1'
+          $parseErrors = $null
+          $tokens = $null
+          [Management.Automation.Language.Parser]::ParseFile($script, [ref]$tokens, [ref]$parseErrors) | Out-Null
+          if ($parseErrors.Count) { throw ($parseErrors | Out-String) }
+          function Launch($name) {
+            $stdout = Join-Path $stage ($name + '.out.log')
+            $stderr = Join-Path $stage ($name + '.err.log')
+            $arguments = '/d /s /c ""' + $wrapper + '" -NoBrowser -Port 5179"'
+            $process = Start-Process -FilePath $env:ComSpec -ArgumentList $arguments -WorkingDirectory $env:RUNNER_TEMP -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+            return @{ process = $process; stdout = $stdout; stderr = $stderr }
+          }
+          function StopOwned($run) {
+            if (-not $run.process.HasExited) {
+              & taskkill.exe /PID $run.process.Id /T /F | Out-Null
+            }
+          }
+          function Ready($run, $port) {
+            $deadline = [DateTime]::UtcNow.AddMinutes(5)
+            while ([DateTime]::UtcNow -lt $deadline) {
+              if ($run.process.HasExited) {
+                Get-Content -LiteralPath $run.stdout, $run.stderr
+                throw "Launcher exited early: $($run.process.ExitCode)"
+              }
+              try {
+                $response = Invoke-WebRequest -UseBasicParsing -Uri ("http://127.0.0.1:" + $port + "/?demo") -TimeoutSec 2
+                if ($response.StatusCode -eq 200 -and $response.Content -match 'id="root"') { return }
+              } catch { }
+              Start-Sleep -Seconds 2
+            }
+            Get-Content -LiteralPath $run.stdout, $run.stderr
+            throw 'Local server did not become ready.'
+          }
+          $first = Launch 'first'
+          try {
+            Ready $first 5179
+            $stamp = Join-Path $stage 'node_modules\.scoreline-deps.sha256'
+            if (-not (Test-Path -LiteralPath $stamp)) { throw 'Install stamp missing.' }
+            $stampTime = (Get-Item -LiteralPath $stamp).LastWriteTimeUtc
+            foreach ($asset in @('rive/moments.riv', 'rive/live-icon.riv', 'node_modules/@rive-app/webgl2/rive.wasm', 'src/main.tsx')) {
+              $response = Invoke-WebRequest -UseBasicParsing -Uri ('http://127.0.0.1:5179/' + $asset) -TimeoutSec 30
+              if ($response.StatusCode -ne 200) { throw ('Cannot load ' + $asset) }
+              Write-Host ('LAUNCHER_HTTP ' + $asset + ' ' + $response.StatusCode)
+            }
+            Write-Host 'LAUNCHER_PASS first install from a folder containing spaces and a different working directory'
+          } finally { StopOwned $first }
+          Start-Sleep -Seconds 2
+          $occupied = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Parse('127.0.0.1'), 5179)
+          $occupied.Start()
+          $second = $null
+          try {
+            $second = Launch 'second'
+            Ready $second 5180
+            if ((Get-Item -LiteralPath $stamp).LastWriteTimeUtc -ne $stampTime) { throw 'Dependencies were installed again.' }
+            if ((Get-Content -LiteralPath $second.stdout -Raw) -notmatch 'no installation needed') { throw 'Restart did not reuse dependencies.' }
+            Write-Host 'LAUNCHER_PASS second launch skips install and uses next port when requested port is occupied'
+          } finally {
+            if ($second) { StopOwned $second }
+            $occupied.Stop()
+          }
+          $savedPath = $env:Path
+          $missing = $null
+          try {
+            $env:Path = $env:SystemRoot + '\System32;' + $env:SystemRoot + '\System32\WindowsPowerShell\v1.0'
+            $missing = Launch 'missing-node'
+            if (-not $missing.process.WaitForExit(30000)) { throw 'Missing-Node failure hung.' }
+            if ($missing.process.ExitCode -eq 0) { throw 'Missing Node was incorrectly accepted.' }
+            if ((Get-Content -LiteralPath $missing.stdout -Raw) -notmatch 'Install Node.js') { throw 'Missing-Node guidance missing.' }
+            Write-Host 'LAUNCHER_PASS missing Node gives actionable failure and nonzero exit'
+          } finally {
+            $env:Path = $savedPath
+            if ($missing) { StopOwned $missing }
+          }
+      - name: Upload launcher evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scoreline-windows-launcher
+          path: ${{ runner.temp }}/Scoreline quick open/*.log
+          retention-days: 7
