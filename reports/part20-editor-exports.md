@@ -1,8 +1,10 @@
 # Part 20 — signed editor exports and final runtime checks
 
-**Latest Live follow-up, 2026-10-04:** the 23,618-byte replacement exports only the helper artboard `font`, without a bound default View Model. It is rejected for production; see [part20-live-export-check.md](part20-live-export-check.md). The original signed Moments acceptance below remains valid.
+**Latest acceptance, 2026-10-04:** both production exports are installed and accepted. Moments is 18,100 bytes; the final compact Live is 26,800 bytes. The host selects `aniamtion` explicitly. See [part20-live-acceptance.md](part20-live-acceptance.md) for the current files, tested commit, count/keyboard checks and production heap results.
 
-Status: **Moments export accepted; corrected Live export pending**.
+**Historical export report below:** it records the earlier Moments acceptance and pending Live correction before the compact full-button replacement arrived. Statements about a missing public Live file or the original diagnostic icon apply only to the cited earlier commit.
+
+Historical status: **Moments export accepted; corrected Live export pending**.
 Implementation branch: `codex/part-20-moments`.
 Validated functional commit: `8032297b40f167b885a5fe5740304fe56eb6cee2`.
 The final reporting commit changes documentation only. No merge, publication, Part 21 work or Opus review was performed.

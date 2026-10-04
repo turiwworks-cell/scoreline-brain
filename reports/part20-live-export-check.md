@@ -1,5 +1,7 @@
 # Part 20 — replacement Live export check
 
+**Historical rejection of the first 23,618-byte replacement.** A newer 26,800-byte full-button export is now installed and accepted; see [part20-live-acceptance.md](part20-live-acceptance.md). File locations/results below describe the rejected candidate at the cited historical commits.
+
 Date: 2026-10-04. Branch: `codex/part-20-moments`.
 Status: **replacement rejected for production; editor correction required**.
 Moments remains accepted. No merge, deployment, Part 21 work or Opus review was performed.
