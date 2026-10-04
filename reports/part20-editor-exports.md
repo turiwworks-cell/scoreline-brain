@@ -1,5 +1,7 @@
 # Part 20 — signed editor exports and final runtime checks
 
+**Latest Live follow-up, 2026-10-04:** the 23,618-byte replacement exports only the helper artboard `font`, without a bound default View Model. It is rejected for production; see [part20-live-export-check.md](part20-live-export-check.md). The original signed Moments acceptance below remains valid.
+
 Status: **Moments export accepted; corrected Live export pending**.
 Implementation branch: `codex/part-20-moments`.
 Validated functional commit: `8032297b40f167b885a5fe5740304fe56eb6cee2`.
