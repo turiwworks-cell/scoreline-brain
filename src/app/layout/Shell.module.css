@@ -18,8 +18,13 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   background: var(--c-bg);
-  scrollbar-width: thin;
-  scrollbar-color: var(--c-dim) transparent;
+  /* no scrollbar, as on the Rive artboards. A classic (Windows) scrollbar took 8–17 px out of the
+     pane: the live cards fell under the Lua's 70 px and dropped their team codes, and the follow
+     picker's chips overflowed. Wheel, touch, keyboard and assistive scrolling are unchanged. */
+  scrollbar-width: none;
+}
+.screen::-webkit-scrollbar {
+  display: none;
 }
 
 /* ------------------------------------------------------------------------------------------

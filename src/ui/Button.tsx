@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, CSSProperties, ReactNode, Ref } from 'react';
 import { withFeel } from './feel';
 import { RollLabel } from './RollLabel';
 import styles from './Button.module.css';
@@ -32,6 +32,7 @@ export function Button({ label, height, minWidth, className, style, type, ...res
 export type RoundButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   'aria-label': string;
   children: ReactNode;
+  ref?: Ref<HTMLButtonElement>;
 };
 
 export function RoundButton({ className, children, type, ...rest }: RoundButtonProps) {

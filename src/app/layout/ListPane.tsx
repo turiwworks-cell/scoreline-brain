@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { m } from 'motion/react';
-import { MatchList } from '../../features/matchList';
+import { AccountSheet, MatchList } from '../../features/matchList';
 import type { Team } from '../../domain';
 import { pushBase } from '../../motion';
 import { playerPhoto, usePhotoManifest } from '../../ui';
@@ -21,9 +21,13 @@ export function ListPane({ layout, shifted, covered, list, openId }: { layout: L
   // the follow card shows the followed player's bust when the manifest has one (Part 8's files)
   const manifest = usePhotoManifest().manifest;
   const photoOf = useCallback((team: Team, n: number) => playerPhoto(manifest, team.id, n), [manifest]);
+  // the account sheet rises over the list: the whole phone screen, the list pane on desktop (luau:7055)
+  const [sheet, setSheet] = useState(false);
+  const openSheet = useCallback(() => setSheet(true), []);
+  const closeSheet = useCallback(() => setSheet(false), []);
   return (
     <m.div className={layout === 'phone' ? styles.base : styles.pane} data-pane="list" variants={pushBase} initial={false} animate={shifted ? 'covered' : 'rest'}>
-      <Screen pane="list" contentKey={`${list.day}|${list.live ? 'live' : ''}`} label="Matches" covered={covered}>
+      <Screen pane="list" contentKey={`${list.day}|${list.live ? 'live' : ''}`} label="Matches" covered={covered || sheet}>
         <MatchList
           list={list}
           openId={openId}
@@ -31,10 +35,12 @@ export function ListPane({ layout, shifted, covered, list, openId }: { layout: L
           onLive={nav.setLive}
           onOpenMatch={(id, from) => nav.openMatch(id, { from })}
           onOpenPlayer={(player, from) => nav.openPlayer(player, { from })}
+          onMenu={openSheet}
           defaultFollowed={demoFollowed()}
           photoOf={photoOf}
         />
       </Screen>
+      <AccountSheet open={sheet} onClose={closeSheet} />
     </m.div>
   );
 }

@@ -85,3 +85,24 @@ export const selectFollowMatchId = perKey((team: string): Selector<number | unde
   }
   return best;
 });
+
+/**
+ * The account sheet's seven bars take tonight's match colours: the matches in play or finished,
+ * else every match (drawSheet, luau:6700). A key of `home:away` pairs, so a poll that changes no
+ * pairing hands back the same string and re-renders nothing.
+ */
+export const selectSheetPairs: Selector<string> = (() => {
+  let lastMatches: unknown;
+  let last = '';
+  return (s: ScorelineState) => {
+    const { matches, matchOrder } = s.domain;
+    if (matches === lastMatches) return last;
+    lastMatches = matches;
+    const all = matchOrder.map((id) => matches[id]).filter((m): m is Match => m !== undefined);
+    const tonight = all.filter((m) => m.status === 'live' || m.status === 'finished');
+    last = (tonight.length > 0 ? tonight : all).map((m) => `${m.home}:${m.away}`).join('|');
+    return last;
+  };
+})();
+
+export const selectTeams: Selector<ScorelineState['domain']['teams']> = (s) => s.domain.teams;
