@@ -82,7 +82,7 @@ export const Marker = memo(function Marker({ team, slot, name, marks, rating, be
               <KitDisc team={team} n={n} size={38} />
             </span>
           )}
-          <Glass radius={PITCH.plate / 2} className={styles.plate} style={{ left: 38 - w / 2, width: w }}>
+          <Glass radius={PITCH.plate / 2} className={styles.plate} style={{ left: 38 - w / 2, width: w, ['--plate-x' as string]: `${38 - w / 2}px` }}>
             {followed && <Star className={styles.pstar} />}
             {photo && <span className={styles.pnum}>{num}</span>}
             <span className={styles.pname} style={{ fontSize: size }}>

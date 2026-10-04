@@ -9,7 +9,7 @@ import styles from './Shell.module.css';
 
 /**
  * Phone, < 768 px (ARCHITECTURE §6): the list at the base (ListPane); the match pushes in over it
- * from the right, the player fades in on top while his face grows into the bust. One layer of
+ * from the right, the player fades in on top while his bust grows in at the centre. One layer of
  * each kind at most: a repeated or reversed navigation retargets the same layer, it never stacks
  * a second one. Back and swipe-back are browser history.
  */

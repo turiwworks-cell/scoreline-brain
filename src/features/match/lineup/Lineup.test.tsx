@@ -66,15 +66,15 @@ describe('a match that has started', () => {
     expect(screen.getByText('0 of 5 used')).toBeTruthy();
   });
 
-  it('puts the keeper at the bottom and the forwards at the top, each row in the Lua’s place', () => {
+  it('puts the keeper at the bottom and the forwards at the top, each line in the middle of its stripe', () => {
     const { container } = setup(1);
     const at = (key: string) => {
       const slot = container.querySelector(`[data-pitch] [data-player="${key}"]`)!.parentElement as HTMLElement;
       return [parseFloat(slot.style.left) + 38, parseFloat(slot.style.top) + 65];
     };
-    expect(at('fra:16')).toEqual([177, 506]); // the keeper
-    expect(at('fra:10')).toEqual([177, 98]); // the lone forward
-    expect(at('fra:7')[1]).toBe(200);
+    expect(at('fra:16')).toEqual([177, 512]); // the keeper
+    expect(at('fra:10')).toEqual([177, 80]); // the lone forward
+    expect(at('fra:7')[1]).toBe(188);
   });
 
   it('shows goals, a rating with the best player starred, and the off capsule', () => {

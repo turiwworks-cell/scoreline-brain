@@ -1,5 +1,5 @@
-import { useRef, type ReactNode } from 'react';
-import { m, useIsPresent, type Variants } from 'motion/react';
+import { useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { m, PresenceContext, useIsPresent, type Variants } from 'motion/react';
 import type { ScrollPane } from '../nav/scrollMemory';
 import { useScrollMemory } from '../nav/useScrollMemory';
 import { useElasticEdges } from './useElasticEdges';
@@ -46,7 +46,28 @@ export function Screen({ pane, contentKey, label, covered = false, className, va
       animate={animate}
       exit={exit}
     >
-      {children}
+      <LaterMountsAnimate>{children}</LaterMountsAnimate>
     </m.section>
   );
+}
+
+/**
+ * What is on a screen at the app's first render shows at once (AnimatePresence initial={false}:
+ * the Lua opens with screenT at -100, nothing cascading). Motion keeps that `initial: false` in the
+ * presence context for as long as the screen stays, though, so everything that mounted inside it
+ * later skipped its entrance too: on a direct link, and for the whole session in the desktop's
+ * match pane, a tab's content, the line-up's rise and the rest never played. Once the first render
+ * is on screen this hands the screen's content the same context without it.
+ */
+function LaterMountsAnimate({ children }: { children: ReactNode }) {
+  const ctx = useContext(PresenceContext);
+  const blocked = ctx?.initial === false;
+  const [lifted, setLifted] = useState(false);
+  useEffect(() => {
+    if (!blocked) return;
+    const id = requestAnimationFrame(() => setLifted(true));
+    return () => cancelAnimationFrame(id);
+  }, [blocked]);
+  const value = useMemo(() => (ctx && blocked && lifted ? { ...ctx, initial: undefined } : ctx), [ctx, blocked, lifted]);
+  return <PresenceContext.Provider value={value}>{children}</PresenceContext.Provider>;
 }

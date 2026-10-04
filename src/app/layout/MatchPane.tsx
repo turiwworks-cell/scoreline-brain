@@ -11,8 +11,8 @@ import styles from './Shell.module.css';
 
 /**
  * The match pane of TwoPane and ThreePane. A new match swaps in at once (the Lua desktop does)
- * while its blocks cascade and its crests and score fly from the card. With `sheet` (tablet) the
- * player rises over it as a sheet. Goal and red card scenes play over it (`stage`, Part 18); on the
+ * while its blocks cascade; nothing flies from the card. With `sheet` (tablet) the player rises
+ * over it as a sheet. Goal and red card scenes play over it (`stage`, Part 18); on the
  * tablet its toasts too.
  */
 export function MatchPane({ r, sheet, stage }: { r: Resolved; sheet: boolean; stage: 'all' | 'scene' }) {

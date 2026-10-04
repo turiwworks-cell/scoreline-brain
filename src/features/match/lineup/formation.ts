@@ -1,14 +1,10 @@
 // Where a side's eleven stand (formRows and slotRow, luau:2320-2345, and the pitch in lineup,
 // luau:5557-5602). Pure: no React, no DOM.
 
-/** The pitch's measures (PITCH_H, FACE and PLATE_H, luau:5380-5382, and the rows' ends, luau:5560). */
+/** The pitch's measures (PITCH_H, FACE and PLATE_H, luau:5380-5382). */
 export const PITCH = {
   /** the pitch's height; its width is the screen's less 2 × 18 */
   height: 540,
-  /** the forwards' row stands this far under the pitch's top edge... */
-  top: 98,
-  /** ...and the keeper's this far above its bottom edge */
-  bottom: 34,
   /** a photo token's width on the pitch */
   face: 56,
   /** the name plate's height */
@@ -52,11 +48,21 @@ export function usableFormation(form: string, players = 11): string {
   return formRows(form).reduce((a, b) => a + b, 0) === players ? form : FALLBACK;
 }
 
-/** The y of row `row` (1 = the keeper) on a pitch of height `h`: every row evenly spaced (rowAt, luau:5564). */
+/*
+ * The pitch is cut into one mowing stripe per line of players, all the same height and edge to
+ * edge, and each line stands in the middle of its stripe: a marker's visual middle (PITCH.lift
+ * above its row) on the stripe's centre. The Lua spaced the rows from 98 under the top to 34 above
+ * the bottom and centred a stripe on each, which left a sliver of bare pitch above the forwards
+ * and below the keeper (review of 2026-10-04: "five sections, and even").
+ */
+
+/** A stripe's height when `rows` lines share the pitch. */
+export const bandHeight = (rows: number, h: number = PITCH.height) => h / Math.max(rows, 1);
+
+/** The y of row `row` (1 = the keeper) on a pitch of height `h`: the middle of its stripe, plus the lift. */
 export function rowY(rows: number, row: number, h: number = PITCH.height): number {
-  const yTop = PITCH.top;
-  const yBot = h - PITCH.bottom;
-  return yBot - ((row - 1) * (yBot - yTop)) / Math.max(rows - 1, 1);
+  const bh = bandHeight(rows, h);
+  return (rows - row + 0.5) * bh + PITCH.lift;
 }
 
 export interface Slot {
@@ -104,10 +110,10 @@ export function pitchLayout(form: string, xi: readonly number[], pw: number): Pi
       slots.push({ n, row, index: i, count, x: pw / 2 + (i - (count + 1) / 2) * spacing, y: rowY(R, row), maxW, fromTop: R - row });
     }
   }
-  const half = (PITCH.height - PITCH.bottom - PITCH.top) / Math.max(R - 1, 1) / 2;
+  const bh = bandHeight(R);
   const bands = [];
   for (let row = R; row >= 1; row--) {
-    bands.push({ y: rowY(R, row) - PITCH.lift - half, h: half * 2, shade: (R - row) % 2 === 0 ? 0.03 : 0.008 });
+    bands.push({ y: (R - row) * bh, h: bh, shade: (R - row) % 2 === 0 ? 0.03 : 0.008 });
   }
   return { form: f, rows, slots, bands };
 }

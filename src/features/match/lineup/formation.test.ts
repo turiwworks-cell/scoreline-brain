@@ -31,9 +31,10 @@ describe('slotRow and slotLine', () => {
 });
 
 describe('rowY', () => {
-  it('spaces the rows evenly from the keeper 34 above the bottom to the forwards 98 under the top', () => {
-    expect([1, 2, 3, 4, 5].map((r) => rowY(5, r))).toEqual([506, 404, 302, 200, 98]);
-    expect([1, 2, 3, 4].map((r) => rowY(4, r))).toEqual([506, 370, 234, 98]);
+  it('stands each line in the middle of its stripe, the stripes sharing the pitch evenly', () => {
+    // five stripes of 108: middles 486, 378, 270, 162, 54, each plus the 26 px lift
+    expect([1, 2, 3, 4, 5].map((r) => rowY(5, r))).toEqual([512, 404, 296, 188, 80]);
+    expect([1, 2, 3, 4].map((r) => rowY(4, r))).toEqual([498.5, 363.5, 228.5, 93.5]);
   });
 });
 
@@ -45,11 +46,11 @@ describe('pitchLayout', () => {
     expect(rows).toEqual([1, 4, 2, 3, 1]);
     expect(slots.map((s) => s.n)).toEqual(xi);
     // the keeper on the middle, the back four 84.5 apart
-    expect(slots[0]).toMatchObject({ n: 16, x: 177, y: 506, fromTop: 4 });
+    expect(slots[0]).toMatchObject({ n: 16, x: 177, y: 512, fromTop: 4 });
     expect(slots.slice(1, 5).map((s) => s.x)).toEqual([177 - 126.75, 177 - 42.25, 177 + 42.25, 177 + 126.75]);
     // the pair of the double pivot stands 116 apart (spacing is capped at 116)
     expect(slots.slice(5, 7).map((s) => s.x)).toEqual([177 - 58, 177 + 58]);
-    expect(slots[10]).toMatchObject({ n: 10, x: 177, y: 98, fromTop: 0 });
+    expect(slots[10]).toMatchObject({ n: 10, x: 177, y: 80, fromTop: 0 });
   });
 
   it('caps a row’s spacing at 116 and its plates at 92', () => {
@@ -76,8 +77,10 @@ describe('pitchLayout', () => {
     expect(bands).toHaveLength(5);
     // from the forwards (row 5) down to the keeper; half = 102 / 2 = 51
     expect(bands.map((b) => b.shade)).toEqual([0.03, 0.008, 0.03, 0.008, 0.03]);
-    expect(bands[0]).toEqual({ y: 98 - 26 - 51, h: 102, shade: 0.03 });
-    expect(bands[4]).toEqual({ y: 506 - 26 - 51, h: 102, shade: 0.03 });
+    // five even stripes, edge to edge: nothing bare above the forwards or below the keeper
+    expect(bands[0]).toEqual({ y: 0, h: 108, shade: 0.03 });
+    expect(bands[4]).toEqual({ y: 432, h: 108, shade: 0.03 });
+    expect(bands[4]!.y + bands[4]!.h).toBe(PITCH.height);
   });
 
   it('lays out at the pane’s own width', () => {

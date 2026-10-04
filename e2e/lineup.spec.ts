@@ -67,9 +67,9 @@ test('the switch, the formation and the pitch sit where the Lua puts them', asyn
   const p = await box(page, pitch(page));
   near(p, { y: sw.y + 68 + 27.7, x: 18, r: 18, h: 540 });
 
-  // rows from the keeper (34 above the bottom) to the forwards (98 under the top), evenly spaced; a
-  // marker is 76 × 84 and its plate's centre line is 65 under its top
-  const rows: Record<string, number> = { 'fra:16': 506, 'fra:19': 404, 'fra:17': 404, 'fra:14': 302, 'fra:20': 200, 'fra:10': 98 };
+  // five even stripes of 108, each line in the middle of its own (plus the 26 px lift); a marker
+  // is 76 × 84 and its plate's centre line is 65 under its top
+  const rows: Record<string, number> = { 'fra:16': 512, 'fra:19': 404, 'fra:17': 404, 'fra:14': 296, 'fra:20': 188, 'fra:10': 80 };
   for (const [key, y] of Object.entries(rows)) {
     const m = await box(page, marker(page, key));
     near(m, { y: p.y + y - 65, w: 76, h: 84 });
@@ -131,30 +131,32 @@ test('the switch shows the other team and plays its entrance again', async ({ pa
 test('markers rise line by line, forwards first', async ({ page }) => {
   await page.goto('/match/1/lineup?demo');
   await expect(screen(page).getByRole('heading', { level: 1 })).toBeAttached();
-  // sample each marker's opacity every frame until the keeper is in
-  const order = await page.evaluate(
+  // the time each marker first shows, sampled every frame until the keeper is in
+  const seen = await page.evaluate(
     () =>
-      new Promise<string[]>((done) => {
-        const seen: string[] = [];
+      new Promise<Record<string, number>>((done) => {
+        const at: Record<string, number> = {};
         const t0 = performance.now();
         const tick = () => {
           for (const b of document.querySelectorAll<HTMLElement>('[data-screen="match"][data-present="true"] [data-pitch] [data-player]')) {
             const op = Number(getComputedStyle(b.parentElement!).opacity);
-            if (op > 0.05 && !seen.includes(b.dataset.player!)) seen.push(b.dataset.player!);
+            if (op > 0.05 && at[b.dataset.player!] === undefined) at[b.dataset.player!] = performance.now() - t0;
           }
-          if (seen.length === 11 || performance.now() - t0 > 6000) done(seen);
+          if (Object.keys(at).length === 11 || performance.now() - t0 > 6000) done(at);
           else requestAnimationFrame(tick);
         };
         requestAnimationFrame(tick);
       }),
   );
-  expect(order).toHaveLength(11);
-  // 4-2-3-1: 10 | 20, 7, 11 | 14, 8 | the back four | 16
-  expect(order[0]).toBe('fra:10');
-  expect(order.slice(1, 4).sort()).toEqual(['fra:11', 'fra:20', 'fra:7']);
-  expect(order.slice(4, 6).sort()).toEqual(['fra:14', 'fra:8']);
-  expect(order.slice(6, 10).sort()).toEqual(['fra:17', 'fra:19', 'fra:4', 'fra:5']);
-  expect(order[10]).toBe('fra:16');
+  expect(Object.keys(seen)).toHaveLength(11);
+  // 4-2-3-1: 10 | 20, 7, 11 | 14, 8 | the back four | 16. Within a line the players start a
+  // quarter of the stagger apart (luau:5667), so the last of one line and the first of the next are
+  // only 35 ms apart: each line's first start is compared, 140 ms after the line above's. A slow
+  // frame can show two lines at once, so a line may tie with the one above but never lead it.
+  const lines = [['fra:10'], ['fra:20', 'fra:7', 'fra:11'], ['fra:14', 'fra:8'], ['fra:19', 'fra:17', 'fra:4', 'fra:5'], ['fra:16']];
+  const first = lines.map((l) => Math.min(...l.map((k) => seen[k]!)));
+  for (let i = 1; i < first.length; i++) expect(first[i]!).toBeGreaterThanOrEqual(first[i - 1]!);
+  expect(first[4]!).toBeGreaterThan(first[0]!);
 });
 
 test('a clock tick does not rebuild the pitch or play the entrance again', async ({ page }) => {
