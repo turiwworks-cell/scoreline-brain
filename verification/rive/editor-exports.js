@@ -6,21 +6,22 @@ import { riveLoader } from '../../src/rive/loader';
 await riveLoader.runtime();
 const which = new URLSearchParams(location.search).get('asset') === 'live' ? 'live' : 'moments';
 const candidate = new URLSearchParams(location.search).has('candidate');
-const source = which === 'live' ? (candidate ? '/verification/rive/exports/live-icon.candidate.riv' : '/verification/rive/exports/live-icon.original.riv') : '/rive/moments.riv';
+const source = which === 'live' ? (candidate ? '/rive/live-icon.riv' : '/verification/rive/exports/live-icon.original.riv') : '/rive/moments.riv';
+const artboard = which === 'live' ? 'aniamtion' : undefined;
 const canvas = document.querySelector('#asset');
 canvas.style.width = which === 'live' ? '443px' : '390px';
 canvas.style.height = which === 'live' ? '152px' : '340px';
-const probe = { ready: false, errors: [], phases: [], contents: null, properties: null, bounds: null, advances: 0, source };
+const probe = { ready: false, errors: [], phases: [], contents: null, properties: null, bounds: null, advances: 0, source, selectedArtboard: artboard };
 window.editorProbe = probe;
 const buffer = await riveLoader.file(source);
 const instance = new Rive({
-  canvas, buffer, autoBind: true, autoplay: false, enableRiveAssetCDN: false,
+  canvas, buffer, artboard, autoBind: true, autoplay: false, enableRiveAssetCDN: false,
   shouldDisableRiveListeners: true,
   onAdvance: () => { probe.advances++; },
   onLoadError: (error) => { probe.errors.push(String(error)); },
   onLoad() {
     const machine = instance.stateMachineNames[0];
-    instance.reset({ stateMachine: machine, autoplay: false, autoBind: true });
+    instance.reset({ artboard, stateMachine: machine, autoplay: false, autoBind: true });
     instance.resizeDrawingSurfaceToCanvas();
     const vm = instance.viewModelInstance;
     probe.contents = instance.contents;

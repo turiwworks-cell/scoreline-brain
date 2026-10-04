@@ -11,6 +11,7 @@ export type LiveGraphicProps = {
   fallback: ReactNode;
 };
 
+// The signed export also contains a font helper; select the full button by its authored name.
 /** The exported artwork owns the complete button, including the moving counter. */
 export default function LiveGraphic({ source, live, count, onChange, onReady, fallback }: LiveGraphicProps) {
   const [ready, setReady] = useState(false);
@@ -53,7 +54,7 @@ export default function LiveGraphic({ source, live, count, onChange, onReady, fa
   return (
     <span aria-hidden="true" style={{ display: 'contents' }}>
       {(!ready || failed) && fallback}
-      {!failed && <RiveCanvas source={source} bind={bind} onReady={loaded} onError={failedLoad} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: ready ? 1 : 0 }} />}
+      {!failed && <RiveCanvas source={source} artboard="aniamtion" bind={bind} onReady={loaded} onError={failedLoad} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: ready ? 1 : 0 }} />}
     </span>
   );
 }

@@ -30,6 +30,7 @@ async function main() {
     host.append(canvas);
     const life = mountCanvas(canvas, {
       source,
+      artboard: goal ? undefined : 'aniamtion',
       bind: (instance) => {
         const vm = instance.viewModelInstance;
         if (!vm) throw new Error('Part 20 asset has no default View Model');
@@ -37,6 +38,9 @@ async function main() {
         if (!goal) {
           const live = vm.boolean('islive');
           if (!live) throw new Error('Live icon has no islive');
+          const count = vm.string('count');
+          if (!probe.diagnosticIcon && !count) throw new Error('Production Live icon has no count');
+          if (count) count.value = '12';
           live.value = true;
           return { cleanup: () => { probe.cleaned++; } };
         }

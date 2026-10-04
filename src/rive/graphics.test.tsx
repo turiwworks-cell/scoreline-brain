@@ -53,6 +53,7 @@ describe('Live icon binding and hit target', () => {
   it('syncs URL changes to islive, Rive changes back, and suppresses write echoes', () => {
     const change = vi.fn(); const f = fixture();
     const view = render(<LiveGraphic source="/rive/live-icon.riv" count={3} live={false} onChange={change} fallback={<svg />} />);
+    expect(mock.canvas!.artboard).toBe('aniamtion');
     const binding = mock.canvas!.bind(f.instance, () => {})!;
     expect(f.live.listeners.size).toBe(1); expect(f.textCount.value).toBe('3');
     view.rerender(<LiveGraphic source="/rive/live-icon.riv" count={4} live onChange={change} fallback={<svg />} />);

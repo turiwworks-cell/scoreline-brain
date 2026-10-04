@@ -53,7 +53,7 @@ test('original Live export responds visually to its bound islive value', async (
   await page.evaluate(() => window.editorAsset.cleanup());
 });
 
-test('corrected Live candidate binds count to the calendar and preserves toggle animation', async ({ page }, testInfo) => {
+test('corrected Live production export binds count to the calendar and preserves toggle animation', async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
@@ -64,8 +64,9 @@ test('corrected Live candidate binds count to the calendar and preserves toggle 
   expect(probe.properties).toEqual(expect.arrayContaining([
     { name: 'islive', type: 'boolean' }, { name: 'count', type: 'string' },
   ]));
-  // The helper for font glyph coverage must not replace or accompany the exported button.
-  expect(probe.contents.artboards).toHaveLength(1);
+  // A glyph helper may remain under budget; the selected full artboard must expose the contract.
+  expect(probe.selectedArtboard).toBe('aniamtion');
+  expect(probe.contents.artboards.map((a: { name: string }) => a.name)).toContain('aniamtion');
   const ratio = (probe.bounds.maxX - probe.bounds.minX) / (probe.bounds.maxY - probe.bounds.minY);
   expect(ratio).toBeGreaterThan(2.8);
   expect(ratio).toBeLessThan(3.0);

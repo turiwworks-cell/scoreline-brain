@@ -3,7 +3,6 @@ import base from './playwright.rive.config';
 
 export default defineConfig({
   ...base,
-  testDir: 'verification/live-export',
-  grep: /selected Live artboard/,
+  grep: /corrected Live production export|full Live host/,
   use: { ...base.use, screenshot: 'only-on-failure' },
 });
