@@ -111,8 +111,10 @@ native rendering checks; actual native checks run in Chromium with local WASM.
 ## Current editor handoff
 
 **No new export or deletion is required for this version.** Both final files are already in
-`public/rive/` on the independent Part 20 branch. To view it, check out this branch and run
-`npm ci`, then `npm run dev`.
+`public/rive/` on the independent Part 20 branch. To view it on Windows, extract the current branch ZIP and double-click
+`Open-Scoreline.cmd`. See [the quick-start guide](../docs/QUICK-START.fa.md) and
+[executed Windows launcher checks](windows-launcher.md). Manual `npm ci` / `npm run dev`
+remain available.
 
 [Persian Moments/editor guide](../rive/EDITOR-GUIDE.fa.md) covers the 390 × 340 transparent
 Moments artboard, Node Script placement at 0/0, View Model/default instance, default state
