@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CARD_H, cardGap, cardHeight, cardMetrics, fitSize, minuteSize, nameChoice, targetWidth } from './cardLayout';
+import { CARD_H, cardGap, cardHeight, cardMetrics, fitSize, minuteSize, NAME_MIN_SCALE, nameChoice, nameFit, targetWidth } from './cardLayout';
 
 describe('live card layout', () => {
   it('grows from 128 px at kick-off to 244 px at 90 minutes', () => {
@@ -51,6 +51,20 @@ describe('live card layout', () => {
     const five = cardMetrics(70);
     expect(nameChoice(70, five, { score: 8, name: 30, nameDrawn: 31, short: 20 })).toBe('short');
     expect(nameChoice(70, five, { score: 8, name: 100, nameDrawn: 101, short: 100 })).toBe('none');
+  });
+
+  it('a short name shrinks a little to stay on a card narrower than the Lua’s, then gives way', () => {
+    const five = cardMetrics(70);
+    expect(nameFit(70, five, { score: 8, name: 30, nameDrawn: 31, short: 20 })).toEqual({ choice: 'short', size: five.name });
+    // a 64 px card (a 360 px phone): "FRA" is 2 px too wide and is drawn a touch smaller
+    const narrow = cardMetrics(64);
+    const room = 64 - 2 * narrow.pad - narrow.crest - narrow.nameGap - 8 - 6 + 2;
+    const fit = nameFit(64, narrow, { score: 8, name: 30, nameDrawn: 31, short: room + 2 });
+    expect(fit.choice).toBe('short');
+    expect(fit.size).toBeCloseTo((narrow.name * room) / (room + 2), 5);
+    expect(fit.size).toBeGreaterThanOrEqual(narrow.name * NAME_MIN_SCALE);
+    // far too wide: no name at all, as in the Lua
+    expect(nameFit(64, narrow, { score: 8, name: 100, nameDrawn: 101, short: 100 }).choice).toBe('none');
   });
 
   it('the minute shrinks to the card’s width less its padding', () => {

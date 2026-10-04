@@ -28,7 +28,7 @@ export type LiveToggleProps = {
 /** Live on / off. A toggle button: the green capsule is its pressed state. */
 export function LiveToggle({ on, count, onToggle }: LiveToggleProps) {
   return (
-    <LiveIcon live={on} count={count} onChange={onToggle} className={`m-glass ${styles.live}`} fallback={
+    <LiveIcon live={on} count={count} onChange={onToggle} className={`m-glass ${styles.live}`} lightClassName={styles.liveLight} fallback={
       <span className={styles.capsule} aria-hidden="true">
         <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><circle cx="4.5" cy="4.5" r="4.5" fill={on ? 'currentColor' : 'var(--c-live)'} /></svg>
         <span>Live</span>

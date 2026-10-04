@@ -76,5 +76,28 @@ export function nameChoice(w: number, m: CardMetrics, t: NameWidths): NameChoice
   return t.short <= room + 2 ? 'short' : 'none';
 }
 
+/**
+ * How far a short name may shrink before it gives way. The Lua's cards are always 70 px wide with
+ * five on stage, because its artboard is scaled to the screen; ours follow the pane, which a 360 px
+ * phone, a desktop scrollbar or a narrow pane makes a few px narrower. Shrinking the code by up
+ * to this much keeps "FRA" on a 64 px card, as the scaled artboard does, instead of dropping it.
+ */
+export const NAME_MIN_SCALE = 0.8;
+
+export interface NameFit {
+  readonly choice: NameChoice;
+  /** the size to draw the name at: the card's name size, or less to fit */
+  readonly size: number;
+}
+
+/** nameChoice, with the short name fitted into a card a little narrower than the Lua's. */
+export function nameFit(w: number, m: CardMetrics, t: NameWidths): NameFit {
+  const choice = nameChoice(w, m, t);
+  if (choice !== 'none') return { choice, size: m.name };
+  const room = w - 2 * m.pad - m.crest - m.nameGap - t.score - 6 + 2;
+  const size = t.short > 0 ? fitSize(m.name, t.short, room) : m.name;
+  return size >= m.name * NAME_MIN_SCALE ? { choice: 'short', size } : { choice: 'none', size: m.name };
+}
+
 /** The minute label's size: fitted into the card's width less its padding (luau:3861). */
 export const minuteSize = (m: CardMetrics, w: number, textW: number) => fitSize(m.minute, textW, w - 2 * m.pad - 8);

@@ -17,6 +17,14 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 html, body, #root { height: 100%; }
+/* Form controls take the page's type. Without this a button falls back to the UA font (Arial at
+   13.3 px, letter-spacing reset), which is how the live cards' codes and minutes came out bold
+   and in the wrong face. A component's own font rules still win (class beats element). */
+button, input, select, textarea {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
 body {
   margin: 0;
   background: var(--c-bg);

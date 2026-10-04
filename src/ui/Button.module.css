@@ -28,10 +28,13 @@
   white-space: nowrap;
 }
 
-/* roundBtn (luau:3451): 40 px circle */
+/* roundBtn (luau:3451): 40 px circle. Its hover light is smaller and dimmer than the Lua's
+   (product review 2026-10-04): at full reach the spot lit most of the circle at once. */
 .round {
   width: 40px;
   height: 40px;
   border-radius: var(--r-20);
   flex: none;
+  --light-reach: 0.7;
+  --light-gain: 0.7;
 }

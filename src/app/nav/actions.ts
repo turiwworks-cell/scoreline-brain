@@ -7,7 +7,13 @@ import { DEFAULT_TAB, hrefOf, matchPath, parseNav, type MatchRef, type MatchTab,
  * Every navigation in the app goes through these. Screens push (a new history entry: back
  * returns), view state replaces (day, Live, tab: back doesn't step through them).
  * A navigation to where you already are does nothing, so a double tap can't stack entries.
+ *
+ * Each one renders at once (flushSync). React Router otherwise renders a navigation as a
+ * transition, a beat after the tap: a second quick tap on Live then read the old state and was
+ * lost, and a day's cascade, whose clock starts on the tap, began before the new day's groups
+ * had mounted, so they came in late. The Lua answers on the frame of the tap; so does this.
  */
+const NOW = { flushSync: true } as const;
 export interface NavActions {
   /** Opens a match (push). `from`: the pressed element, for focus return and the shared element. */
   openMatch(id: number, opts?: { tab?: MatchTab; from?: Element | null }): void;
@@ -51,7 +57,7 @@ export function createNavActions(router: DataRouter): NavActions {
       const to = hrefOf({ list: nav.list, match: { id, tab: opts.tab ?? DEFAULT_TAB } }, loc.search);
       if (to === href || to === pending()) return;
       rememberTrigger(loc.key, pressed(opts.from));
-      void router.navigate(to);
+      void router.navigate(to, NOW);
     },
     setTab(id, tab) {
       const { loc, href, nav } = here();
@@ -59,11 +65,11 @@ export function createNavActions(router: DataRouter): NavActions {
         // the match pane beside a player: its tab is part of the player's history state
         if (nav.under?.id === id && nav.under.tab === tab) return;
         const state: NavHistoryState = { under: { id, tab } };
-        void router.navigate(href, { replace: true, state });
+        void router.navigate(href, { ...NOW, replace: true, state });
         return;
       }
       const to = matchPath({ id, tab }) + href.slice(loc.pathname.length);
-      if (to !== href) void router.navigate(to, { replace: true });
+      if (to !== href) void router.navigate(to, { ...NOW, replace: true });
     },
     openPlayer(player, opts = {}) {
       const { loc, href, nav } = here();
@@ -75,24 +81,24 @@ export function createNavActions(router: DataRouter): NavActions {
       if (to === pending()) return;
       rememberTrigger(loc.key, pressed(opts.from));
       const state: NavHistoryState = opts.under ? { under: opts.under } : {};
-      void router.navigate(to, { state });
+      void router.navigate(to, { ...NOW, state });
     },
     stepPlayer(player, dir) {
       const { loc, href, nav } = here();
       const to = hrefOf({ list: nav.list, player }, loc.search);
       if (to === href || to === pending()) return;
       const state: NavHistoryState = { ...(nav.under ? { under: nav.under } : {}), step: dir };
-      void router.navigate(to, { replace: true, state });
+      void router.navigate(to, { ...NOW, replace: true, state });
     },
     setDay(day) {
       const { loc, href, nav } = here();
       const to = hrefOf({ ...nav, list: { day, live: false } }, loc.search);
-      if (to !== href) void router.navigate(to, { replace: true, state: loc.state });
+      if (to !== href) void router.navigate(to, { ...NOW, replace: true, state: loc.state });
     },
     setLive(on) {
       const { loc, href, nav } = here();
       const to = hrefOf({ ...nav, list: { day: 0, live: on } }, loc.search);
-      if (to !== href) void router.navigate(to, { replace: true, state: loc.state });
+      if (to !== href) void router.navigate(to, { ...NOW, replace: true, state: loc.state });
     },
     back() {
       const { loc, nav } = here();

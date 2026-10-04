@@ -69,6 +69,28 @@
   flex: none;
   -webkit-tap-highlight-color: transparent;
 }
+/* the Rive button's hover light: the glass's spot and rim catch (materials .m-light) on the
+   capsule as wide as it is now. The capsule widens when Live comes on (about 0.5 s in the art),
+   right-aligned in the button; --cap-w follows it. */
+@property --cap-w {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+.liveLight {
+  --cap-w: var(--cap-off);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--cap-w);
+  border-radius: 20px;
+  --light-dx: calc(var(--cap-on) - var(--cap-w));
+  transition: --cap-w 500ms var(--ease-glide);
+}
+.liveLight[data-on] {
+  --cap-w: var(--cap-on);
+}
+
 .live:focus-visible {
   outline: 2px solid var(--c-text);
   outline-offset: 2px;

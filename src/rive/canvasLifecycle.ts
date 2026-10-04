@@ -138,6 +138,17 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
   const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(resize);
   ro?.observe(canvas);
   window.addEventListener('resize', resize);
+  // A change of device pixel ratio alone (browser zoom, a device toolbar, a second screen) leaves
+  // the canvas's CSS size as it was, so neither observer above fires and the drawing surface stays
+  // at the old resolution: the artwork turns soft. Re-arm the query for each new ratio.
+  let dpr: MediaQueryList | null = null;
+  const watchRatio = () => {
+    dpr?.removeEventListener('change', onRatio);
+    dpr = typeof matchMedia === 'function' ? matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`) : null;
+    dpr?.addEventListener('change', onRatio);
+  };
+  function onRatio() { watchRatio(); resize(); }
+  watchRatio();
   document.addEventListener('visibilitychange', visibility);
   start();
   return {
@@ -150,6 +161,7 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
       io?.disconnect();
       ro?.disconnect();
       window.removeEventListener('resize', resize);
+      dpr?.removeEventListener('change', onRatio);
       document.removeEventListener('visibilitychange', visibility);
       releaseInstance();
     },

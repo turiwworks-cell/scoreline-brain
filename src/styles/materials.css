@@ -58,14 +58,17 @@
  * ------------------------------------------------------------------- */
 .m-glass {
   --glass-body: 0.96;
+  /* how far the hover light reaches and how bright it is, as fractions of the Lua's (1 = luau:3253) */
+  --light-reach: 1;
+  --light-gain: 1;
   /* each pane's own tint only: never inherited from a tinted pane it sits in (Glass sets it inline) */
   --glass-tint: initial;
   --glass-fill: rgb(from var(--c-glass) r g b / var(--glass-body));
   /* HALO (0.9) is folded into each peak: pane 0.14, rim 0.6, glow 0.3 (luau:3277-3298) */
-  --spot-a: calc(var(--lit-eff, 0) * 0.126);
+  --spot-a: calc(var(--lit-eff, 0) * 0.126 * var(--light-gain));
   background:
     radial-gradient(
-      circle var(--spot-r, 52px) at var(--mx, 50%) var(--my, 50%),
+      circle calc(var(--spot-r, 52px) * var(--light-reach)) at var(--mx, 50%) var(--my, 50%),
       rgb(255 255 255 / calc(var(--spot-a) * 1)) 0%,
       rgb(255 255 255 / calc(var(--spot-a) * 0.9801)) 10%,
       rgb(255 255 255 / calc(var(--spot-a) * 0.9216)) 20%,
@@ -93,7 +96,7 @@
 
 /* The rim: one 1 px line, drawn over anything that sits on the pane (luau:3262). */
 .m-glass::before {
-  --spot-a: calc(var(--lit-eff, 0) * 0.54);
+  --spot-a: calc(var(--lit-eff, 0) * 0.54 * var(--light-gain));
   content: '';
   position: absolute;
   inset: 0;
@@ -103,7 +106,7 @@
   pointer-events: none;
   background:
     radial-gradient(
-      circle calc(var(--spot-r, 52px) * 1.2) at var(--mx, 50%) var(--my, 50%),
+      circle calc(var(--spot-r, 52px) * 1.2 * var(--light-reach)) at var(--mx, 50%) var(--my, 50%),
       rgb(255 255 255 / calc(var(--spot-a) * 1)) 0%,
       rgb(255 255 255 / calc(var(--spot-a) * 0.9801)) 10%,
       rgb(255 255 255 / calc(var(--spot-a) * 0.9216)) 20%,
@@ -131,19 +134,69 @@
   z-index: 1;
   border-radius: inherit;
   pointer-events: none;
-  box-shadow: inset 0 0 6px 1px rgb(255 255 255 / calc(var(--lit-eff, 0) * 0.27));
+  box-shadow: inset 0 0 6px 1px rgb(255 255 255 / calc(var(--lit-eff, 0) * 0.27 * var(--light-gain)));
   -webkit-mask: radial-gradient(
-    circle calc(var(--spot-r, 52px) * 1.2) at var(--mx, 50%) var(--my, 50%),
+    circle calc(var(--spot-r, 52px) * 1.2 * var(--light-reach)) at var(--mx, 50%) var(--my, 50%),
     #000 0%, rgb(0 0 0 / 0.9801) 10%, rgb(0 0 0 / 0.9216) 20%, rgb(0 0 0 / 0.8281) 30%, rgb(0 0 0 / 0.7056) 40%,
     rgb(0 0 0 / 0.5625) 50%, rgb(0 0 0 / 0.4096) 60%, rgb(0 0 0 / 0.2601) 70%, rgb(0 0 0 / 0.1296) 80%,
     rgb(0 0 0 / 0.0361) 90%, transparent 100%
   );
   mask: radial-gradient(
-    circle calc(var(--spot-r, 52px) * 1.2) at var(--mx, 50%) var(--my, 50%),
+    circle calc(var(--spot-r, 52px) * 1.2 * var(--light-reach)) at var(--mx, 50%) var(--my, 50%),
     #000 0%, rgb(0 0 0 / 0.9801) 10%, rgb(0 0 0 / 0.9216) 20%, rgb(0 0 0 / 0.8281) 30%, rgb(0 0 0 / 0.7056) 40%,
     rgb(0 0 0 / 0.5625) 50%, rgb(0 0 0 / 0.4096) 60%, rgb(0 0 0 / 0.2601) 70%, rgb(0 0 0 / 0.1296) 80%,
     rgb(0 0 0 / 0.0361) 90%, transparent 100%
   );
+}
+
+/* ---------------------------------------------------------------------
+ * The glass hover light on its own, for a pane something else draws (the Rive Live button draws
+ * its own capsule and rim): the soft spot and the brighter catch on the rim, laid over the art.
+ * It reads --lit-eff, --mx, --my and --spot-r from the .m-feel control it sits in. The owner
+ * sizes and rounds it to the pane; --light-dx shifts the cursor into its box when it is not at
+ * the control's left edge.
+ * ------------------------------------------------------------------- */
+.m-light {
+  --light-reach: 1;
+  --light-gain: 1;
+  --light-dx: 0px;
+  --spot-a: calc(var(--lit-eff, 0) * 0.126 * var(--light-gain));
+  position: absolute;
+  pointer-events: none;
+  background: radial-gradient(
+    circle calc(var(--spot-r, 52px) * var(--light-reach)) at calc(var(--mx, 50%) - var(--light-dx)) var(--my, 50%),
+    rgb(255 255 255 / calc(var(--spot-a) * 1)) 0%,
+    rgb(255 255 255 / calc(var(--spot-a) * 0.9801)) 10%,
+    rgb(255 255 255 / calc(var(--spot-a) * 0.9216)) 20%,
+    rgb(255 255 255 / calc(var(--spot-a) * 0.8281)) 30%,
+    rgb(255 255 255 / calc(var(--spot-a) * 0.7056)) 40%,
+    rgb(255 255 255 / calc(var(--spot-a) * 0.5625)) 50%,
+    rgb(255 255 255 / calc(var(--spot-a) * 0.4096)) 60%,
+    rgb(255 255 255 / calc(var(--spot-a) * 0.2601)) 70%,
+    rgb(255 255 255 / calc(var(--spot-a) * 0.1296)) 80%,
+    rgb(255 255 255 / calc(var(--spot-a) * 0.0361)) 90%,
+    rgb(255 255 255 / 0) 100%
+  );
+}
+.m-light::before {
+  --spot-a: calc(var(--lit-eff, 0) * 0.54 * var(--light-gain));
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle calc(var(--spot-r, 52px) * 1.2 * var(--light-reach)) at calc(var(--mx, 50%) - var(--light-dx)) var(--my, 50%),
+    rgb(255 255 255 / calc(var(--spot-a) * 1)) 0%,
+    rgb(255 255 255 / calc(var(--spot-a) * 0.8281)) 30%,
+    rgb(255 255 255 / calc(var(--spot-a) * 0.5625)) 50%,
+    rgb(255 255 255 / calc(var(--spot-a) * 0.2601)) 70%,
+    rgb(255 255 255 / calc(var(--spot-a) * 0.0361)) 90%,
+    rgb(255 255 255 / 0) 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
 }
 
 /* A pane that is not a control never lights, even inside one that is. */

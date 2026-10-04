@@ -1,9 +1,8 @@
 import { memo, useLayoutEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
-import { m } from 'motion/react';
 import { liveMinute, minLabel, scoreStr, type Match, type Team } from '../../domain';
-import { Shared, sharedMatch, transition } from '../../motion';
+import { play, stop } from '../../motion';
 import { Crest, feel, subscribeSecond, textWidth, useFontVersion } from '../../ui';
-import { cardMetrics, minuteSize, nameChoice, type CardMetrics } from './cardLayout';
+import { cardMetrics, minuteSize, nameFit, type CardMetrics } from './cardLayout';
 import { cardColors } from './cardColors';
 import styles from './Live.module.css';
 
@@ -24,7 +23,7 @@ export type LiveCardProps = {
   open: boolean;
   /** the match has ended and the card is folding away */
   leaving: boolean;
-  /** it arrived while Live was open: it grows in from nothing */
+  /** it arrived while Live was open: it grows in from nothing and does not rise */
   grow: boolean;
   /** the match is open beside the list */
   current: boolean;
@@ -35,11 +34,38 @@ export type LiveCardProps = {
 const RISE = 244 + 40;
 const SETTLE = 28;
 
-const cardVariants = {
-  below: { y: RISE, opacity: 1 },
-  in: (i: number) => ({ y: 0, opacity: 1, transition: transition('cards', { index: i }) }),
-  out: (i: number) => ({ y: SETTLE, opacity: 0, transition: transition('live', { index: i }) }),
-};
+/*
+ * Entrance and exit are the Lua's, a function of the time since Live was switched (drawCards,
+ * luau:3906–3913): on, every card drops to RISE below the strip at full opacity and rises in turn
+ * (motion: cards); off, every card settles 28 px and fades in turn (motion: live) while its rise
+ * carries on. Each switch replays from the start, so toggling Live quickly looks the same every
+ * time and answers at once. Two wrappers keep the two motions apart: `.rise` and `.settle`.
+ */
+function useEntrance(open: boolean, index: number, grow: boolean) {
+  const rise = useRef<HTMLDivElement>(null);
+  const settle = useRef<HTMLDivElement>(null);
+  const latest = useRef({ index, grow, first: true });
+  useLayoutEffect(() => {
+    latest.current.index = index;
+    latest.current.grow = grow;
+  });
+  useLayoutEffect(() => {
+    const { index: i, grow: late, first } = latest.current;
+    latest.current.first = false;
+    if (open) {
+      stop(settle.current);
+      // a match that kicks off while Live is open grows in where it stands (its width, luau:3906)
+      if (first && late) return;
+      play(rise.current, 'cards', [{ transform: `translateY(${RISE}px)` }, { transform: 'translateY(0)' }], { index: i });
+    } else if (first) {
+      // arrives while the section is closing: nothing to show
+      play(settle.current, 'live', [{ opacity: 0 }, { opacity: 0 }], { index: 0, withDelay: false });
+    } else {
+      play(settle.current, 'live', [{ transform: 'translateY(0)', opacity: 1 }, { transform: `translateY(${SETTLE}px)`, opacity: 0 }], { index: i });
+    }
+  }, [open]);
+  return { rise, settle };
+}
 
 export const LiveCard = memo(function LiveCard({ match, home, away, index, open, leaving, grow, current, onOpen }: LiveCardProps) {
   const colors = cardColors(home, away);
@@ -50,13 +76,16 @@ export const LiveCard = memo(function LiveCard({ match, home, away, index, open,
     const raf = requestAnimationFrame(() => setEntering(false));
     return () => cancelAnimationFrame(raf);
   }, [grow]);
+  const { rise, settle } = useEntrance(open, index, grow);
 
+  // The card's own layout width. Never the drawn box: the press dip, the goal's step and the
+  // entrance all scale or move it, and reading those back would re-lay the card every frame.
   const ref = useRef<HTMLButtonElement>(null);
   const [w, setW] = useState(70);
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const read = () => setW(Math.round(el.getBoundingClientRect().width) || 70);
+    const read = () => setW(el.offsetWidth || 70);
     read();
     const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(read);
     ro?.observe(el);
@@ -95,15 +124,9 @@ export const LiveCard = memo(function LiveCard({ match, home, away, index, open,
   const label = `${home.name} ${scoreStr(score[0], score[1])} ${away.name}, ${match.status === 'live' ? 'live' : 'full time'}`;
 
   return (
-    <m.div
-      className={styles.slot}
-      variants={cardVariants}
-      custom={index}
-      initial="below"
-      animate={open ? 'in' : 'out'}
-      data-leaving={leaving ? '' : undefined}
-      data-grow={entering ? '0' : undefined}
-    >
+    <div className={styles.slot} data-leaving={leaving ? '' : undefined} data-grow={entering ? '0' : undefined}>
+      <div ref={rise} className={styles.rise}>
+      <div ref={settle} className={styles.settle}>
       <button
         ref={ref}
         type="button"
@@ -121,42 +144,44 @@ export const LiveCard = memo(function LiveCard({ match, home, away, index, open,
         <span className={styles.surface}>
           <span className={styles.sweep} aria-hidden="true" />
           {names.map(({ team, v, trails }, i) => (
-            <TeamLine key={i} team={team} side={i === 0 ? 'home' : 'away'} id={match.id} v={v} trails={trails} m={mt} w={w} y={mt.pad + i * (mt.crest + mt.rowGap)} fonts={fonts} />
+            <TeamLine key={i} team={team} v={v} trails={trails} m={mt} w={w} y={mt.pad + i * (mt.crest + mt.rowGap)} fonts={fonts} />
           ))}
-          <Scores id={match.id} values={[score[0], score[1]]} trails={[score[0] < score[1], score[1] < score[0]]} m={mt} />
+          <Scores values={[score[0], score[1]]} trails={[score[0] < score[1], score[1] < score[0]]} m={mt} />
           <Foot match={match} m={mt} w={w} fonts={fonts} />
         </span>
         {current && <span className={styles.marker} aria-hidden="true" />}
       </button>
-    </m.div>
+      </div>
+      </div>
+    </div>
   );
 });
 
-function TeamLine({ team, side, id, v, trails, m: mt, w, y, fonts }: { team: Team; side: 'home' | 'away'; id: number; v: number; trails: boolean; m: CardMetrics; w: number; y: number; fonts: number }) {
+function TeamLine({ team, v, trails, m: mt, w, y, fonts }: { team: Team; v: number; trails: boolean; m: CardMetrics; w: number; y: number; fonts: number }) {
   void fonts;
   const scoreW = textWidth(700, mt.score, 0, String(v));
-  const choice = nameChoice(w, mt, {
+  const fit = nameFit(w, mt, {
     score: scoreW,
     name: textWidth(600, mt.name, 0, team.name),
     nameDrawn: textWidth(600, mt.name, 0.02, team.name),
     short: textWidth(600, mt.name, 0.02, team.short),
   });
-  const text = choice === 'name' ? team.name : team.short;
+  const text = fit.choice === 'name' ? team.name : team.short;
   return (
     <span className={styles.row} style={{ top: y, height: mt.crest, paddingLeft: mt.pad, paddingRight: mt.pad + scoreW + 6 }} data-trails={trails ? '' : undefined}>
-      <Shared id={sharedMatch(id, side)} end="card" className={styles.crestEnd}>
+      <span className={styles.crestEnd}>
         <Crest team={team} size={mt.crest} />
-      </Shared>
-      <span className={styles.name} style={{ marginLeft: mt.nameGap, fontSize: mt.name }} data-hidden={choice === 'none' ? '' : undefined} aria-hidden="true">
+      </span>
+      <span className={styles.name} style={{ marginLeft: mt.nameGap, fontSize: fit.size }} data-hidden={fit.choice === 'none' ? '' : undefined} aria-hidden="true">
         {text}
       </span>
     </span>
   );
 }
 
-function Scores({ id, values, trails, m: mt }: { id: number; values: [number, number]; trails: [boolean, boolean]; m: CardMetrics }) {
+function Scores({ values, trails, m: mt }: { values: [number, number]; trails: [boolean, boolean]; m: CardMetrics }) {
   return (
-    <Shared id={sharedMatch(id, 'score')} end="card" className={styles.scores} style={{ top: mt.pad, right: mt.pad, gap: mt.rowGap, fontSize: mt.score }}>
+    <span className={styles.scores} style={{ top: mt.pad, right: mt.pad, gap: mt.rowGap, fontSize: mt.score }}>
       {values.map((v, i) => (
         <span key={i} className={styles.score} style={{ height: mt.crest, ['--bump' as string]: `var(--bump-${i === 0 ? 'h' : 'a'}, 1)`, ['--mk' as string]: `var(--mk-${i === 0 ? 'h' : 'a'}, 0)` }} data-trails={trails[i] ? '' : undefined}>
           <span className={styles.num}>
@@ -167,7 +192,7 @@ function Scores({ id, values, trails, m: mt }: { id: number; values: [number, nu
           </span>
         </span>
       ))}
-    </Shared>
+    </span>
   );
 }
 

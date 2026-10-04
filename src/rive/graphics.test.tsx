@@ -35,7 +35,9 @@ describe('Live icon binding and hit target', () => {
     expect(button.classList.contains('m-glass')).toBe(false);
     expect(button.getAttribute('data-rive-live')).toBe('true');
     expect(view.queryByText('8')).toBeNull(); expect(view.queryByText('Live')).toBeNull();
-    expect(parseFloat(button.style.width) / parseFloat(button.style.height)).toBeCloseTo(443 / 152);
+    // the capsule, not the artboard, is the round button's 40 px (luau:8352)
+    expect(parseFloat(button.style.height)).toBe(40);
+    expect(parseFloat(button.style.width)).toBeCloseTo((410.5 - 32.5) * 40 / 137.5, 1);
     act(() => mock.canvas!.onError?.(new Error('renderer failed')));
     expect(button.classList.contains('m-glass')).toBe(true);
     expect(view.getByText('8')).toBeTruthy(); expect(view.getByText('Live')).toBeTruthy();
@@ -50,19 +52,21 @@ describe('Live icon binding and hit target', () => {
     view.rerender(<LiveIcon live count={4} onChange={change} fallback={<svg />} />);
     expect(button.getAttribute('aria-pressed')).toBe('true');
   });
-  it('syncs URL changes to islive, Rive changes back, and suppresses write echoes', () => {
-    const change = vi.fn(); const f = fixture();
-    const view = render(<LiveGraphic source="/rive/live-icon.riv" count={3} live={false} onChange={change} fallback={<svg />} />);
+  it('syncs the URL to islive one way: a late echo from Rive never switches Live back', () => {
+    const f = fixture();
+    const graphic = render(<LiveGraphic source="/rive/live-icon.riv" count={3} live={false} fallback={<svg />} />);
     expect(mock.canvas!.artboard).toBe('aniamtion');
     const binding = mock.canvas!.bind(f.instance, () => {})!;
-    expect(f.live.listeners.size).toBe(1); expect(f.textCount.value).toBe('3');
-    view.rerender(<LiveGraphic source="/rive/live-icon.riv" count={4} live onChange={change} fallback={<svg />} />);
-    expect(f.live.value).toBe(true); expect(f.textCount.value).toBe('4'); f.live.emit(); expect(change).not.toHaveBeenCalled();
-    f.live.value = false; f.live.emit(); expect(change).toHaveBeenCalledWith(false);
-    binding.cleanup?.(); expect(f.live.listeners.size).toBe(0);
+    expect(f.live.listeners.size).toBe(0); expect(f.textCount.value).toBe('3');
+    graphic.rerender(<LiveGraphic source="/rive/live-icon.riv" count={4} live fallback={<svg />} />);
+    expect(f.live.value).toBe(true); expect(f.textCount.value).toBe('4');
+    // Rive holding an older value (two quick taps) is overwritten by the app's, never the reverse
+    f.live.value = false; f.live.emit();
+    binding.resume?.(); expect(f.live.value).toBe(true);
+    binding.cleanup?.();
   });
   it('rejects a full button with no dynamic count, keeping the complete DOM fallback', () => {
-    const view = render(<LiveGraphic source="/rive/live-icon.riv" count={7} live={false} onChange={vi.fn()} fallback={<span>Live 7</span>} />);
+    const view = render(<LiveGraphic source="/rive/live-icon.riv" count={7} live={false} fallback={<span>Live 7</span>} />);
     const f = fixture();
     const vm = { ...f.instance.viewModelInstance!, string: () => null };
     expect(() => mock.canvas!.bind({ ...f.instance, viewModelInstance: vm }, () => {})).toThrow('String count');
@@ -71,7 +75,7 @@ describe('Live icon binding and hit target', () => {
     expect(f.live.listeners.size).toBe(0);
   });
   it('fails closed on a missing Boolean contract and keeps the fallback', () => {
-    const view = render(<LiveGraphic source="/rive/live-icon.riv" count={3} live={false} onChange={vi.fn()} fallback={<span>Static live</span>} />);
+    const view = render(<LiveGraphic source="/rive/live-icon.riv" count={3} live={false} fallback={<span>Static live</span>} />);
     const f = fixture(); const invalid = { ...f.instance, viewModelInstance: null };
     expect(() => mock.canvas!.bind(invalid, () => {})).toThrow('islive');
     act(() => mock.canvas!.onError?.(new Error('no WebGL')));

@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MotionConfig } from 'motion/react';
 import type { Match, Team } from '../../domain';
 import { timing } from '../../motion';
 import { selectCardIds, selectMatchOrder } from './selectors';
@@ -33,19 +32,18 @@ export function LiveSection({ open, openId, onOpen, feed = goalFeed }: LiveSecti
   const live = useScoreline(selectCardIds);
   const order = useScoreline(selectMatchOrder);
   const stage = useStage(live, order);
-  const [mounted, setMounted] = useState(open);
-  const [wasOpen, setWasOpen] = useState(open);
-  const [firstIds] = useState(() => new Set(live));
-  // the cards are drawn while the section is open and until they have settled after it closes
-  if (open !== wasOpen) {
-    setWasOpen(open);
-    if (open) setMounted(true);
-  }
+  // The section's state as of the last switch, in one value so its parts never disagree (several
+  // separate states adjusted during a render did, and the first close lost its cards at once):
+  // - risers: the cards on stage when Live was switched on rise; a match that kicks off after
+  //   that, while the section is open, grows in where it stands instead;
+  // - settled: closed, and every card has finished settling, so none is drawn.
+  const [phase, setPhase] = useState(() => ({ open, risers: new Set(live) as ReadonlySet<number>, settled: !open }));
+  if (phase.open !== open) setPhase({ open, risers: open ? new Set(stage.ids) : phase.risers, settled: false });
   useEffect(() => {
     if (open) return;
     const t = timing('live');
     const ms = (t.duration + t.delay + t.stagger * Math.max(stage.ids.length - 1, 0)) * 1000 + 100;
-    const id = setTimeout(() => setMounted(false), ms);
+    const id = setTimeout(() => setPhase((p) => (p.open ? p : { ...p, settled: true })), ms);
     return () => clearTimeout(id);
   }, [open, stage.ids.length]);
 
@@ -59,12 +57,10 @@ export function LiveSection({ open, openId, onOpen, feed = goalFeed }: LiveSecti
           <span className={`${styles.label} ${styles.title}`}>Live now</span>
           <span className={`${styles.label} ${styles.count}`}>{live.length} in play</span>
         </div>
-        <MotionConfig reducedMotion="user">
-          <div ref={root} className={styles.strip}>
-            {(open || mounted) &&
-              stage.ids.map((id, i) => <Card key={id} id={id} index={i} open={open} leaving={stage.leaving.has(id)} grow={!firstIds.has(id)} current={id === openId} onOpen={onOpen} />)}
-          </div>
-        </MotionConfig>
+        <div ref={root} className={styles.strip}>
+          {(open || !phase.settled) &&
+            stage.ids.map((id, i) => <Card key={id} id={id} index={i} open={open} leaving={stage.leaving.has(id)} grow={!phase.risers.has(id)} current={id === openId} onOpen={onOpen} />)}
+        </div>
       </div>
     </section>
   );

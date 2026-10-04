@@ -74,6 +74,12 @@
 .slot + .slot {
   margin-left: 4px;
 }
+/* the entrance's two motions (LiveCard useEntrance): the rise, and the settle-and-fade on close */
+.rise,
+.settle {
+  width: 100%;
+}
+
 /* a card that arrives while Live is open grows in from nothing */
 .slot[data-grow='0'] {
   flex-grow: 0;
@@ -101,8 +107,9 @@
   text-align: left;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  /* the dip of a goal, the step the other cards take, and the press: scale about the card's centre */
-  transform: translateY(calc(var(--gdy, 0) * 1px)) scale(calc(var(--gsc, 1) * (1 - 0.03 * var(--dip) + 0.008 * var(--lit))));
+  /* the dip of a goal, the step the other cards take, and the press: scale about the card's centre.
+     No hover: a card never lifts or lights under the pointer (only the press dips it). */
+  transform: translateY(calc(var(--gdy, 0) * 1px)) scale(calc(var(--gsc, 1) * (1 - 0.03 * var(--dip))));
   transform-origin: 50% 50%;
 }
 .card:focus-visible {
