@@ -13,6 +13,13 @@
  * `<out>/manifest.json`, keyed by the app's player ids (`<team>:<n>`, playerKey). A coach is
  * n = 0 and is listed under `coaches`, by team, since the domain has no player id for one.
  *
+ * Each player's head is measured on his bust and written to the manifest as `face` (design units):
+ * where the top of his head is, how wide his head is and where it is centred. The squads were
+ * not framed alike (Argentina's heads are about a fifth larger and higher than France's), so a
+ * face cut at one fixed crop made Messi bigger than Mbappé; ui/PlayerPhoto frames every face from
+ * these numbers instead. `--faces <dir>` measures the busts already published in <dir> and writes
+ * only the `face` entries, for when the atlases are not at hand.
+ *
  * Checks, and exits non-zero when one fails: every cell lies inside the sheet; every listed
  * person's cell has a picture and every cell past the squad is empty; nothing touches a cell's
  * edge where a neighbour would cut it; every bust@2x is within BUST_BUDGET bytes at or above
@@ -145,6 +152,29 @@ function framing(a: Alpha) {
   return { empty: x1 < 0, box: { x0, y0, x1, y1 }, edge, mean: sum / a.data.length };
 }
 
+/**
+ * Where a bust's head is, in design units: the top of the hair, the head's width (the widest run
+ * of picture within the head's first 70 units: below that come the shoulders) and its centre.
+ * `k` is pixels per design unit.
+ */
+export function faceFrame(a: Alpha, k: number): { top: number; w: number; cx: number } | null {
+  const run = (y: number) => {
+    let l = -1, r = -1;
+    for (let x = 0; x < a.width; x++) if (a.data[y * a.width + x]! > 128) { if (l < 0) l = x; r = x; }
+    return l < 0 ? null : { l, r };
+  };
+  let top = -1;
+  for (let y = 0; y < a.height && top < 0; y++) if (run(y)) top = y;
+  if (top < 0) return null;
+  let best = { l: 0, r: -1 };
+  for (let y = top; y < Math.min(a.height, top + 70 * k); y++) {
+    const r = run(y);
+    if (r && r.r - r.l > best.r - best.l) best = r;
+  }
+  const u = (px: number) => Math.round((px / k) * 10) / 10;
+  return { top: u(top), w: u(best.r - best.l + 1), cx: u((best.l + best.r + 1) / 2) };
+}
+
 /** Horizontal centre (alpha-weighted) of rows y0..y1, in pixels. */
 function centreX(a: Alpha, y0: number, y1: number): number {
   let m = 0, s = 0;
@@ -160,9 +190,27 @@ function centreX(a: Alpha, y0: number, y1: number): number {
 // ---------------------------------------------------------------------------------------------
 
 type FileOut = { file: string; width: number; height: number; bytes: number; quality: number; psnr: number; alphaPsnr: number };
+type Entry = { team: string; n: number; name: string; cell: number; path: string; face?: { top: number; w: number; cx: number } };
+
+/** `--faces <dir>`: measures the busts published in <dir> and writes their `face` into its manifest. */
+async function measureFaces(dir: string) {
+  const path = join(resolve(dir), 'manifest.json');
+  const manifest = JSON.parse(await readFile(path, 'utf8')) as { players: Record<string, Entry>; coaches: Record<string, Entry> };
+  for (const group of [manifest.players, manifest.coaches]) {
+    for (const e of Object.values(group)) {
+      const { data, info } = await sharp(join(resolve(dir), `${e.path}-bust@2x.webp`)).ensureAlpha().extractChannel(3).raw().toBuffer({ resolveWithObject: true });
+      const face = faceFrame({ data, width: info.width, height: info.height }, ATLAS.k);
+      if (face) e.face = face;
+    }
+  }
+  await writeFile(path, `${JSON.stringify(manifest, null, 2)}\n`);
+  const all = [...Object.values(manifest.players), ...Object.values(manifest.coaches)].flatMap((e) => (e.face ? [e.face] : []));
+  console.log(`face measured for ${all.length} busts: head width ${Math.min(...all.map((f) => f.w))}–${Math.max(...all.map((f) => f.w))} units, top ${Math.min(...all.map((f) => f.top))}–${Math.max(...all.map((f) => f.top))}`);
+}
 
 async function main() {
-  const { values } = parseArgs({ options: { src: { type: 'string' }, out: { type: 'string', default: 'public/img/players' }, report: { type: 'string' } } });
+  const { values } = parseArgs({ options: { src: { type: 'string' }, out: { type: 'string', default: 'public/img/players' }, report: { type: 'string' }, faces: { type: 'string' } } });
+  if (values.faces) return measureFaces(values.faces);
   if (!values.src) throw new Error('usage: node scripts/slice-atlas.ts --src <dir with squad_fra.png, squad_arg.png> [--out dir] [--report file.json]');
   const src = values.src;
   const outDir = resolve(values.out);
@@ -178,9 +226,10 @@ async function main() {
       return [k, { '1x': [r.width / 2, r.height / 2], '2x': [r.width, r.height] }];
     })),
     sources: {} as Record<string, { file: string; sha256: string }>,
-    players: {} as Record<string, { team: string; n: number; name: string; cell: number; path: string }>,
-    coaches: {} as Record<string, { team: string; n: number; name: string; cell: number; path: string }>,
+    players: {} as Record<string, Entry>,
+    coaches: {} as Record<string, Entry>,
   };
+  const faces = new Map<string, NonNullable<Entry['face']>>();
 
   // the two sheets are cut side by side
   await Promise.all(Object.entries(ORDER).map(async ([team, order]) => {
@@ -221,6 +270,8 @@ async function main() {
         if (kind === 'bust' && f.edge.bottom > 128) cut.push('bottom');
         if (cut.length > 0) problems.push(`${id} ${kind}: picture reaches the cell's ${cut.join(', ')} edge (alpha ${cut.map((e) => f.edge[e]).join(', ')})`);
         if (kind === 'bust') {
+          const face = faceFrame(a, ATLAS.k);
+          if (face) faces.set(id, face);
           const u = (px: number) => Math.round((px / ATLAS.k) * 10) / 10;
           const [, fy, , fh] = CROP.face;
           framings.push({
@@ -262,7 +313,8 @@ async function main() {
   manifest.sources = Object.fromEntries(Object.keys(ORDER).map((t) => [t, manifest.sources[t]!]));
   for (const [team, order] of Object.entries(ORDER)) {
     for (const [idx, [n, name]] of order.entries()) {
-      const entry = { team, n, name, cell: idx + 1, path: `${team}/${n}` };
+      const face = faces.get(`${team}:${n}`);
+      const entry: Entry = { team, n, name, cell: idx + 1, path: `${team}/${n}`, ...(face ? { face } : {}) };
       if (n === 0) manifest.coaches[team] = entry;
       else manifest.players[`${team}:${n}`] = entry;
     }

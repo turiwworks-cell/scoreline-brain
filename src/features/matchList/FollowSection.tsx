@@ -31,6 +31,8 @@ export type FollowSectionProps = {
 
 export function FollowSection({ pref, index, shown, onOpenPlayer, photoOf }: FollowSectionProps) {
   const followed = useFollowed(pref);
+  // the picker under "Your player" folds to its title, like the follow card
+  const [pickerOpen, setPickerOpen] = useState(true);
   return (
     <Block index={index} className={styles.section} hidden={!shown}>
       {followed ? (
@@ -38,7 +40,7 @@ export function FollowSection({ pref, index, shown, onOpenPlayer, photoOf }: Fol
       ) : (
         <section aria-label="Your player">
           <Head title="Your player" />
-          <FollowPicker followed={null} staged={false} onPick={pref.set} onUnfollow={() => {}} photoOf={photoOf} />
+          <FollowPicker followed={null} staged={false} onPick={pref.set} onUnfollow={() => {}} photoOf={photoOf} fold={{ open: pickerOpen, onToggle: () => setPickerOpen((o) => !o) }} />
         </section>
       )}
     </Block>

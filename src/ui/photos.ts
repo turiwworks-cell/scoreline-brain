@@ -21,6 +21,17 @@ export const PHOTO_SIZES: Readonly<Record<PhotoKind, { readonly 1: readonly [num
   frost: { 1: [72, 90], 2: [144, 180] },
 };
 
+/**
+ * Where a player's head is on his bust, in design units (measured by scripts/slice-atlas.ts):
+ * the top of his hair, his head's width and its centre. The squads were framed differently, so
+ * faces are cut from these rather than from one fixed crop (PlayerPhoto).
+ */
+export interface FaceFrame {
+  readonly top: number;
+  readonly w: number;
+  readonly cx: number;
+}
+
 export interface PhotoSources {
   /** WebP @1x, for `<img src>` */
   readonly src: string;
@@ -28,11 +39,13 @@ export interface PhotoSources {
   readonly srcSet: string;
   /** AVIF at both widths, for a `<source>` ahead of the `<img>` */
   readonly sources: readonly { readonly type: string; readonly srcSet: string }[];
+  /** where his head is on the bust, when the manifest measured it */
+  readonly face?: FaceFrame;
 }
 
 /** `path` is a manifest entry's `path` (`<team>/<n>`). */
-export function photoSources(path: string, kind: PhotoKind = 'bust'): PhotoSources {
+export function photoSources(path: string, kind: PhotoKind = 'bust', face?: FaceFrame): PhotoSources {
   const url = (scale: 1 | 2, format: 'avif' | 'webp') => `${PHOTO_ROOT}/${path}-${kind}@${scale}x.${format}`;
   const set = (format: 'avif' | 'webp') => `${url(1, format)} ${PHOTO_SIZES[kind][1][0]}w, ${url(2, format)} ${PHOTO_SIZES[kind][2][0]}w`;
-  return { src: url(1, 'webp'), srcSet: set('webp'), sources: [{ type: 'image/avif', srcSet: set('avif') }] };
+  return { src: url(1, 'webp'), srcSet: set('webp'), sources: [{ type: 'image/avif', srcSet: set('avif') }], ...(face ? { face } : {}) };
 }

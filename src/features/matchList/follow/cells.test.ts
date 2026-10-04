@@ -48,8 +48,9 @@ describe('the evening line', () => {
   it('says why there is no goal to show', () => {
     const st = playerStats(state, live, 'away', 2, DEMO_T0);
     expect(eveningNote(undefined, undefined, false)).toBe('No match scheduled');
-    expect(eveningNote(upcoming, undefined, false)).toBe('Today · kick-off 21:00');
-    expect(eveningNote({ ...upcoming, day: 1 }, undefined, false)).toBe('Tomorrow · kick-off 21:00');
+    // the day only: the band under the line has the kick-off
+    expect(eveningNote(upcoming, undefined, false)).toBe('Today');
+    expect(eveningNote({ ...upcoming, day: 1 }, undefined, false)).toBe('Tomorrow');
     expect(eveningNote(live, st, false)).toBe('On the bench');
     expect(eveningNote(live, playerStats(state, live, 'away', 22, DEMO_T0), false)).toBe('Substituted');
     expect(eveningNote(live, st, true)).toBe('No goals yet tonight');

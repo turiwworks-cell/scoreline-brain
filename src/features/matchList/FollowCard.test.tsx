@@ -58,7 +58,9 @@ describe('before kick-off', () => {
     expect(screen.getByText('20:45')).toBeTruthy();
     expect(screen.getByText('Opponent')).toBeTruthy();
     expect(screen.getAllByText('France').length).toBeGreaterThan(0);
-    expect(screen.getByText('Today · kick-off 20:45')).toBeTruthy();
+    // the line says the day; the kick-off is said once, in the band (review of 2026-10-04)
+    expect(screen.getByText('Today')).toBeTruthy();
+    expect(screen.getAllByText(/20:45/)).toHaveLength(1);
   });
 });
 

@@ -1,5 +1,5 @@
 import { useEffect, useSyncExternalStore } from 'react';
-import { PHOTO_ROOT, photoSources, type PhotoKind, type PhotoSources } from './photos';
+import { PHOTO_ROOT, photoSources, type FaceFrame, type PhotoKind, type PhotoSources } from './photos';
 
 /*
  * Which players have a photo: public/img/players/manifest.json (Part 8), read once for the whole
@@ -14,11 +14,13 @@ export interface PhotoManifest {
   readonly players: Readonly<Record<string, string>>;
   /** team id → the coach's file path stem, `<team>/0` */
   readonly coaches: Readonly<Record<string, string>>;
+  /** file path stem → where the head is on that bust, for the ones the manifest measured */
+  readonly faces?: Readonly<Record<string, FaceFrame>>;
 }
 
 export type PhotoManifestState = { readonly status: 'idle' | 'loading' | 'failed'; readonly manifest: null } | { readonly status: 'ready'; readonly manifest: PhotoManifest };
 
-const EMPTY: PhotoManifest = { players: {}, coaches: {} };
+const EMPTY: PhotoManifest = { players: {}, coaches: {}, faces: {} };
 
 const stems = (entries: unknown): Record<string, string> => {
   const out: Record<string, string> = {};
@@ -30,11 +32,30 @@ const stems = (entries: unknown): Record<string, string> => {
   return out;
 };
 
-/** The manifest as slice-atlas writes it, reduced to the paths. Anything unexpected is left out. */
+const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : undefined);
+const faceOf = (v: unknown): FaceFrame | undefined => {
+  const f = (v as { face?: { top?: unknown; w?: unknown; cx?: unknown } } | null)?.face;
+  const top = num(f?.top), w = num(f?.w), cx = num(f?.cx);
+  return top !== undefined && w !== undefined && w > 0 && cx !== undefined ? { top, w, cx } : undefined;
+};
+const facesOf = (...groups: unknown[]): Record<string, FaceFrame> => {
+  const out: Record<string, FaceFrame> = {};
+  for (const g of groups) {
+    if (typeof g !== 'object' || g === null) continue;
+    for (const v of Object.values(g)) {
+      const path = (v as { path?: unknown } | null)?.path;
+      const face = faceOf(v);
+      if (typeof path === 'string' && face) out[path] = face;
+    }
+  }
+  return out;
+};
+
+/** The manifest as slice-atlas writes it, reduced to the paths and faces. Anything unexpected is left out. */
 export function parsePhotoManifest(json: unknown): PhotoManifest {
   if (typeof json !== 'object' || json === null) return EMPTY;
   const j = json as { players?: unknown; coaches?: unknown };
-  return { players: stems(j.players), coaches: stems(j.coaches) };
+  return { players: stems(j.players), coaches: stems(j.coaches), faces: facesOf(j.players, j.coaches) };
 }
 
 const IDLE: PhotoManifestState = { status: 'idle', manifest: null };
@@ -94,17 +115,17 @@ export function usePhotoManifest(): PhotoManifestState {
 
 // one object per file path, so memoised photos aren't handed a new set of sources every render
 const sources = new Map<string, PhotoSources>();
-const sourcesOf = (path: string, kind: PhotoKind = 'bust'): PhotoSources => {
-  const key = `${kind}:${path}`;
+const sourcesOf = (path: string, kind: PhotoKind = 'bust', face?: FaceFrame): PhotoSources => {
+  const key = `${kind}:${path}:${face ? `${face.top},${face.w},${face.cx}` : ''}`;
   let s = sources.get(key);
-  if (!s) sources.set(key, (s = photoSources(path, kind)));
+  if (!s) sources.set(key, (s = photoSources(path, kind, face)));
   return s;
 };
 
 /** A player's photo files, or undefined when the manifest has none (the kit disc stands in). */
 export function playerPhoto(manifest: PhotoManifest | null, team: string, n: number): PhotoSources | undefined {
   const path = manifest?.players[`${team}:${n}`];
-  return path ? sourcesOf(path) : undefined;
+  return path ? sourcesOf(path, 'bust', manifest?.faces?.[path]) : undefined;
 }
 
 /** The same player's frosted bust (the pre-blurred picture seen through glass), or undefined. */
@@ -116,10 +137,10 @@ export function frostPhoto(manifest: PhotoManifest | null, team: string, n: numb
 /** A coach's photo files, or undefined. */
 export function coachPhoto(manifest: PhotoManifest | null, team: string): PhotoSources | undefined {
   const path = manifest?.coaches[team];
-  return path ? sourcesOf(path) : undefined;
+  return path ? sourcesOf(path, 'bust', manifest?.faces?.[path]) : undefined;
 }
 
 /** The props `PlayerPhoto` takes for a player's files (nothing for no photo). */
-export function photoProps(files: PhotoSources | undefined): { src?: string; srcSet?: string; sources?: PhotoSources['sources'] } {
-  return files ? { src: files.src, srcSet: files.srcSet, sources: files.sources } : {};
+export function photoProps(files: PhotoSources | undefined): { src?: string; srcSet?: string; sources?: PhotoSources['sources']; face?: FaceFrame } {
+  return files ? { src: files.src, srcSet: files.srcSet, sources: files.sources, ...(files.face ? { face: files.face } : {}) } : {};
 }

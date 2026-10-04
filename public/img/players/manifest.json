@@ -53,364 +53,624 @@
       "n": 1,
       "name": "Brice Samba",
       "cell": 1,
-      "path": "fra/1"
+      "path": "fra/1",
+      "face": {
+        "top": 33,
+        "w": 67,
+        "cx": 144.5
+      }
     },
     "fra:2": {
       "team": "fra",
       "n": 2,
       "name": "Malo Gusto",
       "cell": 2,
-      "path": "fra/2"
+      "path": "fra/2",
+      "face": {
+        "top": 18.5,
+        "w": 91,
+        "cx": 143.5
+      }
     },
     "fra:3": {
       "team": "fra",
       "n": 3,
       "name": "Lucas Digne",
       "cell": 3,
-      "path": "fra/3"
+      "path": "fra/3",
+      "face": {
+        "top": 39,
+        "w": 59.5,
+        "cx": 144.3
+      }
     },
     "fra:4": {
       "team": "fra",
       "n": 4,
       "name": "Dayot Upamecano",
       "cell": 4,
-      "path": "fra/4"
+      "path": "fra/4",
+      "face": {
+        "top": 40,
+        "w": 60,
+        "cx": 144.5
+      }
     },
     "fra:5": {
       "team": "fra",
       "n": 5,
       "name": "Jules Koundé",
       "cell": 5,
-      "path": "fra/5"
+      "path": "fra/5",
+      "face": {
+        "top": 34,
+        "w": 86,
+        "cx": 144.5
+      }
     },
     "fra:6": {
       "team": "fra",
       "n": 6,
       "name": "Manu Koné",
       "cell": 6,
-      "path": "fra/6"
+      "path": "fra/6",
+      "face": {
+        "top": 35.5,
+        "w": 84.5,
+        "cx": 146.3
+      }
     },
     "fra:7": {
       "team": "fra",
       "n": 7,
       "name": "Ousmane Dembélé",
       "cell": 7,
-      "path": "fra/7"
+      "path": "fra/7",
+      "face": {
+        "top": 43,
+        "w": 61.5,
+        "cx": 144.3
+      }
     },
     "fra:8": {
       "team": "fra",
       "n": 8,
       "name": "Aurélien Tchouaméni",
       "cell": 8,
-      "path": "fra/8"
+      "path": "fra/8",
+      "face": {
+        "top": 34,
+        "w": 65,
+        "cx": 144.5
+      }
     },
     "fra:9": {
       "team": "fra",
       "n": 9,
       "name": "Marcus Thuram",
       "cell": 9,
-      "path": "fra/9"
+      "path": "fra/9",
+      "face": {
+        "top": 37.5,
+        "w": 61.5,
+        "cx": 144.3
+      }
     },
     "fra:10": {
       "team": "fra",
       "n": 10,
       "name": "Kylian Mbappé",
       "cell": 10,
-      "path": "fra/10"
+      "path": "fra/10",
+      "face": {
+        "top": 42.5,
+        "w": 57.5,
+        "cx": 144.3
+      }
     },
     "fra:11": {
       "team": "fra",
       "n": 11,
       "name": "Michael Olise",
       "cell": 11,
-      "path": "fra/11"
+      "path": "fra/11",
+      "face": {
+        "top": 35,
+        "w": 74,
+        "cx": 144.5
+      }
     },
     "fra:12": {
       "team": "fra",
       "n": 12,
       "name": "Bradley Barcola",
       "cell": 12,
-      "path": "fra/12"
+      "path": "fra/12",
+      "face": {
+        "top": 40,
+        "w": 60.5,
+        "cx": 144.8
+      }
     },
     "fra:13": {
       "team": "fra",
       "n": 13,
       "name": "N'Golo Kanté",
       "cell": 13,
-      "path": "fra/13"
+      "path": "fra/13",
+      "face": {
+        "top": 35,
+        "w": 67,
+        "cx": 144
+      }
     },
     "fra:14": {
       "team": "fra",
       "n": 14,
       "name": "Adrien Rabiot",
       "cell": 14,
-      "path": "fra/14"
+      "path": "fra/14",
+      "face": {
+        "top": 37.5,
+        "w": 90.5,
+        "cx": 143.8
+      }
     },
     "fra:15": {
       "team": "fra",
       "n": 15,
       "name": "Ibrahima Konaté",
       "cell": 15,
-      "path": "fra/15"
+      "path": "fra/15",
+      "face": {
+        "top": 38,
+        "w": 59.5,
+        "cx": 144.3
+      }
     },
     "fra:16": {
       "team": "fra",
       "n": 16,
       "name": "Mike Maignan",
       "cell": 16,
-      "path": "fra/16"
+      "path": "fra/16",
+      "face": {
+        "top": 36,
+        "w": 60,
+        "cx": 144
+      }
     },
     "fra:17": {
       "team": "fra",
       "n": 17,
       "name": "William Saliba",
       "cell": 17,
-      "path": "fra/17"
+      "path": "fra/17",
+      "face": {
+        "top": 30.5,
+        "w": 63,
+        "cx": 144
+      }
     },
     "fra:18": {
       "team": "fra",
       "n": 18,
       "name": "Warren Zaïre-Emery",
       "cell": 18,
-      "path": "fra/18"
+      "path": "fra/18",
+      "face": {
+        "top": 27,
+        "w": 64.5,
+        "cx": 143.8
+      }
     },
     "fra:19": {
       "team": "fra",
       "n": 19,
       "name": "Theo Hernández",
       "cell": 19,
-      "path": "fra/19"
+      "path": "fra/19",
+      "face": {
+        "top": 42,
+        "w": 60,
+        "cx": 144
+      }
     },
     "fra:20": {
       "team": "fra",
       "n": 20,
       "name": "Désiré Doué",
       "cell": 20,
-      "path": "fra/20"
+      "path": "fra/20",
+      "face": {
+        "top": 18.5,
+        "w": 66,
+        "cx": 144
+      }
     },
     "fra:21": {
       "team": "fra",
       "n": 21,
       "name": "Lucas Hernández",
       "cell": 21,
-      "path": "fra/21"
+      "path": "fra/21",
+      "face": {
+        "top": 38.5,
+        "w": 63,
+        "cx": 144
+      }
     },
     "fra:22": {
       "team": "fra",
       "n": 22,
       "name": "Jean-Philippe Mateta",
       "cell": 22,
-      "path": "fra/22"
+      "path": "fra/22",
+      "face": {
+        "top": 46.5,
+        "w": 58.5,
+        "cx": 144.3
+      }
     },
     "fra:23": {
       "team": "fra",
       "n": 23,
       "name": "Robin Risser",
       "cell": 23,
-      "path": "fra/23"
+      "path": "fra/23",
+      "face": {
+        "top": 33.5,
+        "w": 60,
+        "cx": 144.5
+      }
     },
     "fra:24": {
       "team": "fra",
       "n": 24,
       "name": "Rayan Cherki",
       "cell": 24,
-      "path": "fra/24"
+      "path": "fra/24",
+      "face": {
+        "top": 28.5,
+        "w": 66.5,
+        "cx": 144.8
+      }
     },
     "fra:25": {
       "team": "fra",
       "n": 25,
       "name": "Maghnes Akliouche",
       "cell": 25,
-      "path": "fra/25"
+      "path": "fra/25",
+      "face": {
+        "top": 19.5,
+        "w": 84.5,
+        "cx": 144.3
+      }
     },
     "fra:26": {
       "team": "fra",
       "n": 26,
       "name": "Maxence Lacroix",
       "cell": 26,
-      "path": "fra/26"
+      "path": "fra/26",
+      "face": {
+        "top": 44,
+        "w": 60,
+        "cx": 144.5
+      }
     },
     "arg:1": {
       "team": "arg",
       "n": 1,
       "name": "Juan Musso",
       "cell": 1,
-      "path": "arg/1"
+      "path": "arg/1",
+      "face": {
+        "top": 29,
+        "w": 61,
+        "cx": 144
+      }
     },
     "arg:2": {
       "team": "arg",
       "n": 2,
       "name": "Marcos Senesi",
       "cell": 2,
-      "path": "arg/2"
+      "path": "arg/2",
+      "face": {
+        "top": 18,
+        "w": 66,
+        "cx": 144
+      }
     },
     "arg:3": {
       "team": "arg",
       "n": 3,
       "name": "Nicolás Tagliafico",
       "cell": 3,
-      "path": "arg/3"
+      "path": "arg/3",
+      "face": {
+        "top": 29,
+        "w": 62.5,
+        "cx": 144.3
+      }
     },
     "arg:4": {
       "team": "arg",
       "n": 4,
       "name": "Gonzalo Montiel",
       "cell": 4,
-      "path": "arg/4"
+      "path": "arg/4",
+      "face": {
+        "top": 25.5,
+        "w": 66,
+        "cx": 144
+      }
     },
     "arg:5": {
       "team": "arg",
       "n": 5,
       "name": "Leandro Paredes",
       "cell": 5,
-      "path": "arg/5"
+      "path": "arg/5",
+      "face": {
+        "top": 28.5,
+        "w": 69.5,
+        "cx": 144.3
+      }
     },
     "arg:6": {
       "team": "arg",
       "n": 6,
       "name": "Lisandro Martínez",
       "cell": 6,
-      "path": "arg/6"
+      "path": "arg/6",
+      "face": {
+        "top": 21.5,
+        "w": 70.5,
+        "cx": 144.3
+      }
     },
     "arg:7": {
       "team": "arg",
       "n": 7,
       "name": "Rodrigo De Paul",
       "cell": 7,
-      "path": "arg/7"
+      "path": "arg/7",
+      "face": {
+        "top": 30.5,
+        "w": 64,
+        "cx": 144.5
+      }
     },
     "arg:8": {
       "team": "arg",
       "n": 8,
       "name": "Valentín Barco",
       "cell": 8,
-      "path": "arg/8"
+      "path": "arg/8",
+      "face": {
+        "top": 20,
+        "w": 81,
+        "cx": 144.5
+      }
     },
     "arg:9": {
       "team": "arg",
       "n": 9,
       "name": "Julián Álvarez",
       "cell": 9,
-      "path": "arg/9"
+      "path": "arg/9",
+      "face": {
+        "top": 23,
+        "w": 68.5,
+        "cx": 144.3
+      }
     },
     "arg:10": {
       "team": "arg",
       "n": 10,
       "name": "Lionel Messi",
       "cell": 10,
-      "path": "arg/10"
+      "path": "arg/10",
+      "face": {
+        "top": 22.5,
+        "w": 69.5,
+        "cx": 144.3
+      }
     },
     "arg:11": {
       "team": "arg",
       "n": 11,
       "name": "Giovani Lo Celso",
       "cell": 11,
-      "path": "arg/11"
+      "path": "arg/11",
+      "face": {
+        "top": 22,
+        "w": 67,
+        "cx": 144
+      }
     },
     "arg:12": {
       "team": "arg",
       "n": 12,
       "name": "Gerónimo Rulli",
       "cell": 12,
-      "path": "arg/12"
+      "path": "arg/12",
+      "face": {
+        "top": 26.5,
+        "w": 64,
+        "cx": 144
+      }
     },
     "arg:13": {
       "team": "arg",
       "n": 13,
       "name": "Cristian Romero",
       "cell": 13,
-      "path": "arg/13"
+      "path": "arg/13",
+      "face": {
+        "top": 28.5,
+        "w": 67.5,
+        "cx": 144.3
+      }
     },
     "arg:14": {
       "team": "arg",
       "n": 14,
       "name": "Exequiel Palacios",
       "cell": 14,
-      "path": "arg/14"
+      "path": "arg/14",
+      "face": {
+        "top": 28,
+        "w": 64,
+        "cx": 144
+      }
     },
     "arg:15": {
       "team": "arg",
       "n": 15,
       "name": "Nicolás González",
       "cell": 15,
-      "path": "arg/15"
+      "path": "arg/15",
+      "face": {
+        "top": 20.5,
+        "w": 70.5,
+        "cx": 144.3
+      }
     },
     "arg:16": {
       "team": "arg",
       "n": 16,
       "name": "Thiago Almada",
       "cell": 16,
-      "path": "arg/16"
+      "path": "arg/16",
+      "face": {
+        "top": 25,
+        "w": 73.5,
+        "cx": 144.3
+      }
     },
     "arg:17": {
       "team": "arg",
       "n": 17,
       "name": "Giuliano Simeone",
       "cell": 17,
-      "path": "arg/17"
+      "path": "arg/17",
+      "face": {
+        "top": 28,
+        "w": 77,
+        "cx": 144.5
+      }
     },
     "arg:18": {
       "team": "arg",
       "n": 18,
       "name": "Nico Paz",
       "cell": 18,
-      "path": "arg/18"
+      "path": "arg/18",
+      "face": {
+        "top": 24.5,
+        "w": 69.5,
+        "cx": 144.8
+      }
     },
     "arg:19": {
       "team": "arg",
       "n": 19,
       "name": "Nicolás Otamendi",
       "cell": 19,
-      "path": "arg/19"
+      "path": "arg/19",
+      "face": {
+        "top": 31,
+        "w": 69.5,
+        "cx": 144.3
+      }
     },
     "arg:20": {
       "team": "arg",
       "n": 20,
       "name": "Alexis Mac Allister",
       "cell": 20,
-      "path": "arg/20"
+      "path": "arg/20",
+      "face": {
+        "top": 22.5,
+        "w": 68.5,
+        "cx": 144.3
+      }
     },
     "arg:21": {
       "team": "arg",
       "n": 21,
       "name": "José Manuel López",
       "cell": 21,
-      "path": "arg/21"
+      "path": "arg/21",
+      "face": {
+        "top": 23,
+        "w": 63,
+        "cx": 144.5
+      }
     },
     "arg:22": {
       "team": "arg",
       "n": 22,
       "name": "Lautaro Martínez",
       "cell": 22,
-      "path": "arg/22"
+      "path": "arg/22",
+      "face": {
+        "top": 20,
+        "w": 69,
+        "cx": 144
+      }
     },
     "arg:23": {
       "team": "arg",
       "n": 23,
       "name": "Emiliano Martínez",
       "cell": 23,
-      "path": "arg/23"
+      "path": "arg/23",
+      "face": {
+        "top": 37.5,
+        "w": 65.5,
+        "cx": 144.3
+      }
     },
     "arg:24": {
       "team": "arg",
       "n": 24,
       "name": "Enzo Fernández",
       "cell": 24,
-      "path": "arg/24"
+      "path": "arg/24",
+      "face": {
+        "top": 27.5,
+        "w": 67.5,
+        "cx": 144.3
+      }
     },
     "arg:25": {
       "team": "arg",
       "n": 25,
       "name": "Facundo Medina",
       "cell": 25,
-      "path": "arg/25"
+      "path": "arg/25",
+      "face": {
+        "top": 27.5,
+        "w": 70.5,
+        "cx": 144.3
+      }
     },
     "arg:26": {
       "team": "arg",
       "n": 26,
       "name": "Nahuel Molina",
       "cell": 26,
-      "path": "arg/26"
+      "path": "arg/26",
+      "face": {
+        "top": 34,
+        "w": 66.5,
+        "cx": 144.3
+      }
     }
   },
   "coaches": {
@@ -419,14 +679,24 @@
       "n": 0,
       "name": "Didier Deschamps",
       "cell": 27,
-      "path": "fra/0"
+      "path": "fra/0",
+      "face": {
+        "top": 33,
+        "w": 61.5,
+        "cx": 143.8
+      }
     },
     "arg": {
       "team": "arg",
       "n": 0,
       "name": "Lionel Scaloni",
       "cell": 27,
-      "path": "arg/0"
+      "path": "arg/0",
+      "face": {
+        "top": 25,
+        "w": 63.5,
+        "cx": 144.3
+      }
     }
   }
 }

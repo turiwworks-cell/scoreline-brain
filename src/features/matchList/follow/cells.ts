@@ -57,10 +57,14 @@ export function bandCells(st: PStats | undefined, phase: Phase, match: Match | u
   ];
 }
 
-/** What the card's evening line says when he has no goal to show (luau:4360). */
+/**
+ * What the card's evening line says when he has no goal to show (luau:4360). Before his match it
+ * says only the day: the band under it already shows the kick-off (the Lua's "Tomorrow · kick-off
+ * 20:45" said it twice; review of 2026-10-04).
+ */
 export function eveningNote(match: Match | undefined, st: PStats | undefined, onPitch: boolean): string {
   if (!match) return 'No match scheduled';
-  if (match.status === 'scheduled') return `${match.day === 1 ? 'Tomorrow' : 'Today'} · kick-off ${match.kickoff}`;
+  if (match.status === 'scheduled') return match.day === 1 ? 'Tomorrow' : 'Today';
   if (!onPitch) return st?.played ? 'Substituted' : 'On the bench';
   return 'No goals yet tonight';
 }

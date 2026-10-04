@@ -1,7 +1,7 @@
 import { memo, useMemo, type CSSProperties } from 'react';
 import { playerKey, type Team } from '../../domain';
 import { selectTeam, useScoreline } from '../../store';
-import { feel, photoProps, PlayerPhoto, RollLabel, textWidth, useFontVersion } from '../../ui';
+import { feel, Icon, KitDisc, photoProps, PlayerPhoto, RollLabel, textWidth, useFontVersion } from '../../ui';
 import type { PhotoOf } from './FollowCard';
 import { fitSize } from './cardLayout';
 import { knownPicks } from './follow/cells';
@@ -22,13 +22,19 @@ export type FollowPickerProps = {
   onPick: (f: Followed) => void;
   onUnfollow: () => void;
   photoOf?: PhotoOf;
+  /**
+   * With nobody followed the picker folds like the follow card does: to 64 px, its title and line
+   * only, behind the same round button (review of 2026-10-04). Absent: always open (Change).
+   */
+  fold?: { open: boolean; onToggle: () => void };
 };
 
-export function FollowPicker({ followed, staged, onPick, onUnfollow, photoOf }: FollowPickerProps) {
+export function FollowPicker({ followed, staged, onPick, onUnfollow, photoOf, fold }: FollowPickerProps) {
   const players = useScoreline(selectPlayers);
   const picks = useMemo(() => knownPicks(players), [players]);
+  const open = fold?.open ?? true;
   return (
-    <div className={`m-glass ${styles.picker}`}>
+    <div className={`m-glass ${styles.picker}`} data-open={open}>
       <h3 className={styles.pickTitle}>Follow a player</h3>
       <p className={styles.pickSub}>Live touches, stats and every goal, right here.</p>
       {followed && (
@@ -36,7 +42,12 @@ export function FollowPicker({ followed, staged, onPick, onUnfollow, photoOf }: 
           <span className={styles.label}>Unfollow</span>
         </button>
       )}
-      <div className={styles.chips}>
+      {fold && (
+        <button type="button" className={`m-glass m-feel m-dip ${styles.toggle}`} aria-label={open ? 'Show less' : 'Choose a player'} aria-expanded={open} onClick={fold.onToggle} {...feel}>
+          <Icon name="chevUp" />
+        </button>
+      )}
+      <div className={styles.chips} inert={!open}>
         {picks.map((p, i) => (
           <Chip key={`${p.team}:${p.n}`} pick={p} index={i} on={sameFollowed(p, followed)} staged={staged} onPick={onPick} photoOf={photoOf} />
         ))}
@@ -51,6 +62,7 @@ const Chip = memo(function Chip({ pick, index, on, staged, onPick, photoOf }: { 
   useFontVersion();
   const player = players[playerKey(pick.team, pick.n)];
   if (!team || !player) return null;
+  const files = photoOf?.(team, pick.n);
   const name = player.short;
   // the name shrinks to fit beside the face (fit, luau:4113)
   const size = fitSize(12.5, textWidth(600, 12.5, 0, name), 66);
@@ -64,8 +76,15 @@ const Chip = memo(function Chip({ pick, index, on, staged, onPick, photoOf }: { 
       onClick={() => onPick(pick)}
       {...feel}
     >
-      <span className={styles.face}>
-        <PlayerPhoto team={team} n={pick.n} width={28} {...photoProps(photoOf?.(team, pick.n))} alt="" />
+      {/* his head inside the rim, so the rim reads the same over a shirt as over the glass; his
+          shoulders run on to the chip's round end. Without a photo, his number on a disc centred
+          where his head would be (review of 2026-10-04: photos and discs line up). */}
+      <span className={styles.faceClip}>
+        {files ? (
+          <PlayerPhoto team={team} n={pick.n} width={28} shoulders={24} className={styles.face} {...photoProps(files)} alt="" />
+        ) : (
+          <KitDisc team={team} n={pick.n} size={20} className={styles.disc} />
+        )}
       </span>
       <span className={styles.chipName}>
         <RollLabel text={name} />

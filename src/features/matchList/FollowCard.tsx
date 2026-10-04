@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { minText, nameOf, playerKey, scoreStr, type Match, type NextFixture, type Team } from '../../domain';
 import { selectMatch, selectTeam, useScoreline } from '../../store';
-import { Crest, EventTags, feel, Icon, KitDisc, MatchClock, mix, pastel, PlayerPhoto, RatingBadge, SoftLight, Tag, tagList, tagLayout, textWidth, useFontVersion, type PhotoSources } from '../../ui';
+import { Crest, EventTags, feel, Icon, KitDisc, MatchClock, mix, pastel, photoProps, PlayerPhoto, RatingBadge, SoftLight, Tag, tagList, tagLayout, textWidth, useFontVersion, type PhotoSources } from '../../ui';
 import { fitSize } from './cardLayout';
 import { bandCells, eveningNote, type Cell } from './follow/cells';
 import { useNowMs } from './follow/clock';
@@ -192,9 +192,15 @@ export function FollowCard({ followed, live, open, hidden, onToggle, onOpenPlaye
         </span>
 
         <span className={`${styles.layer} ${styles.closed}`}>
-          <span className={styles.faceBox}>
-            <PlayerPhoto team={team} n={n} width={54} src={photo?.src} srcSet={photo?.srcSet} sources={photo?.sources} alt="" />
-          </span>
+          {photo ? (
+            <span className={styles.faceBox}>
+              <PlayerPhoto team={team} n={n} width={54} shoulders={16} {...photoProps(photo)} alt="" />
+            </span>
+          ) : (
+            // no photo: his number on a disc in the middle of the card's height, so the name beside
+            // it lines up as it does beside a face (review of 2026-10-04)
+            <KitDisc team={team} n={n} size={38} className={styles.faceDisc} />
+          )}
           <span className={`${styles.text} ${styles.cName}`} style={{ fontSize: closedSize }}>
             {last}
           </span>

@@ -1,4 +1,6 @@
 import { memo, useState, type CSSProperties, type HTMLAttributes, type SVGAttributes } from 'react';
+import type { FaceFrame } from './photos';
+import { faceCrop } from './faceCrop';
 import { pastel, mix } from './color';
 import { Crest } from './Crest';
 import type { CrestTeam } from './flags';
@@ -61,6 +63,13 @@ export type PlayerPhotoProps = Omit<HTMLAttributes<HTMLSpanElement>, 'children'>
   n: number;
   /** the player's bust image, 288 × 360 (or a multiple); absent = no photo */
   src?: string;
+  /** where his head is on the bust (photoProps passes it from the manifest) */
+  face?: FaceFrame;
+  /**
+   * Design units of shoulder to show on each side beyond the box (the holder clips): a chip or a
+   * card shows his shoulders rather than cutting them at the box's edge. 0 cuts at the box.
+   */
+  shoulders?: number;
   srcSet?: string;
   /** <source> sets ahead of the <img>, e.g. AVIF (photoSources) */
   sources?: readonly { readonly type: string; readonly srcSet: string }[];
@@ -80,9 +89,13 @@ export type PlayerPhotoProps = Omit<HTMLAttributes<HTMLSpanElement>, 'children'>
  * A face rising from the bottom of a `width` × `width` box (riseFace, luau:3654). The bust runs
  * on below the box; the holder clips it there.
  */
-export const PlayerPhoto = memo(function PlayerPhoto({ team, n, src, srcSet, sources, width: w, alt = '', loading, coach, onFail, className, style, ...rest }: PlayerPhotoProps) {
+export const PlayerPhoto = memo(function PlayerPhoto({ team, n, src, srcSet, sources, face, shoulders = 0, width: w, alt = '', loading, coach, onFail, className, style, ...rest }: PlayerPhotoProps) {
   const [failed, setFailed] = useState<string | null>(null);
   const k = w / FACE.w;
+  const crop = faceCrop(face);
+  // px per bust unit for this player's crop, and the shoulder room beyond the box
+  const kb = w / crop.w;
+  const pad = shoulders * k;
   const photo = !!src && (n > 0 || coach === true) && failed !== src;
   const cls = className ? `${styles.photo} ${className}` : styles.photo;
   const st = { ...style, width: w, height: w } as CSSProperties;
@@ -90,13 +103,15 @@ export const PlayerPhoto = memo(function PlayerPhoto({ team, n, src, srcSet, sou
     <span className={cls} style={st} data-photo={photo ? 'bust' : n > 0 ? 'kit' : 'crest'} {...rest}>
       {photo ? (
         // the face crop and 30 units below it (luau:3662), standing (FACE.h - 14) units above the bottom
-        <span className={styles.crop} style={{ top: w - (FACE.h - 14) * k, height: (FACE.h + 30) * k }}>
+        <span className={styles.crop} style={{ top: w - (FACE.h - 14) * k, height: (FACE.h + 30) * k, left: -pad, width: w + 2 * pad }}>
           <BustImg
             src={src}
             srcSet={srcSet}
             sources={sources}
             alt={alt}
-            k={k}
+            k={kb}
+            x={crop.x * kb - pad}
+            y={crop.y * kb}
             loading={loading}
             onError={() => {
               setFailed(src);
@@ -111,8 +126,8 @@ export const PlayerPhoto = memo(function PlayerPhoto({ team, n, src, srcSet, sou
   );
 });
 
-/** The whole bust at k px per design unit, offset so the face crop starts at the box's corner. */
-function BustImg({ src, srcSet, sources, alt, k, loading, onError }: Pick<PlayerPhotoProps, 'srcSet' | 'sources' | 'loading'> & { src: string; alt: string; k: number; onError: () => void }) {
+/** The whole bust at k px per design unit, offset by (x, y) px so the face crop starts at the box's corner. */
+function BustImg({ src, srcSet, sources, alt, k, x, y, loading, onError }: Pick<PlayerPhotoProps, 'srcSet' | 'sources' | 'loading'> & { src: string; alt: string; k: number; x: number; y: number; onError: () => void }) {
   const w = BUST.w * k;
   // `sizes` lets a `w`-described set pick the smallest file that covers the drawn width
   const img = (
@@ -123,7 +138,7 @@ function BustImg({ src, srcSet, sources, alt, k, loading, onError }: Pick<Player
       alt={alt}
       width={w}
       height={BUST.h * k}
-      style={{ left: -FACE.x * k, top: -FACE.y * k }}
+      style={{ left: -x, top: -y }}
       loading={loading}
       decoding="async"
       draggable={false}
