@@ -1,5 +1,6 @@
 import { useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { m, PresenceContext, useIsPresent, type Variants } from 'motion/react';
+import { useAfterPaint } from '../../motion';
 import type { ScrollPane } from '../nav/scrollMemory';
 import { useScrollMemory } from '../nav/useScrollMemory';
 import { useElasticEdges } from './useElasticEdges';
@@ -30,6 +31,11 @@ export type ScreenProps = {
 export function Screen({ pane, contentKey, label, covered = false, className, variants, initial, animate, exit, children }: ScreenProps) {
   const ref = useRef<HTMLElement>(null);
   const present = useIsPresent();
+  // A screen that gets covered turns inert a frame later, after the tap that covered it has
+  // painted: inert restyles its whole subtree (a list or a match's Facts: hundreds of elements),
+  // and that was a third of the tap's frame (Part 21, #3). Focus has moved to the new screen's
+  // heading by then. Uncovered, it is back in reach at once, for focus to return to.
+  const coveredLater = useAfterPaint(covered);
   useScrollMemory(ref, pane, contentKey, present);
   useElasticEdges(ref);
   return (
@@ -40,7 +46,7 @@ export function Screen({ pane, contentKey, label, covered = false, className, va
       data-scroller=""
       data-present={present ? 'true' : 'false'}
       aria-label={label}
-      inert={covered || !present}
+      inert={(covered && coveredLater !== false) || !present}
       variants={variants}
       initial={initial}
       animate={animate}

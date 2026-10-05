@@ -23,7 +23,10 @@ export function useScrollVars(ref: RefObject<HTMLElement | null>) {
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(write);
     };
-    write();
+    // first in the frame's callbacks, not here: reading scrollTop in the commit forced a layout of
+    // the whole page inside the tap that opened the player (Part 21, #3); until then the CSS
+    // defaults read as the top
+    frame = requestAnimationFrame(write);
     scroller.addEventListener('scroll', onScroll, { passive: true });
     return () => {
       scroller.removeEventListener('scroll', onScroll);

@@ -15,6 +15,9 @@ export function useScrollMemory(ref: RefObject<HTMLElement | null>, pane: Scroll
   const navType = useNavigationType();
   const live = useRef({ key: location.key, present });
   const shown = useRef<string | null>(null);
+  // where the pane is, as its scroll events last said: reading scrollTop in the commit forced a
+  // style and layout of the whole page inside the tap that opened a screen (Part 21, #3)
+  const y = useRef(0);
 
   useLayoutEffect(() => {
     live.current = { key: location.key, present };
@@ -24,12 +27,14 @@ export function useScrollMemory(ref: RefObject<HTMLElement | null>, pane: Scroll
     const el = ref.current;
     if (!present || !el) return;
     const plan = scrollPlan({ pop: navType === 'POP', saved: memory.get(location.key, pane), contentChanged: shown.current !== contentKey });
+    const mounted = shown.current === null;
     shown.current = contentKey;
-    if (plan.kind === 'top') el.scrollTop = 0;
+    // a screen that just mounted is at the top already
+    if (plan.kind === 'top' && !mounted && y.current !== 0) el.scrollTop = y.current = 0;
     if (plan.kind !== 'restore') {
       // the new entry starts where the pane is now: a tab switch or a day change replaces the
       // entry (a new key), and back/forward to it must find this position, not nothing
-      memory.set(location.key, pane, el.scrollTop);
+      memory.set(location.key, pane, plan.kind === 'top' ? 0 : y.current);
       return;
     }
     // content may still be growing: keep at it for a few frames, until the user scrolls
@@ -54,7 +59,8 @@ export function useScrollMemory(ref: RefObject<HTMLElement | null>, pane: Scroll
     const el = ref.current;
     if (!el) return;
     const onScroll = () => {
-      if (live.current.present) memory.set(live.current.key, pane, el.scrollTop);
+      y.current = el.scrollTop;
+      if (live.current.present) memory.set(live.current.key, pane, y.current);
     };
     el.addEventListener('scroll', onScroll, { passive: true });
     return () => el.removeEventListener('scroll', onScroll);

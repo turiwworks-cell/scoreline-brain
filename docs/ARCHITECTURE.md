@@ -215,7 +215,8 @@ One app, one component set, one URL scheme. Layout is a function of route and wi
   cy puts the baseline on `bc` at any line height; a box with `line-height: 1.2` whose top is
   `y − 0.9485em` puts it on y; a `line-height: 1` box starts 0.8485 em above it. Chromium rounds the
   ascent and descent to whole pixels, so a line box shorter than 1.303 em can sit up to 1 px higher
-  than this arithmetic. Badges and tags beside text centre on what the Lua centres them on (cy or the
+  than this arithmetic. **Accepted limitation:** that sub-pixel difference is the browser's, not a
+  porting error; the design is not adjusted to compensate, and the baseline specs allow 1.1 px. Badges and tags beside text centre on what the Lua centres them on (cy or the
   cap height), not on the line box. `e2e/baselines.spec.ts` and `verification/moments/baselines.spec.ts`
   hold the ported text to the Lua's numbers within 1.1 px (`e2e/support/baseline.ts` measures the
   baseline the browser drew); add a row there when porting a new text block.

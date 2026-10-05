@@ -1,6 +1,6 @@
 import { useCallback, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import { m } from 'motion/react';
-import { CASCADE, cascade, transition } from '../../motion';
+import { CASCADE, cascade, transition, useAfterPaint } from '../../motion';
 import type { Side } from '../../domain';
 import { selectLeague, selectMatch, selectTeam, useScoreline } from '../../store';
 import { Icon, RoundButton, Tabs } from '../../ui';
@@ -16,7 +16,8 @@ import styles from './MatchDetail.module.css';
  * The match screen (drawDetailScreen, luau:5781): a bar that stays (back, the league, the
  * favourite), then the hero, the tab bar and the open tab, all scrolling under the bar. The hero,
  * the tab bar and the pane come in one after another (blockIn, motion: screen); switching tabs
- * slides the new pane in from the side the tab lies on (motion: tabs).
+ * slides the new pane in from the side the tab lies on (motion: tabs). The tab bar answers in the
+ * tap's frame; the pane's body renders after that paint (useAfterPaint, Part 21 #3).
  *
  * Laid out at the pane's own width: every x of the Lua's 390 px screen is kept from the nearer
  * edge, so at 390 the numbers are the Lua's.
@@ -79,9 +80,12 @@ export function MatchDetail({ id, tab, chrome, onBack, onTab, onOpenPlayer, onFa
   const width = useWidth(ref, !!match && !!home && !!away);
   const league = useScoreline(selectLeague(match?.league ?? ''));
 
-  // the pane slides in from the side of the tab it came from (paneDir, luau:7162)
-  const [pane, setPane] = useState({ tab, dir: 0, first: true });
-  if (pane.tab !== tab) setPane({ tab, dir: DETAIL_TABS.indexOf(tab) > DETAIL_TABS.indexOf(pane.tab) ? 1 : -1, first: false });
+  // the open tab's body, a render after the tap (null on the screen's first frame)
+  const shown = useAfterPaint(tab);
+  // the pane slides in from the side of the tab it came from (paneDir, luau:7162); the first body
+  // comes in with the screen's cascade
+  const [pane, setPane] = useState({ tab: shown, dir: 0, first: true });
+  if (pane.tab !== shown && shown) setPane({ tab: shown, dir: pane.tab && DETAIL_TABS.indexOf(shown) > DETAIL_TABS.indexOf(pane.tab) ? 1 : -1, first: !pane.tab });
 
   // the side the Lineup tab shows lasts while the match is open, whichever tab is (luSide, luau:7139)
   const [lineupSide, setLineupSide] = useState<{ id: number; side: Side }>({ id, side: 'home' });
@@ -124,21 +128,23 @@ export function MatchDetail({ id, tab, chrome, onBack, onTab, onOpenPlayer, onFa
       </m.div>
 
       <m.div className={styles.panel} variants={c} custom={4} {...CASCADE} role="tabpanel" id={`${idBase}-panel-${tab}`} aria-labelledby={`${idBase}-tab-${tab}`}>
-        <m.div
-          key={tab}
-          initial={first ? false : { opacity: 0, x: 24 * dir }}
-          animate={{ opacity: 1, x: 0, transition: transition('tabs', { index: 1 }) }}
-        >
-          {tab === 'facts' ? (
-            <Facts match={match} home={home} away={away} league={league} width={width} onReplayGoal={onReplayGoal} />
-          ) : tab === 'stats' ? (
-            <Stats match={match} home={home} away={away} />
-          ) : tab === 'lineup' ? (
-            <Lineup match={match} home={home} away={away} width={width} side={lineupSide.side} onSide={onSide} followed={followed} onOpenPlayer={onOpenPlayer} />
-          ) : (
-            <Table match={match} league={league} />
-          )}
-        </m.div>
+        {shown && (
+          <m.div
+            key={shown}
+            initial={first ? false : { opacity: 0, x: 24 * dir }}
+            animate={{ opacity: 1, x: 0, transition: transition('tabs', { index: 1 }) }}
+          >
+            {shown === 'facts' ? (
+              <Facts match={match} home={home} away={away} league={league} width={width} onReplayGoal={onReplayGoal} />
+            ) : shown === 'stats' ? (
+              <Stats match={match} home={home} away={away} />
+            ) : shown === 'lineup' ? (
+              <Lineup match={match} home={home} away={away} width={width} side={lineupSide.side} onSide={onSide} followed={followed} onOpenPlayer={onOpenPlayer} />
+            ) : (
+              <Table match={match} league={league} />
+            )}
+          </m.div>
+        )}
       </m.div>
     </div>
   );
