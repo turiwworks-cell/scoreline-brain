@@ -1,0 +1,17 @@
+/?demo=fast at 3.6x, 390x844, Rive blocked: 12 frames over 50 ms in 20 s
+  start-up    n   8  median  133 ms  max  477 ms
+  poll        n   4  median   60 ms  max  102 ms
+
+worst frames:
+     0.6 s   477 ms  [start-up]  405 ms import.then (no source) (forced layout 77 ms); 14 ms FrameRequestCallback app-vendor-CA1omR8B.js@319794
+     0.3 s   246 ms  [start-up]  238 ms MessagePort.onmessage app-vendor-CA1omR8B.js@9174 (forced layout 73 ms)
+     0.1 s   156 ms  [start-up]  150 ms http://127.0.0.1:4180/assets/index-9I8RqK8J.js index-9I8RqK8J.js@0
+     1.4 s   133 ms  [start-up]  60 ms import.then (no source); 59 ms http://127.0.0.1:4180/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js@0
+     1.6 s   110 ms  [start-up]  
+     7.2 s   102 ms  [poll]  90 ms TimerHandler:setTimeout demo-DUfn2IkN.js@34072
+     4.1 s    96 ms  [start-up]  87 ms TimerHandler:setTimeout demo-DUfn2IkN.js@34072
+     0.0 s    80 ms  [start-up]  
+    10.3 s    60 ms  [poll]  54 ms TimerHandler:setTimeout demo-DUfn2IkN.js@34072
+     1.0 s    59 ms  [start-up]  16 ms TimerHandler:setTimeout demo-DUfn2IkN.js@34072
+    13.4 s    59 ms  [poll]  54 ms TimerHandler:setTimeout demo-DUfn2IkN.js@34072
+    19.6 s    51 ms  [poll]  47 ms TimerHandler:setTimeout demo-DUfn2IkN.js@34072

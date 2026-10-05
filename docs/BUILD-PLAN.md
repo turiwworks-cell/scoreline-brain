@@ -256,11 +256,15 @@ Milestones:
 - **Follow-up #1/#2:** the shared parser/bundle work is grouped: session-scoped feed reuse,
   lazy match/player screens, and the CI initial-JS budget. Decisions and measured limits are in
   `reports/part21-poll-and-bundle.md`; the remaining audit issues keep their own scope.
+- **Follow-up #5/#4:** the first-data render and the first paint: canvas-measured day tabs, the
+  list body rendered after the feed's task and a long first list mounted in slices, a static
+  first frame in `index.html` with the app run after it paints, and Rive gated behind the first
+  data. Results, and what is still over budget, are in `reports/part21-startup-and-lcp.md`.
 
 ### 22 · Adapter server (Opus designs, Sonnet maps)
 - **Opus:** design the service. It polls the provider and keeps a per-match `seq`, serves
   `/feed` with an ETag, and serves `/events` over SSE with `Last-Event-ID` replay. Also decide
-  how it's deployed.
+  how it's deployed; the static host must compress `application/wasm` (ARCHITECTURE §7).
 - **Sonnet:** map the provider's fields per `DATA-BINDING_4.md` §5, with tests against recorded
   provider fixtures.
 - **First:** pick the data provider.

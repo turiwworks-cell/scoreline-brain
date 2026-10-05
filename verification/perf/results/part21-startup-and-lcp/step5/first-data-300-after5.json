@@ -1,0 +1,1351 @@
+{
+  "rate": 3.6,
+  "matches": 300,
+  "parse": [
+    {
+      "bytes": 2119532,
+      "json": 49.700000000186265,
+      "validate": 410.10000000009313
+    },
+    {
+      "bytes": 2119532,
+      "json": 41.40000000037253,
+      "validate": 418.1999999997206
+    },
+    {
+      "bytes": 2119532,
+      "json": 36.8000000002794,
+      "validate": 333.09999999962747
+    },
+    {
+      "bytes": 2119532,
+      "json": 49.60000000009313,
+      "validate": 380.8000000002794
+    },
+    {
+      "bytes": 2119532,
+      "json": 47.60000000009313,
+      "validate": 391.70000000018626
+    }
+  ],
+  "results": [
+    {
+      "run": 1,
+      "callback": 62.89999999990687,
+      "frame": {
+        "start": 660.3000000002794,
+        "duration": 594.5,
+        "forced": 0
+      },
+      "parts": {
+        "beforeApply": 523.7999999998137,
+        "apply": 62.89999999990687,
+        "afterApply": 7.800000000279397,
+        "renderStart": 588.2999999998137
+      },
+      "later": [
+        {
+          "start": 1418.2000000001863,
+          "duration": 128.79999999981374,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 5
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 14
+            }
+          ]
+        },
+        {
+          "start": 1561.3000000002794,
+          "duration": 69.10000000009313,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 18
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 5
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 14
+            }
+          ]
+        },
+        {
+          "start": 1641.8000000002794,
+          "duration": 140.10000000009313,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 68
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 6
+            }
+          ]
+        },
+        {
+          "start": 1797.2000000001863,
+          "duration": 53.299999999813735,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 33
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 5
+            }
+          ]
+        },
+        {
+          "start": 1857.5,
+          "duration": 59.200000000186265,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 35
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 5
+            }
+          ]
+        },
+        {
+          "start": 1923.5,
+          "duration": 68.10000000009313,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 34
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 5
+            }
+          ]
+        },
+        {
+          "start": 1996.5,
+          "duration": 51.8000000002794,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 18
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 5
+            }
+          ]
+        },
+        {
+          "start": 2050.600000000093,
+          "duration": 138.89999999990687,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 85
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 14
+            }
+          ]
+        },
+        {
+          "start": 2235.600000000093,
+          "duration": 70.39999999990687,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 41
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 9
+            }
+          ]
+        },
+        {
+          "start": 2400.3000000002794,
+          "duration": 55.1999999997206,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 34
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 5
+            }
+          ]
+        },
+        {
+          "start": 2485.3000000002794,
+          "duration": 55.5,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 34
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 6
+            }
+          ]
+        },
+        {
+          "start": 3911.4000000003725,
+          "duration": 89.29999999981374,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "http://127.0.0.1:33221/assets/runtime-Dbwfuf0d.js",
+              "dur": 41
+            },
+            {
+              "inv": "import.then",
+              "dur": 39
+            }
+          ]
+        }
+      ],
+      "laterTimer": 9,
+      "fillMs": 1339.8999999999069,
+      "fill": [
+        {
+          "t": -1123,
+          "rows": 0
+        },
+        {
+          "t": 261,
+          "rows": 11
+        },
+        {
+          "t": 535,
+          "rows": 30
+        },
+        {
+          "t": 651,
+          "rows": 44
+        },
+        {
+          "t": 712,
+          "rows": 58
+        },
+        {
+          "t": 782,
+          "rows": 74
+        },
+        {
+          "t": 835,
+          "rows": 91
+        },
+        {
+          "t": 958,
+          "rows": 114
+        },
+        {
+          "t": 1100,
+          "rows": 128
+        },
+        {
+          "t": 1173,
+          "rows": 143
+        },
+        {
+          "t": 1255,
+          "rows": 163
+        },
+        {
+          "t": 1340,
+          "rows": 175
+        }
+      ],
+      "rows": 175,
+      "groups": 5,
+      "pending": 0,
+      "unique": 175,
+      "filled": true,
+      "errors": []
+    },
+    {
+      "run": 2,
+      "callback": 64.90000000037253,
+      "frame": {
+        "start": 554.7999999998137,
+        "duration": 501.89999999990687,
+        "forced": 0
+      },
+      "parts": {
+        "beforeApply": 428.39999999990687,
+        "apply": 64.90000000037253,
+        "afterApply": 8.599999999627471,
+        "renderStart": 495.60000000009313
+      },
+      "later": [
+        {
+          "start": 1197.6000000000931,
+          "duration": 123.09999999962747,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 5
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 5
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 16
+            }
+          ]
+        },
+        {
+          "start": 1337.1999999997206,
+          "duration": 66.20000000018626,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 18
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 16
+            }
+          ]
+        },
+        {
+          "start": 1413.5,
+          "duration": 146.29999999981374,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 60
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 23
+            }
+          ]
+        },
+        {
+          "start": 1585.8999999999069,
+          "duration": 56.700000000186265,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 33
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 6
+            }
+          ]
+        },
+        {
+          "start": 1650.8999999999069,
+          "duration": 75.10000000009313,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 39
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 7
+            }
+          ]
+        },
+        {
+          "start": 1731.7999999998137,
+          "duration": 71.89999999990687,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 40
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 6
+            }
+          ]
+        },
+        {
+          "start": 1818.6000000000931,
+          "duration": 86.6999999997206,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 51
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 6
+            }
+          ]
+        },
+        {
+          "start": 1911.5,
+          "duration": 58.10000000009313,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 36
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 7
+            }
+          ]
+        },
+        {
+          "start": 2050.6999999997206,
+          "duration": 54.700000000186265,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 28
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 6
+            }
+          ]
+        },
+        {
+          "start": 2112.399999999907,
+          "duration": 61.200000000186265,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 35
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 7
+            }
+          ]
+        },
+        {
+          "start": 3639.7999999998137,
+          "duration": 86.8000000002794,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "http://127.0.0.1:33221/assets/runtime-Dbwfuf0d.js",
+              "dur": 40
+            },
+            {
+              "inv": "import.then",
+              "dur": 37
+            }
+          ]
+        },
+        {
+          "start": 3734.899999999907,
+          "duration": 129.20000000018626,
+          "timer": false,
+          "scripts": []
+        }
+      ],
+      "laterTimer": 8,
+      "fillMs": 1250.1000000000931,
+      "fill": [
+        {
+          "t": -943,
+          "rows": 0
+        },
+        {
+          "t": 243,
+          "rows": 11
+        },
+        {
+          "t": 495,
+          "rows": 30
+        },
+        {
+          "t": 642,
+          "rows": 46
+        },
+        {
+          "t": 715,
+          "rows": 62
+        },
+        {
+          "t": 792,
+          "rows": 79
+        },
+        {
+          "t": 892,
+          "rows": 96
+        },
+        {
+          "t": 972,
+          "rows": 110
+        },
+        {
+          "t": 1020,
+          "rows": 125
+        },
+        {
+          "t": 1103,
+          "rows": 145
+        },
+        {
+          "t": 1170,
+          "rows": 168
+        },
+        {
+          "t": 1250,
+          "rows": 175
+        }
+      ],
+      "rows": 175,
+      "groups": 5,
+      "pending": 0,
+      "unique": 175,
+      "filled": true,
+      "errors": []
+    },
+    {
+      "run": 3,
+      "callback": 54.89999999990687,
+      "frame": {
+        "start": 558.6000000000931,
+        "duration": 498.89999999990687,
+        "forced": 0
+      },
+      "parts": {
+        "beforeApply": 438.10000000009313,
+        "apply": 54.89999999990687,
+        "afterApply": 5.899999999906868,
+        "renderStart": 494
+      },
+      "later": [
+        {
+          "start": 1195.3000000002794,
+          "duration": 129.39999999990687,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 12
+            }
+          ]
+        },
+        {
+          "start": 1346,
+          "duration": 51.8000000002794,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 12
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 13
+            }
+          ]
+        },
+        {
+          "start": 1407.1000000000931,
+          "duration": 150.79999999981374,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 76
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 7
+            }
+          ]
+        },
+        {
+          "start": 1578.5,
+          "duration": 58,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 34
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 10
+            }
+          ]
+        },
+        {
+          "start": 1644.1000000000931,
+          "duration": 67.20000000018626,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 39
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 5
+            }
+          ]
+        },
+        {
+          "start": 1715.7000000001863,
+          "duration": 58.1999999997206,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 31
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 5
+            }
+          ]
+        },
+        {
+          "start": 1779.3999999999069,
+          "duration": 60.8000000002794,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 27
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 7
+            }
+          ]
+        },
+        {
+          "start": 1846.3999999999069,
+          "duration": 80.10000000009313,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 46
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 6
+            }
+          ]
+        },
+        {
+          "start": 1961.3999999999069,
+          "duration": 70.8000000002794,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 42
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 7
+            }
+          ]
+        },
+        {
+          "start": 2044.3000000002794,
+          "duration": 53.39999999990687,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 31
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 6
+            }
+          ]
+        },
+        {
+          "start": 2123,
+          "duration": 63.200000000186265,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 33
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 8
+            }
+          ]
+        },
+        {
+          "start": 2220.600000000093,
+          "duration": 51.60000000009313,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 30
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 5
+            }
+          ]
+        },
+        {
+          "start": 3551.8000000002794,
+          "duration": 68.39999999990687,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "Window.fetch.catch",
+              "dur": 6
+            }
+          ]
+        },
+        {
+          "start": 3674.600000000093,
+          "duration": 72.29999999981374,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "http://127.0.0.1:33221/assets/runtime-Dbwfuf0d.js",
+              "dur": 53
+            },
+            {
+              "inv": "import.then",
+              "dur": 15
+            }
+          ]
+        },
+        {
+          "start": 3769.899999999907,
+          "duration": 129.3000000002794,
+          "timer": false,
+          "scripts": []
+        }
+      ],
+      "laterTimer": 10,
+      "fillMs": 1259.3999999999069,
+      "fill": [
+        {
+          "t": -956,
+          "rows": 0
+        },
+        {
+          "t": 213,
+          "rows": 11
+        },
+        {
+          "t": 492,
+          "rows": 30
+        },
+        {
+          "t": 620,
+          "rows": 44
+        },
+        {
+          "t": 694,
+          "rows": 58
+        },
+        {
+          "t": 754,
+          "rows": 73
+        },
+        {
+          "t": 814,
+          "rows": 90
+        },
+        {
+          "t": 902,
+          "rows": 109
+        },
+        {
+          "t": 1012,
+          "rows": 127
+        },
+        {
+          "t": 1081,
+          "rows": 145
+        },
+        {
+          "t": 1164,
+          "rows": 165
+        },
+        {
+          "t": 1259,
+          "rows": 175
+        }
+      ],
+      "rows": 175,
+      "groups": 5,
+      "pending": 0,
+      "unique": 175,
+      "filled": true,
+      "errors": []
+    },
+    {
+      "run": 4,
+      "callback": 64.20000000018626,
+      "frame": {
+        "start": 574.4000000003725,
+        "duration": 558.8999999999069,
+        "forced": 0
+      },
+      "parts": {
+        "beforeApply": 487.09999999962747,
+        "apply": 64.20000000018626,
+        "afterApply": 7.600000000093132,
+        "renderStart": 553.3999999999069
+      },
+      "later": [
+        {
+          "start": 1260.7000000001863,
+          "duration": 118.39999999990687,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 6
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 11
+            }
+          ]
+        },
+        {
+          "start": 1396.7000000001863,
+          "duration": 55.39999999990687,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 15
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 14
+            }
+          ]
+        },
+        {
+          "start": 1459.9000000003725,
+          "duration": 124.79999999981374,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 55
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 9
+            }
+          ]
+        },
+        {
+          "start": 1611.6000000000931,
+          "duration": 82.3000000002794,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 47
+            },
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 5
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 8
+            }
+          ]
+        },
+        {
+          "start": 1701,
+          "duration": 65.10000000009313,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 40
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 5
+            }
+          ]
+        },
+        {
+          "start": 1773.3000000002794,
+          "duration": 64.79999999981374,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 38
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 6
+            }
+          ]
+        },
+        {
+          "start": 1844.7000000001863,
+          "duration": 62.700000000186265,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 30
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 6
+            }
+          ]
+        },
+        {
+          "start": 1914.1000000000931,
+          "duration": 78.3000000002794,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 40
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 8
+            }
+          ]
+        },
+        {
+          "start": 2024.3000000002794,
+          "duration": 63.299999999813735,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 34
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 6
+            }
+          ]
+        },
+        {
+          "start": 2125.5,
+          "duration": 88.60000000009313,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 44
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 6
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 9
+            }
+          ]
+        },
+        {
+          "start": 2260.7000000001863,
+          "duration": 55.60000000009313,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 30
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 6
+            }
+          ]
+        },
+        {
+          "start": 2351.600000000093,
+          "duration": 67.89999999990687,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 39
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 5
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 6
+            }
+          ]
+        },
+        {
+          "start": 3774,
+          "duration": 82.90000000037253,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "http://127.0.0.1:33221/assets/runtime-Dbwfuf0d.js",
+              "dur": 38
+            },
+            {
+              "inv": "import.then",
+              "dur": 35
+            }
+          ]
+        },
+        {
+          "start": 3864.3000000002794,
+          "duration": 110,
+          "timer": false,
+          "scripts": []
+        }
+      ],
+      "laterTimer": 10,
+      "fillMs": 1334.9000000003725,
+      "fill": [
+        {
+          "t": -1021,
+          "rows": 0
+        },
+        {
+          "t": 219,
+          "rows": 11
+        },
+        {
+          "t": 462,
+          "rows": 30
+        },
+        {
+          "t": 611,
+          "rows": 47
+        },
+        {
+          "t": 682,
+          "rows": 61
+        },
+        {
+          "t": 754,
+          "rows": 76
+        },
+        {
+          "t": 818,
+          "rows": 91
+        },
+        {
+          "t": 898,
+          "rows": 107
+        },
+        {
+          "t": 1003,
+          "rows": 124
+        },
+        {
+          "t": 1116,
+          "rows": 141
+        },
+        {
+          "t": 1234,
+          "rows": 158
+        },
+        {
+          "t": 1335,
+          "rows": 175
+        }
+      ],
+      "rows": 175,
+      "groups": 5,
+      "pending": 0,
+      "unique": 175,
+      "filled": true,
+      "errors": []
+    },
+    {
+      "run": 5,
+      "callback": 51.60000000009313,
+      "frame": {
+        "start": 550,
+        "duration": 525.2999999998137,
+        "forced": 0
+      },
+      "parts": {
+        "beforeApply": 466.79999999981374,
+        "apply": 51.60000000009313,
+        "afterApply": 6.899999999906868,
+        "renderStart": 519.8999999999069
+      },
+      "later": [
+        {
+          "start": 1183.6000000000931,
+          "duration": 132.6999999997206,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 5
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 18
+            }
+          ]
+        },
+        {
+          "start": 1332.8999999999069,
+          "duration": 62.39999999990687,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 18
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 17
+            }
+          ]
+        },
+        {
+          "start": 1406.1000000000931,
+          "duration": 133.29999999981374,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 64
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 8
+            }
+          ]
+        },
+        {
+          "start": 1558.1999999997206,
+          "duration": 77.20000000018626,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 8
+            },
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 44
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 5
+            }
+          ]
+        },
+        {
+          "start": 1643.8999999999069,
+          "duration": 70.29999999981374,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 45
+            }
+          ]
+        },
+        {
+          "start": 1812.7999999998137,
+          "duration": 77.8000000002794,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 41
+            }
+          ]
+        },
+        {
+          "start": 1902.7999999998137,
+          "duration": 97.20000000018626,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 58
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 12
+            }
+          ]
+        },
+        {
+          "start": 2009.1000000000931,
+          "duration": 50.09999999962747,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 24
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 7
+            }
+          ]
+        },
+        {
+          "start": 2174.1999999997206,
+          "duration": 68.10000000009313,
+          "timer": true,
+          "scripts": [
+            {
+              "inv": "TimerHandler:setTimeout",
+              "dur": 40
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 6
+            }
+          ]
+        },
+        {
+          "start": 3068.5,
+          "duration": 54.60000000009313,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 33
+            }
+          ]
+        },
+        {
+          "start": 3603.100000000093,
+          "duration": 102.1999999997206,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "http://127.0.0.1:33221/assets/runtime-Dbwfuf0d.js",
+              "dur": 43
+            },
+            {
+              "inv": "import.then",
+              "dur": 47
+            }
+          ]
+        },
+        {
+          "start": 3760.399999999907,
+          "duration": 82.29999999981374,
+          "timer": false,
+          "scripts": []
+        }
+      ],
+      "laterTimer": 7,
+      "fillMs": 1207.8000000002794,
+      "fill": [
+        {
+          "t": -970,
+          "rows": 0
+        },
+        {
+          "t": 197,
+          "rows": 11
+        },
+        {
+          "t": 460,
+          "rows": 30
+        },
+        {
+          "t": 599,
+          "rows": 45
+        },
+        {
+          "t": 677,
+          "rows": 58
+        },
+        {
+          "t": 722,
+          "rows": 71
+        },
+        {
+          "t": 785,
+          "rows": 90
+        },
+        {
+          "t": 842,
+          "rows": 110
+        },
+        {
+          "t": 951,
+          "rows": 129
+        },
+        {
+          "t": 1022,
+          "rows": 145
+        },
+        {
+          "t": 1119,
+          "rows": 165
+        },
+        {
+          "t": 1208,
+          "rows": 175
+        }
+      ],
+      "rows": 175,
+      "groups": 5,
+      "pending": 0,
+      "unique": 175,
+      "filled": true,
+      "errors": []
+    }
+  ]
+}

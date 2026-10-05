@@ -1,0 +1,19 @@
+file                       perf  FCP    LCP    TBT    TTI    SI     CLS    LCP element
+demo-run1.json             0.65   2.91  4.74  0.50  5.03  2.73  0.001   span._chestPos_uaagh_280 > span._chest_uaagh_280 > picture > img._chestImg_uaagh_307 <img>
+                           LCP phases (unthrottled trace): Time to first byte 7 ms, Resource load delay 3863 ms, Resource load duration 788 ms, Element render delay 85 ms
+demo-run2.json             0.61   3.01  4.91  0.62  5.10  2.83  0.001   span._chestPos_uaagh_280 > span._chest_uaagh_280 > picture > img._chestImg_uaagh_307 <img>
+                           LCP phases (unthrottled trace): Time to first byte 14 ms, Resource load delay 4176 ms, Resource load duration 699 ms, Element render delay 25 ms
+demo-run3.json             0.64   2.94  4.89  0.52  5.10  2.83  0.001   span._chestPos_uaagh_280 > span._chest_uaagh_280 > picture > img._chestImg_uaagh_307 <img>
+                           LCP phases (unthrottled trace): Time to first byte 7 ms, Resource load delay 4088 ms, Resource load duration 706 ms, Element render delay 87 ms
+root-run1.json             0.9    2.96  2.96  0.03  4.96  1.91  0.000   No matches yet.
+Play the demo matchday <p>
+                           LCP phases (unthrottled trace): Time to first byte 13 ms, Element render delay 2948 ms
+root-run2.json             0.91   2.88  2.88  0.05  4.91  1.86  0.000   No matches yet.
+Play the demo matchday <p>
+                           LCP phases (unthrottled trace): Time to first byte 9 ms, Element render delay 2867 ms
+root-run3.json             0.91   2.85  2.85  0.06  4.94  1.87  0.000   No matches yet.
+Play the demo matchday <p>
+                           LCP phases (unthrottled trace): Time to first byte 7 ms, Element render delay 2845 ms
+
+Lighthouse 13.5.0; benchmarkIndex 2230.5; Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.0.0 Safari/537.36
+median of 6: FCP  2.94  LCP  4.74  TBT  0.50  TTI  5.03  SI  2.73  (seconds)

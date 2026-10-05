@@ -96,8 +96,12 @@ simulation, JSON parsing, text, layout, scrolling, hit testing and tweens.
 **Rules for Rive in the app:**
 - Rive canvases are never hit targets. A DOM `<button aria-pressed>` wraps the Live icon, and
   every Rive canvas is `aria-hidden` with `pointer-events: none`.
-- The runtime loads after first paint (idle callback). Until then the Live icon shows a static
-  SVG of its idle frame. `moments.riv` preloads as soon as any match is live.
+- The runtime starts only after the first data has been committed, painted and the page has gone
+  idle (`src/rive/startGate.ts`, state in `app/layout/RiveGate.tsx` so opening it re-renders the
+  Live button and nothing else). A feed that is due and late does not hold it past 4 s; a page with
+  no data on its way opens the gate after its first paint. Until then, and while it loads, the
+  Live icon is its DOM fallback, swapped for the canvas without a visible change. `moments.riv`
+  preloads once the gate is open and any match is live.
 - `useOffscreenRenderer: true` makes the instances share one WebGL context. Never more than 2
   instances at once. Pause when off-screen or the tab is hidden, and call `cleanup()` on unmount.
 - Size budget: `live-icon.riv` ≤ 60 KB, `moments.riv` ≤ 150 KB.
@@ -231,6 +235,23 @@ their ready thenables preserve the first warmed push/reveal. A cold load keeps l
 and transfers any focus it holds to the resolved heading. Rive stays outside the initial graph.
 Motion's `domAnimation` stays synchronous: deferring it prevented some initial screens from
 completing their exits in browser tests.
+
+First paint and first data (Part 21, `reports/part21-startup-and-lcp.md`):
+- `index.html` carries the list's header and day tabs as an inline-styled static frame inside
+  `#root`; React replaces it at its first commit in the same boxes (`e2e/handoff.spec.ts` holds
+  the geometry and the handoff, `src/app/staticFrame.test.ts` the copied tokens).
+- The app's entry runs after that frame is on screen: the build turns the entry's module script
+  into a (low-priority) modulepreload and adds the script once the first contentful paint is
+  observed (`vite.config.ts`, `bootAfterFirstPaint`). The module graph is unchanged and
+  `check:size` counts the entry through its modulepreload.
+- Day-tab widths come from `textWidth` and `useFontVersion`, never from a DOM measurement.
+- The first feed reaches the header in the store's own render; the list body (follow card,
+  groups) follows in a deferred render. A first list longer than a screen mounts the first screen
+  at once and the rest in measured ~40 ms slices (`progressive.ts`); a day or Live change mounts its
+  list whole, because the cascade is timed for that.
+- The host must compress `application/wasm` (the Rive runtime is 2.3 MB raw, about 0.93 MB gzip
+  and 0.73 MB brotli) and serve it with that content type. `vite preview` sends it uncompressed;
+  `verification/perf/compression.mjs --base <host>` checks a deployment.
 
 ## 8. Project structure
 

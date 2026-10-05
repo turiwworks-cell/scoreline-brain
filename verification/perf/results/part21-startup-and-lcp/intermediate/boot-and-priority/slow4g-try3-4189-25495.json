@@ -1,0 +1,388 @@
+{
+ "path": "/?demo",
+ "rate": 4,
+ "width": 390,
+ "height": 844,
+ "noRive": false,
+ "results": [
+  {
+   "run": 1,
+   "fcp": 1552,
+   "lcp": {
+    "t": 4396,
+    "render": 4396,
+    "size": 18219,
+    "tag": "img",
+    "cls": "_chestImg_uaagh_307",
+    "text": ""
+   },
+   "lcpCandidates": [
+    {
+     "t": 1552,
+     "render": 1552,
+     "size": 2987,
+     "tag": "h1",
+     "cls": "sf-word",
+     "text": "scoreline"
+    },
+    {
+     "t": 2788,
+     "render": 2788,
+     "size": 3069,
+     "tag": "h1",
+     "cls": "_wordmark_1hm1u_45",
+     "text": "scoreline"
+    },
+    {
+     "t": 4396,
+     "render": 4396,
+     "size": 18219,
+     "tag": "img",
+     "cls": "_chestImg_uaagh_307",
+     "text": ""
+    }
+   ],
+   "resources": [
+    {
+     "name": "/fonts/hanken-grotesk-latin-wght-normal.woff2",
+     "start": 613.3999999999069,
+     "end": 1826,
+     "size": 35004
+    },
+    {
+     "name": "/assets/index-CLQoqotl.js",
+     "start": 615.7999999998137,
+     "end": 1944.5999999996275,
+     "size": 46154
+    },
+    {
+     "name": "/assets/rolldown-runtime-CbXtAM7H.js",
+     "start": 616,
+     "end": 1214.1999999997206,
+     "size": 889
+    },
+    {
+     "name": "/assets/colorOf-ClTxFktT.js",
+     "start": 616.0999999996275,
+     "end": 1309.0999999996275,
+     "size": 3821
+    },
+    {
+     "name": "/assets/index-k4qExRyO.css",
+     "start": 616.0999999996275,
+     "end": 1483.5999999996275,
+     "size": 13356
+    },
+    {
+     "name": "/assets/app-vendor-CCjG9T8J.js",
+     "start": 616.0999999996275,
+     "end": 2398.5,
+     "size": 128782
+    },
+    {
+     "name": "/assets/demo-BkacKGDk.js",
+     "start": 2540.399999999907,
+     "end": 3264.0999999996275,
+     "size": 13625
+    },
+    {
+     "name": "/assets/standings-CUdfNi5b.js",
+     "start": 2541.5,
+     "end": 3113.1999999997206,
+     "size": 1250
+    },
+    {
+     "name": "/assets/data-DJxRtNur.js",
+     "start": 2541.6999999997206,
+     "end": 3247.899999999907,
+     "size": 11908
+    },
+    {
+     "name": "/assets/rng-W439OvqJ.js",
+     "start": 2541.899999999907,
+     "end": 3121.5999999996275,
+     "size": 613
+    },
+    {
+     "name": "/img/players/manifest.json",
+     "start": 2808.399999999907,
+     "end": 3382.7999999998137,
+     "size": 2461
+    },
+    {
+     "name": "/icon.svg",
+     "start": 2843.0999999996275,
+     "end": 3415.5,
+     "size": 492
+    },
+    {
+     "name": "/assets/Scene-B8EmphxU.js",
+     "start": 2863.899999999907,
+     "end": 3860.0999999996275,
+     "size": 5651
+    },
+    {
+     "name": "/assets/MatchScreen-Cs7PC34o.js",
+     "start": 2868.0999999996275,
+     "end": 4059.399999999907,
+     "size": 16915
+    },
+    {
+     "name": "/assets/StandingsTable-OF31hQnt.js",
+     "start": 2869.399999999907,
+     "end": 4003.399999999907,
+     "size": 1567
+    },
+    {
+     "name": "/assets/StandingsTable-Dfa2LwMN.css",
+     "start": 2870.5,
+     "end": 3686,
+     "size": 1401
+    },
+    {
+     "name": "/assets/MatchScreen-CwEJmPYY.css",
+     "start": 2871.899999999907,
+     "end": 3717.399999999907,
+     "size": 5425
+    },
+    {
+     "name": "/assets/PlayerScreen-ilwYmDNB.js",
+     "start": 2873.399999999907,
+     "end": 4298.199999999721,
+     "size": 6519
+    },
+    {
+     "name": "/assets/PlayerScreen-BVJSY1t5.css",
+     "start": 2874.399999999907,
+     "end": 3827.6999999997206,
+     "size": 2504
+    },
+    {
+     "name": "/img/players/arg/10-bust@1x.avif",
+     "start": 3655.5999999996275,
+     "end": 4352.699999999721,
+     "size": 11595
+    },
+    {
+     "name": "/assets/LiveGraphic-CF-OthkW.js",
+     "start": 4040.5999999996275,
+     "end": 4607.0999999996275,
+     "size": 978
+    },
+    {
+     "name": "/assets/RiveCanvas-DI9PcWmf.js",
+     "start": 4041,
+     "end": 4622.899999999907,
+     "size": 1688
+    },
+    {
+     "name": "/assets/WordGraphic-CcDcooQ2.js",
+     "start": 4094,
+     "end": 4679.399999999907,
+     "size": 1520
+    },
+    {
+     "name": "/assets/runtime-Dbwfuf0d.js",
+     "start": 4094.5999999996275,
+     "end": 5139.5,
+     "size": 60586
+    },
+    {
+     "name": "/rive/live-icon.riv",
+     "start": 4095,
+     "end": 5091.699999999721,
+     "size": 15424
+    },
+    {
+     "name": "/rive/moments.riv",
+     "start": 4095.0999999996275,
+     "end": 5076.5,
+     "size": 9867
+    }
+   ],
+   "seen": {
+    "h1": 632.1999999997206,
+    "staticFrame": 632.1999999997206,
+    "tabs": 2771.1999999997206,
+    "staticGone": 2771.1999999997206,
+    "rows": 3769.7999999998137
+   },
+   "shifts": [
+    {
+     "t": 1842.2999999998137,
+     "value": 0.0007815483142786549,
+     "hadInput": true
+    }
+   ],
+   "firstDataFrame": {
+    "start": 3754,
+    "dur": 161.1999999997206,
+    "block": 94.161,
+    "renderStart": 3789.1999999997206,
+    "scripts": [
+     {
+      "inv": "MessagePort.onmessage",
+      "url": "http://127.0.0.1:4189/assets/app-vendor-CCjG9T8J.js",
+      "dur": 15,
+      "layout": 0
+     },
+     {
+      "inv": "MessagePort.onmessage",
+      "url": "http://127.0.0.1:4189/assets/app-vendor-CCjG9T8J.js",
+      "dur": 18,
+      "layout": 0
+     },
+     {
+      "inv": "FrameRequestCallback",
+      "url": "http://127.0.0.1:4189/assets/app-vendor-CCjG9T8J.js",
+      "dur": 16,
+      "layout": 0
+     }
+    ]
+   },
+   "longFrames": [
+    {
+     "start": 572.6999999997206,
+     "dur": 968.6000000000931,
+     "block": 0,
+     "renderStart": 1505.8999999999069,
+     "scripts": []
+    },
+    {
+     "start": 2417,
+     "dur": 127.09999999962747,
+     "block": 76.777,
+     "renderStart": 2544.0999999996275,
+     "scripts": [
+      {
+       "inv": "http://127.0.0.1:4189/assets/index-CLQoqotl.js",
+       "url": "http://127.0.0.1:4189/assets/index-CLQoqotl.js",
+       "dur": 126,
+       "layout": 0
+      }
+     ]
+    },
+    {
+     "start": 2550.399999999907,
+     "dur": 227.10000000009313,
+     "block": 176.258,
+     "renderStart": 2774.0999999996275,
+     "scripts": [
+      {
+       "inv": "MessagePort.onmessage",
+       "url": "http://127.0.0.1:4189/assets/app-vendor-CCjG9T8J.js",
+       "dur": 221,
+       "layout": 61
+      }
+     ]
+    },
+    {
+     "start": 3270.0999999996275,
+     "dur": 92.29,
+     "block": 42.29,
+     "renderStart": 0,
+     "scripts": [
+      {
+       "inv": "http://127.0.0.1:4189/assets/demo-BkacKGDk.js",
+       "url": "http://127.0.0.1:4189/assets/demo-BkacKGDk.js",
+       "dur": 13,
+       "layout": 0
+      },
+      {
+       "inv": "import.then",
+       "url": "http://127.0.0.1:4189/assets/index-CLQoqotl.js",
+       "dur": 77,
+       "layout": 0
+      }
+     ]
+    },
+    {
+     "start": 3363.0999999996275,
+     "dur": 155.90000000037253,
+     "block": 105.072,
+     "renderStart": 3510.5999999996275,
+     "scripts": [
+      {
+       "inv": "TimerHandler:setTimeout",
+       "url": "http://127.0.0.1:4189/assets/index-CLQoqotl.js",
+       "dur": 146,
+       "layout": 0
+      }
+     ]
+    },
+    {
+     "start": 3754,
+     "dur": 161.1999999997206,
+     "block": 94.161,
+     "renderStart": 3789.1999999997206,
+     "scripts": [
+      {
+       "inv": "MessagePort.onmessage",
+       "url": "http://127.0.0.1:4189/assets/app-vendor-CCjG9T8J.js",
+       "dur": 15,
+       "layout": 0
+      },
+      {
+       "inv": "MessagePort.onmessage",
+       "url": "http://127.0.0.1:4189/assets/app-vendor-CCjG9T8J.js",
+       "dur": 18,
+       "layout": 0
+      },
+      {
+       "inv": "FrameRequestCallback",
+       "url": "http://127.0.0.1:4189/assets/app-vendor-CCjG9T8J.js",
+       "dur": 16,
+       "layout": 0
+      }
+     ]
+    },
+    {
+     "start": 5147.799999999814,
+     "dur": 88.702,
+     "block": 38.702,
+     "renderStart": 0,
+     "scripts": [
+      {
+       "inv": "http://127.0.0.1:4189/assets/runtime-Dbwfuf0d.js",
+       "url": "http://127.0.0.1:4189/assets/runtime-Dbwfuf0d.js",
+       "dur": 38,
+       "layout": 0
+      },
+      {
+       "inv": "import.then",
+       "url": "http://127.0.0.1:4189/assets/index-CLQoqotl.js",
+       "dur": 49,
+       "layout": 0
+      }
+     ]
+    }
+   ],
+   "longtasks": [
+    {
+     "start": 2417,
+     "dur": 126
+    },
+    {
+     "start": 2550.399999999907,
+     "dur": 222
+    },
+    {
+     "start": 3270.0999999996275,
+     "dur": 92
+    },
+    {
+     "start": 3363.0999999996275,
+     "dur": 146
+    },
+    {
+     "start": 3789.1999999997206,
+     "dur": 142
+    },
+    {
+     "start": 5147.799999999814,
+     "dur": 88
+    }
+   ]
+  }
+ ]
+}

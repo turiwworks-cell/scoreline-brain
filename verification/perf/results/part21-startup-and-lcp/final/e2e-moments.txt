@@ -1,0 +1,64 @@
+
+Running 15 tests using 1 worker
+
+[1/15] [phone-390x844] › verification/moments/moments.spec.ts:46:1 › goalHome plays the goal scene; a first tap shows it all, the next closes it
+[WebServer] 1:43:13 PM [vite] (client) [console.warn] [Rive: default-state-machine] No `stateMachine` was specified, so the artboard's first linear animation is playing by default. In the next major version, the artboard's state machine will be played by default instead when one exists. Pass the `stateMachine` parameter to adopt that behavior now.
+[WebServer] To suppress this warning, set Rive.suppressDeprecationWarnings = ["default-state-machine"]
+
+[2/15] [phone-390x844] › verification/moments/moments.spec.ts:69:1 › redHome plays the red card scene; Escape closes it
+[WebServer] 1:43:18 PM [vite] (client) [console.warn] [Rive: default-state-machine] No `stateMachine` was specified, so the artboard's first linear animation is playing by default. In the next major version, the artboard's state machine will be played by default instead when one exists. Pass the `stateMachine` parameter to adopt that behavior now.
+[WebServer] To suppress this warning, set Rive.suppressDeprecationWarnings = ["default-state-machine"]
+
+[3/15] [phone-390x844] › verification/moments/moments.spec.ts:86:1 › a goal in another match is a toast; a tap opens that match
+[WebServer] 1:43:24 PM [vite] (client) [console.warn] [Rive: default-state-machine] No `stateMachine` was specified, so the artboard's first linear animation is playing by default. In the next major version, the artboard's state machine will be played by default instead when one exists. Pass the `stateMachine` parameter to adopt that behavior now.
+[WebServer] To suppress this warning, set Rive.suppressDeprecationWarnings = ["default-state-machine"]
+
+[4/15] [phone-390x844] › verification/moments/moments.spec.ts:104:1 › a swipe up sends the toast away without opening the match
+[WebServer] 1:43:28 PM [vite] (client) [console.warn] [Rive: default-state-machine] No `stateMachine` was specified, so the artboard's first linear animation is playing by default. In the next major version, the artboard's state machine will be played by default instead when one exists. Pass the `stateMachine` parameter to adopt that behavior now.
+[WebServer] To suppress this warning, set Rive.suppressDeprecationWarnings = ["default-state-machine"]
+
+[5/15] [phone-390x844] › verification/moments/moments.spec.ts:120:1 › the toast leaves on its own after its hold
+[WebServer] 1:43:32 PM [vite] (client) [console.warn] [Rive: default-state-machine] No `stateMachine` was specified, so the artboard's first linear animation is playing by default. In the next major version, the artboard's state machine will be played by default instead when one exists. Pass the `stateMachine` parameter to adopt that behavior now.
+[WebServer] To suppress this warning, set Rive.suppressDeprecationWarnings = ["default-state-machine"]
+
+[6/15] [tablet-900x800] › verification/moments/moments.spec.ts:46:1 › goalHome plays the goal scene; a first tap shows it all, the next closes it
+[WebServer] 1:43:40 PM [vite] (client) [console.warn] [Rive: default-state-machine] No `stateMachine` was specified, so the artboard's first linear animation is playing by default. In the next major version, the artboard's state machine will be played by default instead when one exists. Pass the `stateMachine` parameter to adopt that behavior now.
+[WebServer] To suppress this warning, set Rive.suppressDeprecationWarnings = ["default-state-machine"]
+
+[7/15] [tablet-900x800] › verification/moments/moments.spec.ts:69:1 › redHome plays the red card scene; Escape closes it
+[WebServer] 1:43:45 PM [vite] (client) [console.warn] [Rive: default-state-machine] No `stateMachine` was specified, so the artboard's first linear animation is playing by default. In the next major version, the artboard's state machine will be played by default instead when one exists. Pass the `stateMachine` parameter to adopt that behavior now.
+[WebServer] To suppress this warning, set Rive.suppressDeprecationWarnings = ["default-state-machine"]
+
+[8/15] [tablet-900x800] › verification/moments/moments.spec.ts:86:1 › a goal in another match is a toast; a tap opens that match
+[WebServer] 1:43:51 PM [vite] (client) [console.warn] [Rive: default-state-machine] No `stateMachine` was specified, so the artboard's first linear animation is playing by default. In the next major version, the artboard's state machine will be played by default instead when one exists. Pass the `stateMachine` parameter to adopt that behavior now.
+[WebServer] To suppress this warning, set Rive.suppressDeprecationWarnings = ["default-state-machine"]
+
+[9/15] [tablet-900x800] › verification/moments/moments.spec.ts:104:1 › a swipe up sends the toast away without opening the match
+[WebServer] 1:43:55 PM [vite] (client) [console.warn] [Rive: default-state-machine] No `stateMachine` was specified, so the artboard's first linear animation is playing by default. In the next major version, the artboard's state machine will be played by default instead when one exists. Pass the `stateMachine` parameter to adopt that behavior now.
+[WebServer] To suppress this warning, set Rive.suppressDeprecationWarnings = ["default-state-machine"]
+
+[10/15] [tablet-900x800] › verification/moments/moments.spec.ts:120:1 › the toast leaves on its own after its hold
+[WebServer] 1:43:58 PM [vite] (client) [console.warn] [Rive: default-state-machine] No `stateMachine` was specified, so the artboard's first linear animation is playing by default. In the next major version, the artboard's state machine will be played by default instead when one exists. Pass the `stateMachine` parameter to adopt that behavior now.
+[WebServer] To suppress this warning, set Rive.suppressDeprecationWarnings = ["default-state-machine"]
+
+[11/15] [desktop-1280x892] › verification/moments/moments.spec.ts:46:1 › goalHome plays the goal scene; a first tap shows it all, the next closes it
+[WebServer] 1:44:07 PM [vite] (client) [console.warn] [Rive: default-state-machine] No `stateMachine` was specified, so the artboard's first linear animation is playing by default. In the next major version, the artboard's state machine will be played by default instead when one exists. Pass the `stateMachine` parameter to adopt that behavior now.
+[WebServer] To suppress this warning, set Rive.suppressDeprecationWarnings = ["default-state-machine"]
+
+[12/15] [desktop-1280x892] › verification/moments/moments.spec.ts:69:1 › redHome plays the red card scene; Escape closes it
+[WebServer] 1:44:13 PM [vite] (client) [console.warn] [Rive: default-state-machine] No `stateMachine` was specified, so the artboard's first linear animation is playing by default. In the next major version, the artboard's state machine will be played by default instead when one exists. Pass the `stateMachine` parameter to adopt that behavior now.
+[WebServer] To suppress this warning, set Rive.suppressDeprecationWarnings = ["default-state-machine"]
+
+[13/15] [desktop-1280x892] › verification/moments/moments.spec.ts:86:1 › a goal in another match is a toast; a tap opens that match
+[WebServer] 1:44:18 PM [vite] (client) [console.warn] [Rive: default-state-machine] No `stateMachine` was specified, so the artboard's first linear animation is playing by default. In the next major version, the artboard's state machine will be played by default instead when one exists. Pass the `stateMachine` parameter to adopt that behavior now.
+[WebServer] To suppress this warning, set Rive.suppressDeprecationWarnings = ["default-state-machine"]
+
+[14/15] [desktop-1280x892] › verification/moments/moments.spec.ts:104:1 › a swipe up sends the toast away without opening the match
+[WebServer] 1:44:23 PM [vite] (client) [console.warn] [Rive: default-state-machine] No `stateMachine` was specified, so the artboard's first linear animation is playing by default. In the next major version, the artboard's state machine will be played by default instead when one exists. Pass the `stateMachine` parameter to adopt that behavior now.
+[WebServer] To suppress this warning, set Rive.suppressDeprecationWarnings = ["default-state-machine"]
+
+[15/15] [desktop-1280x892] › verification/moments/moments.spec.ts:120:1 › the toast leaves on its own after its hold
+[WebServer] 1:44:26 PM [vite] (client) [console.warn] [Rive: default-state-machine] No `stateMachine` was specified, so the artboard's first linear animation is playing by default. In the next major version, the artboard's state machine will be played by default instead when one exists. Pass the `stateMachine` parameter to adopt that behavior now.
+[WebServer] To suppress this warning, set Rive.suppressDeprecationWarnings = ["default-state-machine"]
+
+  15 passed (1.4m)

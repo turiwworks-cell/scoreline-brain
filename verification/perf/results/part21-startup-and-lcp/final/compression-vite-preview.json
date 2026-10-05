@@ -1,0 +1,265 @@
+{
+ "base": "http://127.0.0.1:4191",
+ "rows": [
+  {
+   "path": "/assets/DevKit-BB1v0y0y.js",
+   "raw": 27225,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "gzip",
+   "bytes": 8944
+  },
+  {
+   "path": "/assets/DevKit-CwzHBkJe.css",
+   "raw": 8535,
+   "status": 200,
+   "type": "text/css",
+   "encoding": "gzip",
+   "bytes": 2231
+  },
+  {
+   "path": "/assets/Insights-CG1pB5Kx.js",
+   "raw": 7563,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "gzip",
+   "bytes": 3022
+  },
+  {
+   "path": "/assets/Insights-DtahtWB3.css",
+   "raw": 4438,
+   "status": 200,
+   "type": "text/css",
+   "encoding": "gzip",
+   "bytes": 1351
+  },
+  {
+   "path": "/assets/LiveGraphic-Dq7np3fl.js",
+   "raw": 1375,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "gzip",
+   "bytes": 676
+  },
+  {
+   "path": "/assets/MatchScreen-BV-QWGiK.js",
+   "raw": 48047,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "gzip",
+   "bytes": 16616
+  },
+  {
+   "path": "/assets/MatchScreen-CwEJmPYY.css",
+   "raw": 22657,
+   "status": 200,
+   "type": "text/css",
+   "encoding": "gzip",
+   "bytes": 5125
+  },
+  {
+   "path": "/assets/PlayerScreen-BVJSY1t5.css",
+   "raw": 7840,
+   "status": 200,
+   "type": "text/css",
+   "encoding": "gzip",
+   "bytes": 2204
+  },
+  {
+   "path": "/assets/PlayerScreen-DZBOFtJn.js",
+   "raw": 16648,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "gzip",
+   "bytes": 6218
+  },
+  {
+   "path": "/assets/RiveCanvas-B0NAKZri.js",
+   "raw": 2833,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "gzip",
+   "bytes": 1386
+  },
+  {
+   "path": "/assets/Scene-CgxlHeD-.js",
+   "raw": 14051,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "gzip",
+   "bytes": 5350
+  },
+  {
+   "path": "/assets/StandingsTable-Bby_8YIT.js",
+   "raw": 3469,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "gzip",
+   "bytes": 1267
+  },
+  {
+   "path": "/assets/StandingsTable-Dfa2LwMN.css",
+   "raw": 3285,
+   "status": 200,
+   "type": "text/css",
+   "encoding": "gzip",
+   "bytes": 1101
+  },
+  {
+   "path": "/assets/WordGraphic-DhsMsvnq.js",
+   "raw": 2248,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "gzip",
+   "bytes": 1220
+  },
+  {
+   "path": "/assets/app-vendor-CCjG9T8J.js",
+   "raw": 403163,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "gzip",
+   "bytes": 128482
+  },
+  {
+   "path": "/assets/colorOf-ClTxFktT.js",
+   "raw": 9108,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "gzip",
+   "bytes": 3521
+  },
+  {
+   "path": "/assets/data-DJxRtNur.js",
+   "raw": 30287,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "gzip",
+   "bytes": 11608
+  },
+  {
+   "path": "/assets/demo-CNuamVTL.js",
+   "raw": 35151,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "gzip",
+   "bytes": 13325
+  },
+  {
+   "path": "/assets/index-k0rumXmd.js",
+   "raw": 132502,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "gzip",
+   "bytes": 46007
+  },
+  {
+   "path": "/assets/index-k4qExRyO.css",
+   "raw": 63285,
+   "status": 200,
+   "type": "text/css",
+   "encoding": "gzip",
+   "bytes": 13056
+  },
+  {
+   "path": "/assets/rive-BHUgDsdB.wasm",
+   "raw": 2272630,
+   "status": 200,
+   "type": "application/wasm",
+   "encoding": "",
+   "bytes": 2272630
+  },
+  {
+   "path": "/assets/rive_fallback-CeBxpMvX.wasm",
+   "raw": 2284807,
+   "status": 200,
+   "type": "application/wasm",
+   "encoding": "",
+   "bytes": 2284807
+  },
+  {
+   "path": "/assets/rng-W439OvqJ.js",
+   "raw": 313,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "",
+   "bytes": 313
+  },
+  {
+   "path": "/assets/rolldown-runtime-CbXtAM7H.js",
+   "raw": 589,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "",
+   "bytes": 589
+  },
+  {
+   "path": "/assets/runtime-Dbwfuf0d.js",
+   "raw": 213907,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "gzip",
+   "bytes": 60286
+  },
+  {
+   "path": "/assets/standings-CUdfNi5b.js",
+   "raw": 950,
+   "status": 200,
+   "type": "text/javascript",
+   "encoding": "",
+   "bytes": 950
+  },
+  {
+   "path": "/icon.svg",
+   "raw": 192,
+   "status": 200,
+   "type": "image/svg+xml",
+   "encoding": "",
+   "bytes": 192
+  },
+  {
+   "path": "/img/players/manifest.json",
+   "raw": 12433,
+   "status": 200,
+   "type": "application/json",
+   "encoding": "gzip",
+   "bytes": 2161
+  },
+  {
+   "path": "/index.html",
+   "raw": 9676,
+   "status": 200,
+   "type": "text/html;charset=utf-8",
+   "encoding": "gzip",
+   "bytes": 3320
+  },
+  {
+   "path": "/manifest.webmanifest",
+   "raw": 444,
+   "status": 200,
+   "type": "application/manifest+json",
+   "encoding": "",
+   "bytes": 444
+  },
+  {
+   "path": "/rive/live-icon.riv",
+   "raw": 26800,
+   "status": 200,
+   "type": "",
+   "encoding": "gzip",
+   "bytes": 15124
+  },
+  {
+   "path": "/rive/moments.riv",
+   "raw": 18100,
+   "status": 200,
+   "type": "",
+   "encoding": "gzip",
+   "bytes": 9567
+  }
+ ],
+ "problems": [
+  "/assets/rive-BHUgDsdB.wasm: sent uncompressed (2272630 bytes)",
+  "/assets/rive_fallback-CeBxpMvX.wasm: sent uncompressed (2284807 bytes)"
+ ]
+}

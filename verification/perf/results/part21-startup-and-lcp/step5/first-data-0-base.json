@@ -1,0 +1,319 @@
+{
+  "rate": 3.6,
+  "matches": 0,
+  "parse": [
+    {
+      "bytes": 126611,
+      "json": 2.2000000001862645,
+      "validate": 25.200000000186265
+    },
+    {
+      "bytes": 126611,
+      "json": 3.1000000000931323,
+      "validate": 23.899999999906868
+    },
+    {
+      "bytes": 126611,
+      "json": 6.800000000279397,
+      "validate": 39.1999999997206
+    },
+    {
+      "bytes": 126611,
+      "json": 5.5,
+      "validate": 43.89999999990687
+    },
+    {
+      "bytes": 126611,
+      "json": 3.2999999998137355,
+      "validate": 21.600000000093132
+    }
+  ],
+  "results": [
+    {
+      "run": 1,
+      "callback": 161.60000000009313,
+      "frame": {
+        "start": 531.5999999996275,
+        "duration": 244.20000000018626,
+        "forced": 52
+      },
+      "parts": {
+        "beforeApply": 32,
+        "apply": 161.60000000009313,
+        "afterApply": 50.60000000009313,
+        "renderStart": 202.60000000009313
+      },
+      "later": [
+        {
+          "start": 987.7999999998137,
+          "duration": 89.10000000009313,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "http://127.0.0.1:46333/assets/runtime-Dbwfuf0d.js",
+              "dur": 42
+            },
+            {
+              "inv": "import.then",
+              "dur": 38
+            }
+          ]
+        },
+        {
+          "start": 1089.8999999999069,
+          "duration": 126.79999999981374,
+          "timer": false,
+          "scripts": []
+        }
+      ],
+      "laterTimer": 0,
+      "fillMs": 171.70000000018626,
+      "fill": [
+        {
+          "t": -518,
+          "rows": 0
+        },
+        {
+          "t": 172,
+          "rows": 7
+        }
+      ],
+      "rows": 7,
+      "groups": 5,
+      "pending": 0,
+      "unique": 7,
+      "filled": true,
+      "errors": []
+    },
+    {
+      "run": 2,
+      "callback": 163.8000000002794,
+      "frame": {
+        "start": 494.90000000037253,
+        "duration": 261.6999999997206,
+        "forced": 54
+      },
+      "parts": {
+        "beforeApply": 33.09999999962747,
+        "apply": 163.8000000002794,
+        "afterApply": 64.79999999981374,
+        "renderStart": 206.6999999997206
+      },
+      "later": [
+        {
+          "start": 964.6000000000931,
+          "duration": 89.60000000009313,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "http://127.0.0.1:46333/assets/runtime-Dbwfuf0d.js",
+              "dur": 39
+            },
+            {
+              "inv": "import.then",
+              "dur": 38
+            }
+          ]
+        },
+        {
+          "start": 1069.3000000002794,
+          "duration": 72.10000000009313,
+          "timer": false,
+          "scripts": []
+        },
+        {
+          "start": 1145,
+          "duration": 109.40000000037253,
+          "timer": false,
+          "scripts": []
+        }
+      ],
+      "laterTimer": 0,
+      "fillMs": 174.40000000037253,
+      "fill": [
+        {
+          "t": -486,
+          "rows": 0
+        },
+        {
+          "t": 174,
+          "rows": 7
+        }
+      ],
+      "rows": 7,
+      "groups": 5,
+      "pending": 0,
+      "unique": 7,
+      "filled": true,
+      "errors": []
+    },
+    {
+      "run": 3,
+      "callback": 190.8000000002794,
+      "frame": {
+        "start": 546.5,
+        "duration": 308.20000000018626,
+        "forced": 68
+      },
+      "parts": {
+        "beforeApply": 38.89999999990687,
+        "apply": 190.8000000002794,
+        "afterApply": 78.5,
+        "renderStart": 245
+      },
+      "later": [
+        {
+          "start": 1069.5,
+          "duration": 82.70000000018626,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "http://127.0.0.1:46333/assets/runtime-Dbwfuf0d.js",
+              "dur": 35
+            },
+            {
+              "inv": "import.then",
+              "dur": 37
+            }
+          ]
+        },
+        {
+          "start": 1171,
+          "duration": 130,
+          "timer": false,
+          "scripts": []
+        }
+      ],
+      "laterTimer": 0,
+      "fillMs": 207,
+      "fill": [
+        {
+          "t": -543,
+          "rows": 0
+        },
+        {
+          "t": 207,
+          "rows": 7
+        }
+      ],
+      "rows": 7,
+      "groups": 5,
+      "pending": 0,
+      "unique": 7,
+      "filled": true,
+      "errors": []
+    },
+    {
+      "run": 4,
+      "callback": 184.89999999990687,
+      "frame": {
+        "start": 543,
+        "duration": 320.29999999981374,
+        "forced": 59
+      },
+      "parts": {
+        "beforeApply": 61.89999999990687,
+        "apply": 184.89999999990687,
+        "afterApply": 73.5,
+        "renderStart": 260
+      },
+      "later": [
+        {
+          "start": 1053,
+          "duration": 105.59999999962747,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "http://127.0.0.1:46333/assets/runtime-Dbwfuf0d.js",
+              "dur": 48
+            },
+            {
+              "inv": "import.then",
+              "dur": 35
+            }
+          ]
+        },
+        {
+          "start": 1166.7999999998137,
+          "duration": 138.29999999981374,
+          "timer": false,
+          "scripts": []
+        }
+      ],
+      "laterTimer": 0,
+      "fillMs": 198.79999999981374,
+      "fill": [
+        {
+          "t": -558,
+          "rows": 0
+        },
+        {
+          "t": 199,
+          "rows": 7
+        }
+      ],
+      "rows": 7,
+      "groups": 5,
+      "pending": 0,
+      "unique": 7,
+      "filled": true,
+      "errors": []
+    },
+    {
+      "run": 5,
+      "callback": 219.79999999981374,
+      "frame": {
+        "start": 523.5,
+        "duration": 340.20000000018626,
+        "forced": 73
+      },
+      "parts": {
+        "beforeApply": 50.10000000009313,
+        "apply": 219.79999999981374,
+        "afterApply": 70.3000000002794,
+        "renderStart": 279.39999999990687
+      },
+      "later": [
+        {
+          "start": 1066.2999999998137,
+          "duration": 100.5,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "http://127.0.0.1:46333/assets/runtime-Dbwfuf0d.js",
+              "dur": 49
+            },
+            {
+              "inv": "import.then",
+              "dur": 44
+            }
+          ]
+        },
+        {
+          "start": 1214.6000000000931,
+          "duration": 91.79999999981374,
+          "timer": false,
+          "scripts": []
+        }
+      ],
+      "laterTimer": 0,
+      "fillMs": 232.1999999997206,
+      "fill": [
+        {
+          "t": -535,
+          "rows": 0
+        },
+        {
+          "t": 232,
+          "rows": 7
+        }
+      ],
+      "rows": 7,
+      "groups": 5,
+      "pending": 0,
+      "unique": 7,
+      "filled": true,
+      "errors": []
+    }
+  ]
+}

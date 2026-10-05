@@ -1,0 +1,18 @@
+http://127.0.0.1:4191 against /tmp/claude-0/-home-user-scoreline-brain/d0ca0a3c-3c7d-5603-b2b0-acdd96df0f49/scratchpad/dist-final/ (32 files)
+  raw bytes   on the wire  encoding  content type                    path
+      27225          8944  gzip      text/javascript                 /assets/DevKit-BB1v0y0y.js
+      48047         16616  gzip      text/javascript                 /assets/MatchScreen-BV-QWGiK.js
+      22657          5125  gzip      text/css                        /assets/MatchScreen-CwEJmPYY.css
+     403163        128482  gzip      text/javascript                 /assets/app-vendor-CCjG9T8J.js
+      30287         11608  gzip      text/javascript                 /assets/data-DJxRtNur.js
+      35151         13325  gzip      text/javascript                 /assets/demo-CNuamVTL.js
+     132502         46007  gzip      text/javascript                 /assets/index-k0rumXmd.js
+      63285         13056  gzip      text/css                        /assets/index-k4qExRyO.css
+    2272630       2272630  -         application/wasm                /assets/rive-BHUgDsdB.wasm  <- not compressed
+    2284807       2284807  -         application/wasm                /assets/rive_fallback-CeBxpMvX.wasm  <- not compressed
+     213907         60286  gzip      text/javascript                 /assets/runtime-Dbwfuf0d.js
+      26800         15124  gzip                                      /rive/live-icon.riv
+
+problems:
+  /assets/rive-BHUgDsdB.wasm: sent uncompressed (2272630 bytes)
+  /assets/rive_fallback-CeBxpMvX.wasm: sent uncompressed (2284807 bytes)

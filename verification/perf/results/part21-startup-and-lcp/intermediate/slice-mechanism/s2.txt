@@ -1,0 +1,65 @@
+run 1: /?demo at 3.6x 390x844, Rive blocked
+  FCP 424 ms  LCP 424 ms (<h1> "scoreline")  h1 in DOM 406 ms  rows in DOM 887 ms  CLS 0.0000
+  LCP candidates: 424 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 9; the first-data frame: 104 ms at 873 ms, forced layout 0 ms
+       23 ms    65 ms  
+      120 ms   100 ms  96 ms http://127.0.0.1:4183/assets/index-C_lZoaaM.js index-C_lZoaaM.js
+      223 ms   189 ms  184 ms MessagePort.onmessage app-vendor-CA1omR8B.js (forced layout 48 ms)
+      473 ms    60 ms  45 ms import.then index-C_lZoaaM.js
+      542 ms   151 ms  144 ms TimerHandler:setTimeout index-C_lZoaaM.js
+      873 ms   104 ms  14 ms MessagePort.onmessage app-vendor-CA1omR8B.js
+      991 ms    62 ms  21 ms FrameRequestCallback app-vendor-CA1omR8B.js
+     1199 ms    87 ms  48 ms http://127.0.0.1:4183/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+     1289 ms   126 ms  
+run 2: /?demo at 3.6x 390x844, Rive blocked
+  FCP 424 ms  LCP 424 ms (<h1> "scoreline")  h1 in DOM 404 ms  rows in DOM 892 ms  CLS 0.0000
+  LCP candidates: 424 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 9; the first-data frame: 94 ms at 882 ms, forced layout 0 ms
+       13 ms    62 ms  
+      106 ms   114 ms  111 ms http://127.0.0.1:4183/assets/index-C_lZoaaM.js index-C_lZoaaM.js
+      220 ms   188 ms  185 ms MessagePort.onmessage app-vendor-CA1omR8B.js (forced layout 56 ms)
+      490 ms    81 ms  60 ms import.then index-C_lZoaaM.js
+      582 ms   160 ms  153 ms TimerHandler:setTimeout index-C_lZoaaM.js
+      882 ms    94 ms  11 ms MessagePort.onmessage app-vendor-CA1omR8B.js
+      988 ms    51 ms  15 ms MessagePort.onmessage app-vendor-CA1omR8B.js
+     1168 ms    83 ms  40 ms http://127.0.0.1:4183/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+     1269 ms    94 ms  
+run 3: /?demo at 3.6x 390x844, Rive blocked
+  FCP 432 ms  LCP 432 ms (<h1> "scoreline")  h1 in DOM 415 ms  rows in DOM 857 ms  CLS 0.0000
+  LCP candidates: 432 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 10; the first-data frame: 101 ms at 844 ms, forced layout 0 ms
+       12 ms    82 ms  
+      108 ms   112 ms  109 ms http://127.0.0.1:4183/assets/index-C_lZoaaM.js index-C_lZoaaM.js
+      225 ms   195 ms  189 ms MessagePort.onmessage app-vendor-CA1omR8B.js (forced layout 45 ms)
+      499 ms    59 ms  44 ms import.then index-C_lZoaaM.js
+      588 ms   137 ms  130 ms TimerHandler:setTimeout index-C_lZoaaM.js
+      844 ms   101 ms  14 ms MessagePort.onmessage app-vendor-CA1omR8B.js
+      955 ms    63 ms  17 ms MessagePort.onmessage app-vendor-CA1omR8B.js
+     1107 ms   101 ms  41 ms import.then index-C_lZoaaM.js
+     1230 ms    63 ms  7 ms TimerHandler:setTimeout index-C_lZoaaM.js
+     1296 ms    94 ms  
+run 4: /?demo at 3.6x 390x844, Rive blocked
+  FCP 456 ms  LCP 456 ms (<h1> "scoreline")  h1 in DOM 433 ms  rows in DOM 912 ms  CLS 0.0000
+  LCP candidates: 456 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 9; the first-data frame: 133 ms at 900 ms, forced layout 0 ms
+       12 ms    73 ms  
+      107 ms   124 ms  120 ms http://127.0.0.1:4183/assets/index-C_lZoaaM.js index-C_lZoaaM.js
+      238 ms   200 ms  196 ms MessagePort.onmessage app-vendor-CA1omR8B.js (forced layout 57 ms)
+      525 ms    59 ms  44 ms import.then index-C_lZoaaM.js
+      600 ms   145 ms  138 ms TimerHandler:setTimeout index-C_lZoaaM.js
+      900 ms   133 ms  16 ms MessagePort.onmessage app-vendor-CA1omR8B.js
+     1157 ms    92 ms  39 ms import.then index-C_lZoaaM.js
+     1263 ms   131 ms  
+     1908 ms    55 ms  27 ms TimerHandler:setTimeout demo-Dc0RxUHN.js
+run 5: /?demo at 3.6x 390x844, Rive blocked
+  FCP 412 ms  LCP 412 ms (<h1> "scoreline")  h1 in DOM 389 ms  rows in DOM 922 ms  CLS 0.0000
+  LCP candidates: 412 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 8; the first-data frame: 160 ms at 902 ms, forced layout 0 ms
+       10 ms    70 ms  
+       98 ms   104 ms  101 ms http://127.0.0.1:4183/assets/index-C_lZoaaM.js index-C_lZoaaM.js
+      205 ms   189 ms  185 ms MessagePort.onmessage app-vendor-CA1omR8B.js (forced layout 62 ms)
+      490 ms    94 ms  78 ms import.then index-C_lZoaaM.js
+      603 ms   156 ms  148 ms TimerHandler:setTimeout index-C_lZoaaM.js
+      902 ms   160 ms  22 ms MessagePort.onmessage app-vendor-CA1omR8B.js
+     1276 ms   105 ms  57 ms http://127.0.0.1:4183/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+     1395 ms   160 ms  5 ms FrameRequestCallback app-vendor-CA1omR8B.js

@@ -1,0 +1,64 @@
+run 1: /?demo at 3.6x 390x844, Rive blocked
+  FCP 144 ms  LCP 144 ms (<h1> "scoreline")  h1 in DOM 72 ms  rows in DOM 958 ms  CLS 0.0000
+  LCP candidates: 144 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 10; the first-data frame: 95 ms at 941 ms, forced layout 0 ms
+       24 ms   106 ms  
+      182 ms   111 ms  110 ms http://127.0.0.1:4191/assets/index-k0rumXmd.js index-k0rumXmd.js
+      302 ms   180 ms  176 ms MessagePort.onmessage app-vendor-CCjG9T8J.js (forced layout 41 ms)
+      488 ms    59 ms  52 ms MessagePort.onmessage app-vendor-CCjG9T8J.js
+      549 ms    75 ms  47 ms import.then index-k0rumXmd.js
+      639 ms   158 ms  147 ms TimerHandler:setTimeout index-k0rumXmd.js
+      941 ms    95 ms  18 ms MessagePort.onmessage app-vendor-CCjG9T8J.js
+     1048 ms    56 ms  17 ms MessagePort.onmessage app-vendor-CCjG9T8J.js
+     1291 ms   107 ms  64 ms http://127.0.0.1:4191/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+     1411 ms   161 ms  
+run 2: /?demo at 3.6x 390x844, Rive blocked
+  FCP 128 ms  LCP 128 ms (<h1> "scoreline")  h1 in DOM 48 ms  rows in DOM 825 ms  CLS 0.0000
+  LCP candidates: 128 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 8; the first-data frame: 126 ms at 810 ms, forced layout 0 ms
+        8 ms   107 ms  
+      177 ms   100 ms  98 ms http://127.0.0.1:4191/assets/index-k0rumXmd.js index-k0rumXmd.js
+      280 ms   168 ms  163 ms MessagePort.onmessage app-vendor-CCjG9T8J.js (forced layout 37 ms)
+      451 ms    91 ms  51 ms import.then index-k0rumXmd.js
+      546 ms   135 ms  124 ms TimerHandler:setTimeout index-k0rumXmd.js
+      810 ms   126 ms  16 ms MessagePort.onmessage app-vendor-CCjG9T8J.js
+     1207 ms    86 ms  42 ms import.then index-k0rumXmd.js
+     1307 ms   154 ms  
+run 3: /?demo at 3.6x 390x844, Rive blocked
+  FCP 124 ms  LCP 124 ms (<h1> "scoreline")  h1 in DOM 55 ms  rows in DOM 911 ms  CLS 0.0000
+  LCP candidates: 124 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 9; the first-data frame: 150 ms at 866 ms, forced layout 0 ms
+       12 ms   101 ms  
+      162 ms   100 ms  98 ms http://127.0.0.1:4191/assets/index-k0rumXmd.js index-k0rumXmd.js
+      265 ms   201 ms  197 ms MessagePort.onmessage app-vendor-CCjG9T8J.js (forced layout 45 ms)
+      470 ms    90 ms  39 ms import.then index-k0rumXmd.js
+      562 ms   161 ms  146 ms TimerHandler:setTimeout index-k0rumXmd.js
+      866 ms   150 ms  47 ms MessagePort.onmessage app-vendor-CCjG9T8J.js
+     1028 ms    82 ms  23 ms MessagePort.onmessage app-vendor-CCjG9T8J.js
+     1325 ms    76 ms  36 ms import.then index-k0rumXmd.js
+     1413 ms   137 ms  
+run 4: /?demo at 3.6x 390x844, Rive blocked
+  FCP 172 ms  LCP 172 ms (<h1> "scoreline")  h1 in DOM 66 ms  rows in DOM 948 ms  CLS 0.0000
+  LCP candidates: 172 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 8; the first-data frame: 190 ms at 932 ms, forced layout 0 ms
+       14 ms   143 ms  
+      205 ms    98 ms  95 ms http://127.0.0.1:4191/assets/index-k0rumXmd.js index-k0rumXmd.js
+      324 ms   181 ms  177 ms MessagePort.onmessage app-vendor-CCjG9T8J.js (forced layout 43 ms)
+      543 ms    67 ms  47 ms import.then index-k0rumXmd.js
+      632 ms   175 ms  164 ms TimerHandler:setTimeout index-k0rumXmd.js
+      932 ms   190 ms  23 ms MessagePort.onmessage app-vendor-CCjG9T8J.js
+     1378 ms    91 ms  40 ms http://127.0.0.1:4191/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+     1483 ms   144 ms  
+run 5: /?demo at 3.6x 390x844, Rive blocked
+  FCP 128 ms  LCP 128 ms (<h1> "scoreline")  h1 in DOM 56 ms  rows in DOM 901 ms  CLS 0.0000
+  LCP candidates: 128 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 9; the first-data frame: 110 ms at 887 ms, forced layout 0 ms
+       12 ms   102 ms  
+      150 ms   119 ms  108 ms http://127.0.0.1:4191/assets/index-k0rumXmd.js index-k0rumXmd.js
+      272 ms   168 ms  164 ms MessagePort.onmessage app-vendor-CCjG9T8J.js (forced layout 43 ms)
+      486 ms    86 ms  54 ms import.then index-k0rumXmd.js
+      595 ms   157 ms  145 ms TimerHandler:setTimeout index-k0rumXmd.js
+      887 ms   110 ms  14 ms MessagePort.onmessage app-vendor-CCjG9T8J.js
+     1011 ms    60 ms  17 ms MessagePort.onmessage app-vendor-CCjG9T8J.js
+     1238 ms    89 ms  44 ms import.then index-k0rumXmd.js
+     1344 ms   124 ms  

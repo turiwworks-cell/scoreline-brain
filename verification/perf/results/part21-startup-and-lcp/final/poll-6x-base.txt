@@ -1,0 +1,24 @@
+{
+  "rate": 6,
+  "matches": "demo fixtures",
+  "samples": 40,
+  "callback": {
+    "median": 42.40000000037253,
+    "max": 88
+  },
+  "untilPaint": {
+    "median": 63.799999999813735,
+    "max": 112.90000000037253
+  },
+  "longTasks": [
+    {
+      "start": 2653.5999999996275,
+      "duration": 91
+    },
+    {
+      "start": 4432.0999999996275,
+      "duration": 51
+    }
+  ],
+  "errors": []
+}

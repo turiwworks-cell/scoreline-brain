@@ -1,0 +1,111 @@
+run 1: /?demo at 4x 390x844
+  FCP 2900 ms  LCP 4756 ms (<img> "")  h1 in DOM 2871 ms  rows in DOM 3761 ms  CLS 0.0000
+  LCP candidates: 2900 ms <h1> "scoreline" 3069px² → 4756 ms <img> 18224px²
+  frames over 50 ms until 2.5 s after the first rows: 6; the first-data frame: 600 ms at 3261 ms, forced layout 99 ms
+      583 ms   939 ms  
+     2422 ms   113 ms  108 ms http://127.0.0.1:4180/assets/index-9I8RqK8J.js index-9I8RqK8J.js
+     2538 ms   346 ms  334 ms MessagePort.onmessage app-vendor-CA1omR8B.js (forced layout 89 ms)
+     3261 ms   600 ms  495 ms import.then index-9I8RqK8J.js (forced layout 99 ms)
+     3976 ms    79 ms  50 ms Response.json.then index-9I8RqK8J.js
+     4908 ms   102 ms  50 ms import.then index-9I8RqK8J.js
+  requests (start → end, ms; transferred bytes):
+       619 →   1840     35004  /fonts/hanken-grotesk-latin-wght-normal.woff2
+       621 →   1959     45535  /assets/index-9I8RqK8J.js
+       622 →   1197       889  /assets/rolldown-runtime-CbXtAM7H.js
+       622 →   2404    128779  /assets/app-vendor-CA1omR8B.js
+       623 →   1307      3821  /assets/colorOf-ClTxFktT.js
+       623 →   1506     13356  /assets/index-k4qExRyO.css
+      2518 →   3254     13626  /assets/demo-DUfn2IkN.js
+      2520 →   3097      1250  /assets/standings-CUdfNi5b.js
+      2521 →   3223     11908  /assets/data-DJxRtNur.js
+      2521 →   3105       613  /assets/rng-W439OvqJ.js
+      2659 →   3240       977  /assets/LiveGraphic-CiuY7kIh.js
+      2663 →   3262      1688  /assets/RiveCanvas-BEzFwzB-.js
+      2845 →   3819      2461  /img/players/manifest.json
+      2899 →   3829       492  /icon.svg
+      2923 →   3862      5662  /assets/Scene-C5IPYz63.js
+      2927 →   4344     16920  /assets/MatchScreen-CVTzXuXh.js
+      2929 →   4288      1570  /assets/StandingsTable-DnL1IzdE.js
+      2930 →   3670      1401  /assets/StandingsTable-Dfa2LwMN.css
+      2931 →   3700      5425  /assets/MatchScreen-CwEJmPYY.css
+      2933 →   4447      6502  /assets/PlayerScreen-FkIQ6lHy.js
+      2933 →   3804      2504  /assets/PlayerScreen-BVJSY1t5.css
+      2940 →   4900     60586  /assets/runtime-Dbwfuf0d.js
+      2941 →   4582     15424  /rive/live-icon.riv
+      4039 →   4725     11595  /img/players/arg/10-bust@1x.avif
+      4164 →   4885      1519  /assets/WordGraphic-Qs12q3Fn.js
+      4168 →   4964      9867  /rive/moments.riv
+run 2: /?demo at 4x 390x844
+  FCP 2808 ms  LCP 4992 ms (<img> "")  h1 in DOM 2784 ms  rows in DOM 3662 ms  CLS 0.0000
+  LCP candidates: 2808 ms <h1> "scoreline" 3069px² → 4992 ms <img> 18224px²
+  frames over 50 ms until 2.5 s after the first rows: 6; the first-data frame: 461 ms at 3267 ms, forced layout 78 ms
+      574 ms   937 ms  
+     2415 ms   110 ms  104 ms http://127.0.0.1:4180/assets/index-9I8RqK8J.js index-9I8RqK8J.js
+     2530 ms   266 ms  255 ms MessagePort.onmessage app-vendor-CA1omR8B.js (forced layout 66 ms)
+     3267 ms   461 ms  394 ms import.then index-9I8RqK8J.js (forced layout 78 ms)
+     3809 ms    81 ms  46 ms Response.json.then index-9I8RqK8J.js
+     4832 ms    96 ms  49 ms http://127.0.0.1:4180/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+  requests (start → end, ms; transferred bytes):
+       610 →   1834     35004  /fonts/hanken-grotesk-latin-wght-normal.woff2
+       612 →   1953     45535  /assets/index-9I8RqK8J.js
+       613 →   1191       889  /assets/rolldown-runtime-CbXtAM7H.js
+       614 →   2398    128779  /assets/app-vendor-CA1omR8B.js
+       615 →   1293      3821  /assets/colorOf-ClTxFktT.js
+       615 →   1492     13356  /assets/index-k4qExRyO.css
+      2502 →   3248     13626  /assets/demo-DUfn2IkN.js
+      2506 →   3083      1250  /assets/standings-CUdfNi5b.js
+      2506 →   3224     11908  /assets/data-DJxRtNur.js
+      2507 →   3089       613  /assets/rng-W439OvqJ.js
+      2626 →   3209       977  /assets/LiveGraphic-CiuY7kIh.js
+      2629 →   3240      1688  /assets/RiveCanvas-BEzFwzB-.js
+      2762 →   3810      2461  /img/players/manifest.json
+      2810 →   3814       492  /icon.svg
+      2830 →   3845      5662  /assets/Scene-C5IPYz63.js
+      2834 →   4329     16920  /assets/MatchScreen-CVTzXuXh.js
+      2836 →   4274      1570  /assets/StandingsTable-DnL1IzdE.js
+      2837 →   3654      1401  /assets/StandingsTable-Dfa2LwMN.css
+      2838 →   3686      5425  /assets/MatchScreen-CwEJmPYY.css
+      2840 →   4417      6502  /assets/PlayerScreen-FkIQ6lHy.js
+      2840 →   3789      2504  /assets/PlayerScreen-BVJSY1t5.css
+      2845 →   4822     60586  /assets/runtime-Dbwfuf0d.js
+      2846 →   4583     15424  /rive/live-icon.riv
+      3785 →   4456      1519  /assets/WordGraphic-Qs12q3Fn.js
+      3787 →   4893      9867  /rive/moments.riv
+      3880 →   4957     11595  /img/players/arg/10-bust@1x.avif
+run 3: /?demo at 4x 390x844
+  FCP 2872 ms  LCP 4752 ms (<img> "")  h1 in DOM 2847 ms  rows in DOM 3787 ms  CLS 0.0000
+  LCP candidates: 2872 ms <h1> "scoreline" 3069px² → 4752 ms <img> 18224px²
+  frames over 50 ms until 2.5 s after the first rows: 6; the first-data frame: 532 ms at 3334 ms, forced layout 87 ms
+      577 ms   947 ms  
+     2427 ms   152 ms  147 ms http://127.0.0.1:4180/assets/index-9I8RqK8J.js index-9I8RqK8J.js
+     2583 ms   274 ms  264 ms MessagePort.onmessage app-vendor-CA1omR8B.js (forced layout 68 ms)
+     3334 ms   532 ms  448 ms import.then index-9I8RqK8J.js (forced layout 87 ms)
+     3953 ms    57 ms  48 ms Response.json.then index-9I8RqK8J.js
+     4941 ms    98 ms  49 ms http://127.0.0.1:4180/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+  requests (start → end, ms; transferred bytes):
+       616 →   1841     35004  /fonts/hanken-grotesk-latin-wght-normal.woff2
+       618 →   1960     45535  /assets/index-9I8RqK8J.js
+       619 →   1208       889  /assets/rolldown-runtime-CbXtAM7H.js
+       620 →   2406    128779  /assets/app-vendor-CA1omR8B.js
+       620 →   1309      3821  /assets/colorOf-ClTxFktT.js
+       620 →   1500     13356  /assets/index-k4qExRyO.css
+      2559 →   3304     13626  /assets/demo-DUfn2IkN.js
+      2560 →   3137      1250  /assets/standings-CUdfNi5b.js
+      2562 →   3280     11908  /assets/data-DJxRtNur.js
+      2562 →   3145       613  /assets/rng-W439OvqJ.js
+      2675 →   3256       977  /assets/LiveGraphic-CiuY7kIh.js
+      2677 →   3296      1688  /assets/RiveCanvas-BEzFwzB-.js
+      2820 →   3859      2461  /img/players/manifest.json
+      2871 →   3868       492  /icon.svg
+      2893 →   3900      5662  /assets/Scene-C5IPYz63.js
+      2900 →   4384     16920  /assets/MatchScreen-CVTzXuXh.js
+      2901 →   4328      1570  /assets/StandingsTable-DnL1IzdE.js
+      2902 →   3709      1401  /assets/StandingsTable-Dfa2LwMN.css
+      2905 →   3741      5425  /assets/MatchScreen-CwEJmPYY.css
+      2906 →   4464      6502  /assets/PlayerScreen-FkIQ6lHy.js
+      2906 →   3835      2504  /assets/PlayerScreen-BVJSY1t5.css
+      2914 →   4933     60586  /assets/runtime-Dbwfuf0d.js
+      2916 →   4639     15424  /rive/live-icon.riv
+      4000 →   4718     11595  /img/players/arg/10-bust@1x.avif
+      4047 →   4916      1519  /assets/WordGraphic-Qs12q3Fn.js
+      4049 →   5004      9867  /rive/moments.riv

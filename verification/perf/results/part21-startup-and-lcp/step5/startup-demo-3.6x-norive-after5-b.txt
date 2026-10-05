@@ -1,0 +1,65 @@
+run 1: /?demo at 3.6x 390x844, Rive blocked
+  FCP 436 ms  LCP 436 ms (<h1> "scoreline")  h1 in DOM 414 ms  rows in DOM 886 ms  CLS 0.0000
+  LCP candidates: 436 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 9; the first-data frame: 107 ms at 870 ms, forced layout 0 ms
+       13 ms    80 ms  
+      101 ms   109 ms  106 ms http://127.0.0.1:4185/assets/index-DyTVBxgN.js index-DyTVBxgN.js
+      213 ms   204 ms  202 ms MessagePort.onmessage app-vendor-CCjG9T8J.js (forced layout 60 ms)
+      486 ms    68 ms  47 ms import.then index-DyTVBxgN.js
+      562 ms   156 ms  149 ms TimerHandler:setTimeout index-DyTVBxgN.js
+      870 ms   107 ms  16 ms MessagePort.onmessage app-vendor-CCjG9T8J.js
+      986 ms    67 ms  22 ms MessagePort.onmessage app-vendor-CCjG9T8J.js
+     1208 ms    99 ms  51 ms import.then index-DyTVBxgN.js
+     1318 ms   146 ms  
+run 2: /?demo at 3.6x 390x844, Rive blocked
+  FCP 460 ms  LCP 460 ms (<h1> "scoreline")  h1 in DOM 438 ms  rows in DOM 972 ms  CLS 0.0000
+  LCP candidates: 460 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 9; the first-data frame: 146 ms at 915 ms, forced layout 1 ms
+        8 ms    69 ms  
+       97 ms   128 ms  124 ms http://127.0.0.1:4185/assets/index-DyTVBxgN.js index-DyTVBxgN.js
+      226 ms   219 ms  213 ms MessagePort.onmessage app-vendor-CCjG9T8J.js (forced layout 60 ms)
+      528 ms    80 ms  62 ms import.then index-DyTVBxgN.js
+      622 ms   156 ms  148 ms TimerHandler:setTimeout index-DyTVBxgN.js
+      915 ms   146 ms  58 ms MessagePort.onmessage app-vendor-CCjG9T8J.js
+     1072 ms    56 ms  17 ms MessagePort.onmessage app-vendor-CCjG9T8J.js
+     1236 ms    83 ms  38 ms import.then index-DyTVBxgN.js
+     1376 ms    98 ms  
+run 3: /?demo at 3.6x 390x844, Rive blocked
+  FCP 444 ms  LCP 444 ms (<h1> "scoreline")  h1 in DOM 427 ms  rows in DOM 947 ms  CLS 0.0000
+  LCP candidates: 444 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 10; the first-data frame: 100 ms at 931 ms, forced layout 0 ms
+       10 ms    96 ms  
+      117 ms   122 ms  117 ms http://127.0.0.1:4185/assets/index-DyTVBxgN.js index-DyTVBxgN.js
+      243 ms   189 ms  185 ms MessagePort.onmessage app-vendor-CCjG9T8J.js (forced layout 62 ms)
+      504 ms    97 ms  83 ms import.then index-DyTVBxgN.js
+      617 ms   166 ms  159 ms TimerHandler:setTimeout index-DyTVBxgN.js
+      931 ms   100 ms  16 ms MessagePort.onmessage app-vendor-CCjG9T8J.js
+     1045 ms    55 ms  16 ms MessagePort.onmessage app-vendor-CCjG9T8J.js
+     1218 ms    82 ms  42 ms import.then index-DyTVBxgN.js
+     1311 ms    52 ms  
+     1367 ms   127 ms  
+run 4: /?demo at 3.6x 390x844, Rive blocked
+  FCP 440 ms  LCP 440 ms (<h1> "scoreline")  h1 in DOM 418 ms  rows in DOM 919 ms  CLS 0.0000
+  LCP candidates: 440 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 9; the first-data frame: 91 ms at 905 ms, forced layout 0 ms
+       11 ms    70 ms  
+      105 ms   117 ms  113 ms http://127.0.0.1:4185/assets/index-DyTVBxgN.js index-DyTVBxgN.js
+      225 ms   199 ms  194 ms MessagePort.onmessage app-vendor-CCjG9T8J.js (forced layout 62 ms)
+      478 ms    88 ms  67 ms import.then index-DyTVBxgN.js
+      598 ms   156 ms  146 ms TimerHandler:setTimeout index-DyTVBxgN.js
+      905 ms    91 ms  14 ms MessagePort.onmessage app-vendor-CCjG9T8J.js
+     1010 ms    58 ms  17 ms MessagePort.onmessage app-vendor-CCjG9T8J.js
+     1180 ms    89 ms  41 ms http://127.0.0.1:4185/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+     1284 ms   159 ms  
+run 5: /?demo at 3.6x 390x844, Rive blocked
+  FCP 448 ms  LCP 448 ms (<h1> "scoreline")  h1 in DOM 422 ms  rows in DOM 890 ms  CLS 0.0000
+  LCP candidates: 448 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 8; the first-data frame: 138 ms at 876 ms, forced layout 0 ms
+       11 ms    74 ms  
+      102 ms   108 ms  105 ms http://127.0.0.1:4185/assets/index-DyTVBxgN.js index-DyTVBxgN.js
+      214 ms   212 ms  208 ms MessagePort.onmessage app-vendor-CCjG9T8J.js (forced layout 66 ms)
+      507 ms    66 ms  47 ms import.then index-DyTVBxgN.js
+      584 ms   142 ms  135 ms TimerHandler:setTimeout index-DyTVBxgN.js
+      876 ms   138 ms  17 ms FrameRequestCallback app-vendor-CCjG9T8J.js
+     1158 ms   101 ms  53 ms http://127.0.0.1:4185/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+     1276 ms   185 ms  
