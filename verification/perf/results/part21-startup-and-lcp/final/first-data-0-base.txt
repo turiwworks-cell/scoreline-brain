@@ -1,0 +1,97 @@
+{
+  "mode": "first-data",
+  "rate": 3.6,
+  "matches": "demo fixtures",
+  "runs": 5,
+  "rows": 7,
+  "groups": 5,
+  "callback": [
+    162,
+    168,
+    199,
+    227,
+    210
+  ],
+  "frame": [
+    268,
+    294,
+    322,
+    372,
+    342
+  ],
+  "frameMedian": 322,
+  "parseBytes": 126611,
+  "parseJson": [
+    3,
+    3,
+    3,
+    2,
+    4
+  ],
+  "parseValidate": [
+    27,
+    26,
+    32,
+    26,
+    28
+  ],
+  "forcedLayout": [
+    54,
+    52,
+    68,
+    72,
+    71
+  ],
+  "beforeApply": [
+    38,
+    33,
+    30,
+    62,
+    71
+  ],
+  "afterApply": [
+    68,
+    93,
+    94,
+    83,
+    62
+  ],
+  "fillMs": [
+    174,
+    179,
+    214,
+    243,
+    222
+  ],
+  "sliceFramesOver50": [
+    [],
+    [],
+    [],
+    [],
+    []
+  ],
+  "allFilled": true,
+  "laterFramesOver50": [
+    [
+      "94",
+      "178"
+    ],
+    [
+      "108",
+      "179"
+    ],
+    [
+      "88",
+      "158"
+    ],
+    [
+      "87",
+      "125"
+    ],
+    [
+      "90",
+      "139"
+    ]
+  ],
+  "errors": []
+}

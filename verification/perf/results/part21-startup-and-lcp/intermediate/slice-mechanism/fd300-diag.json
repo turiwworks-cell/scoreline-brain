@@ -1,0 +1,278 @@
+{
+  "rate": 3.6,
+  "matches": 300,
+  "parse": [
+    {
+      "bytes": 2119532,
+      "json": 39.0999999998603,
+      "validate": 377.10000000009313
+    },
+    {
+      "bytes": 2119532,
+      "json": 41.5,
+      "validate": 388.20000000018626
+    }
+  ],
+  "results": [
+    {
+      "run": 1,
+      "callback": 35.700000000186265,
+      "frame": {
+        "start": 596,
+        "duration": 494.30000000004657,
+        "forced": 0
+      },
+      "parts": {
+        "beforeApply": 452,
+        "apply": 35.700000000186265,
+        "afterApply": 6.599999999860302,
+        "renderStart": 489.4000000001397
+      },
+      "later": [
+        {
+          "start": 1232.9000000001397,
+          "duration": 125.39999999990687,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 5
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 5
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 12
+            }
+          ]
+        },
+        {
+          "start": 1378.7000000001863,
+          "duration": 68.5999999998603,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 25
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 15
+            }
+          ]
+        },
+        {
+          "start": 1654.8000000000466,
+          "duration": 97.19999999995343,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 8
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 16
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 9
+            }
+          ]
+        },
+        {
+          "start": 2191.100000000093,
+          "duration": 58,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 25
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 11
+            }
+          ]
+        },
+        {
+          "start": 2761.5,
+          "duration": 51,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 18
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 10
+            }
+          ]
+        }
+      ],
+      "laterTimer": 0,
+      "fillMs": 2120.4000000001397,
+      "fill": [
+        {
+          "t": -992,
+          "rows": 0
+        },
+        {
+          "t": 210,
+          "rows": 11
+        },
+        {
+          "t": 636,
+          "rows": 57
+        },
+        {
+          "t": 1094,
+          "rows": 104
+        },
+        {
+          "t": 1688,
+          "rows": 151
+        },
+        {
+          "t": 2120,
+          "rows": 175
+        }
+      ],
+      "rows": 175,
+      "groups": 5,
+      "pending": 0,
+      "unique": 175,
+      "filled": true,
+      "errors": []
+    },
+    {
+      "run": 2,
+      "callback": 60.0999999998603,
+      "frame": {
+        "start": 538.3000000000466,
+        "duration": 530.3999999999069,
+        "forced": 0
+      },
+      "parts": {
+        "beforeApply": 462.5,
+        "apply": 60.0999999998603,
+        "afterApply": 7.800000000046566,
+        "renderStart": 524.6999999999534
+      },
+      "later": [
+        {
+          "start": 1218.6999999999534,
+          "duration": 147.69999999995343,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 5
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 11
+            }
+          ]
+        },
+        {
+          "start": 1663.3000000000466,
+          "duration": 77.29999999981374,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 8
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 7
+            }
+          ]
+        },
+        {
+          "start": 2789.3000000000466,
+          "duration": 52.699999999953434,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 17
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 11
+            }
+          ]
+        },
+        {
+          "start": 3181.0999999998603,
+          "duration": 56,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 18
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 11
+            }
+          ]
+        },
+        {
+          "start": 3680.8000000000466,
+          "duration": 110.39999999990687,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "http://127.0.0.1:45923/assets/runtime-Dbwfuf0d.js",
+              "dur": 38
+            },
+            {
+              "inv": "import.then",
+              "dur": 45
+            }
+          ]
+        }
+      ],
+      "laterTimer": 0,
+      "fillMs": 2156.2999999998137,
+      "fill": [
+        {
+          "t": -962,
+          "rows": 0
+        },
+        {
+          "t": 237,
+          "rows": 11
+        },
+        {
+          "t": 673,
+          "rows": 57
+        },
+        {
+          "t": 1076,
+          "rows": 104
+        },
+        {
+          "t": 1759,
+          "rows": 151
+        },
+        {
+          "t": 2156,
+          "rows": 175
+        }
+      ],
+      "rows": 175,
+      "groups": 5,
+      "pending": 0,
+      "unique": 175,
+      "filled": true,
+      "errors": []
+    }
+  ]
+}

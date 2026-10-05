@@ -1,0 +1,54 @@
+run 1: /?demo at 3.6x 390x844, Rive blocked
+  FCP 1300 ms  LCP 1300 ms (<h1> "scoreline")  h1 in DOM 1211 ms  rows in DOM 2110 ms  CLS 0.0000
+  LCP candidates: 1300 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 8; the first-data frame: 841 ms at 1407 ms, forced layout 170 ms
+       37 ms   257 ms  
+      316 ms   350 ms  338 ms http://127.0.0.1:4180/assets/index-9I8RqK8J.js index-9I8RqK8J.js
+      683 ms   570 ms  530 ms MessagePort.onmessage app-vendor-CA1omR8B.js (forced layout 203 ms)
+     1407 ms   841 ms  677 ms import.then index-9I8RqK8J.js (forced layout 170 ms)
+     2302 ms    53 ms  
+     2680 ms   189 ms  123 ms http://127.0.0.1:4180/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+     2892 ms   229 ms  
+     3127 ms   364 ms  
+run 2: /?demo at 3.6x 390x844, Rive blocked
+  FCP 480 ms  LCP 480 ms (<h1> "scoreline")  h1 in DOM 455 ms  rows in DOM 966 ms  CLS 0.0000
+  LCP candidates: 480 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 7; the first-data frame: 509 ms at 525 ms, forced layout 95 ms
+        9 ms    83 ms  
+       98 ms   130 ms  124 ms http://127.0.0.1:4180/assets/index-9I8RqK8J.js index-9I8RqK8J.js
+      232 ms   232 ms  224 ms MessagePort.onmessage app-vendor-CA1omR8B.js (forced layout 70 ms)
+      525 ms   509 ms  438 ms import.then index-9I8RqK8J.js (forced layout 95 ms)
+     1208 ms   132 ms  69 ms http://127.0.0.1:4180/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+     1347 ms   190 ms  
+     1539 ms   208 ms  
+run 3: /?demo at 3.6x 390x844, Rive blocked
+  FCP 532 ms  LCP 532 ms (<h1> "scoreline")  h1 in DOM 499 ms  rows in DOM 1084 ms  CLS 0.0000
+  LCP candidates: 532 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 6; the first-data frame: 554 ms at 601 ms, forced layout 97 ms
+       10 ms    95 ms  
+      116 ms   117 ms  114 ms http://127.0.0.1:4180/assets/index-9I8RqK8J.js index-9I8RqK8J.js
+      234 ms   282 ms  266 ms MessagePort.onmessage app-vendor-CA1omR8B.js (forced layout 65 ms)
+      601 ms   554 ms  476 ms import.then index-9I8RqK8J.js (forced layout 97 ms)
+     1339 ms    88 ms  43 ms http://127.0.0.1:4180/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+     1441 ms   158 ms  
+run 4: /?demo at 3.6x 390x844, Rive blocked
+  FCP 536 ms  LCP 536 ms (<h1> "scoreline")  h1 in DOM 512 ms  rows in DOM 956 ms  CLS 0.0000
+  LCP candidates: 536 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 7; the first-data frame: 448 ms at 580 ms, forced layout 62 ms
+       11 ms    82 ms  
+      114 ms   161 ms  156 ms http://127.0.0.1:4180/assets/index-9I8RqK8J.js index-9I8RqK8J.js
+      277 ms   247 ms  237 ms MessagePort.onmessage app-vendor-CA1omR8B.js (forced layout 63 ms)
+      580 ms   448 ms  372 ms import.then index-9I8RqK8J.js (forced layout 62 ms)
+     1275 ms    89 ms  43 ms http://127.0.0.1:4180/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+     1374 ms    56 ms  
+     1434 ms   107 ms  
+run 5: /?demo at 3.6x 390x844, Rive blocked
+  FCP 524 ms  LCP 524 ms (<h1> "scoreline")  h1 in DOM 500 ms  rows in DOM 973 ms  CLS 0.0000
+  LCP candidates: 524 ms <h1> "scoreline" 3069px²
+  frames over 50 ms until 2.5 s after the first rows: 6; the first-data frame: 490 ms at 562 ms, forced layout 81 ms
+       14 ms   105 ms  
+      136 ms   119 ms  114 ms http://127.0.0.1:4180/assets/index-9I8RqK8J.js index-9I8RqK8J.js
+      259 ms   250 ms  241 ms MessagePort.onmessage app-vendor-CA1omR8B.js (forced layout 64 ms)
+      562 ms   490 ms  413 ms import.then index-9I8RqK8J.js (forced layout 81 ms)
+     1216 ms    79 ms  35 ms http://127.0.0.1:4180/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+     1310 ms   127 ms  

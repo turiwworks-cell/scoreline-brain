@@ -1,0 +1,449 @@
+/*
+ * The Lineup tab (lineup and squadList, luau:5384-5697). Every x of the Lua's 390 px screen is
+ * kept from the nearer edge; the pitch and the switch span the pane less the 18 px gutters, the
+ * rows span it less 12. Text is placed by its centre line: a 20 px line box centred on the Lua's
+ * cy puts the baseline where the Lua's bc(cy, size) does (see Hero.module.css).
+ */
+
+.lineup {
+  position: relative;
+}
+
+/* ---- the team switch: a glass pill 46 tall, the chosen side wears its colours (luau:5455) ---- */
+
+.switch {
+  position: relative;
+  height: 46px;
+  margin: 0 var(--gutter) 22px;
+}
+.thumb {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: 38px;
+  border-radius: 19px;
+  pointer-events: none;
+}
+.segs {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 0 4px;
+}
+.seg {
+  position: relative;
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: var(--fw-s) var(--fs-14) / normal var(--font-sans);
+  /* lerp(MUTED, TEXT, 0.6 * lit); INK-black on the chosen side */
+  color: color-mix(in srgb, var(--c-text) calc(var(--lit) * 60%), var(--c-muted));
+  transition: color var(--t-tabs-dur) var(--t-tabs-ease);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+}
+.seg[aria-checked='true'] {
+  color: #000;
+}
+.seg:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: -2px;
+  border-radius: 23px;
+}
+/* crest 20, 6 px, the name; the whole label dips 4 % */
+.segLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  transform: scale(calc(1 - var(--press-depth-segment) * var(--dip)));
+}
+.segName {
+  white-space: nowrap;
+}
+/* a side not chosen shows a faint hover light over the thumb's place: 0.1 * lit, spotR(seg, 38) */
+.seg::before {
+  content: '';
+  position: absolute;
+  inset: 4px 0;
+  border-radius: 19px;
+  pointer-events: none;
+  --a: calc(var(--lit) * 0.1);
+  background: radial-gradient(
+    circle var(--spot-r, 52px) at var(--mx, 50%) calc(var(--my, 50%) - 4px),
+    rgb(255 255 255 / calc(var(--a) * 1)) 0%,
+    rgb(255 255 255 / calc(var(--a) * 0.9801)) 10%,
+    rgb(255 255 255 / calc(var(--a) * 0.9216)) 20%,
+    rgb(255 255 255 / calc(var(--a) * 0.8281)) 30%,
+    rgb(255 255 255 / calc(var(--a) * 0.7056)) 40%,
+    rgb(255 255 255 / calc(var(--a) * 0.5625)) 50%,
+    rgb(255 255 255 / calc(var(--a) * 0.4096)) 60%,
+    rgb(255 255 255 / calc(var(--a) * 0.2601)) 70%,
+    rgb(255 255 255 / calc(var(--a) * 0.1296)) 80%,
+    rgb(255 255 255 / calc(var(--a) * 0.0361)) 90%,
+    rgb(255 255 255 / 0) 100%
+  );
+}
+.seg[aria-checked='true']::before {
+  content: none;
+}
+
+/* ---- the pitch: glass 540 tall, our half, attacking upwards (luau:5478) ---------------------- */
+
+.pitch {
+  position: relative;
+  height: 540px;
+  margin: 0 var(--gutter) 34px;
+}
+/* the light, the stripes and the lines are clipped to the pane's corners (radius 22) */
+.field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 22px;
+  pointer-events: none;
+}
+.lines {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+}
+
+/*
+ * A marker: 76 × 84, its row's name plate on y 55 and the photo above it. The hit box is the
+ * Lua's (cx - 38, photoTop - 4, 76, FACE + PLATE_H + 8). It rises from 26 px below (motion: lineup).
+ */
+.slot {
+  position: absolute;
+  width: 76px;
+  height: 84px;
+}
+.marker {
+  position: absolute;
+  inset: 0;
+  appearance: none;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* the cursor's place in the marker (feel.ts writes --mx / --my on it), for its plate's light */
+.marker {
+  --marker-mx: var(--mx);
+  --marker-my: var(--my);
+}
+.marker:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: -2px;
+  border-radius: 14px;
+}
+/* press: 1 - 0.05 pk + 0.02 lit, about the plate's centre (luau:5415) */
+.markerBody {
+  position: absolute;
+  inset: 0;
+  transform: scale(calc(1 - 0.05 * var(--dip) + 0.02 * var(--lit)));
+  transform-origin: 38px 65px;
+}
+/* a sent-off player is drawn at half strength */
+.markerBody[data-sent-off] {
+  opacity: 0.5;
+}
+/* the photo, a 56 px square cut behind the plate (bust(…, CROP.face, …, FACE, FACE), luau:5418):
+   nothing of it runs on below, where a white shirt showed under the plate */
+.face {
+  position: absolute;
+  left: 10px;
+  top: 4px;
+  width: 56px;
+  height: 56px;
+  overflow: hidden;
+}
+/* no photo: the kit disc, 38 across, its middle 24 above the plate's top */
+.kit {
+  position: absolute;
+  left: 19px;
+  top: 12px;
+}
+/* the name plate: solid glass (glass(…, 1, lit), luau:5423), so nothing of the photo behind it
+   shows through, lit with the marker: the hover light follows the cursor over the whole marker.
+   Two classes, to win over materials' "a pane that is not a control never lights". */
+.marker .plate {
+  position: absolute;
+  top: 55px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  --glass-body: 1;
+  --lit-eff: max(var(--lit), calc(var(--dip) * 0.7));
+  /* the cursor's place is the marker's; the plate starts 55 px down and (38 − w/2) px in */
+  --mx: calc(var(--marker-mx) - var(--plate-x, 0px));
+  --my: calc(var(--marker-my) - 55px);
+}
+.pstar {
+  flex: none;
+  width: 9.2px;
+  height: 9.2px;
+  margin-right: 3.8px;
+}
+.pnum {
+  flex: none;
+  margin-right: 5px;
+  font: var(--fw-s) var(--fs-10p5) / 20px var(--font-sans);
+  color: var(--c-muted);
+}
+.pname {
+  flex: none;
+  font-family: var(--font-sans);
+  font-weight: var(--fw-s);
+  line-height: 20px;
+  white-space: nowrap;
+  color: var(--c-text);
+}
+/* tags sit on the photo like stickers: rating top right, off capsule top left, goals bottom right, cards bottom left */
+.rating {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+}
+.off {
+  position: absolute;
+  top: 3px;
+  right: 47px;
+}
+.goals {
+  position: absolute;
+  top: 43px;
+  left: 57px;
+}
+.cards {
+  position: absolute;
+  top: 43px;
+  right: 57px;
+}
+
+/* ---- rows: the substitutes and the squad, 64 tall (playerRow, luau:5504) ------------------- */
+
+.row {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: calc(100% - 24px);
+  height: 64px;
+  margin: 0 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.row:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: -2px;
+  border-radius: 14px;
+}
+/* the hover and press light: 366 × 60, radius 14, 2 px under the top */
+.row::before {
+  content: '';
+  position: absolute;
+  inset: 2px 0;
+  border-radius: 14px;
+  background: rgb(255 255 255 / calc(0.03 * var(--lit) + 0.05 * var(--dip)));
+  pointer-events: none;
+}
+.rowShared {
+  position: absolute;
+  left: 4px;
+  top: 6px;
+}
+/* the shirt number: S 15 MUTED, right on x 90, centred on y 33.5 */
+.rowNum {
+  position: absolute;
+  left: 0;
+  top: 23.5px;
+  width: 78px;
+  font: var(--fw-s) var(--fs-15) / 20px var(--font-sans);
+  text-align: right;
+  color: var(--c-muted);
+}
+/* the name S 15 from x 100, its star and tags after it, centred on y 24 */
+.rowName {
+  position: absolute;
+  left: 88px;
+  top: 14px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.rowFull {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-s);
+  line-height: 20px;
+  color: var(--c-text);
+}
+.rowStar {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-left: 8px;
+}
+.rowTags {
+  flex: none;
+  margin-left: 8px;
+}
+.rowStar + .rowTags {
+  margin-left: 6px;
+}
+/* the role R 12 MUTED, centred on y 43 */
+.rowRole {
+  position: absolute;
+  left: 88px;
+  top: 33px;
+  font: var(--fw-r) var(--fs-12) / 20px var(--font-sans);
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+/* came on: the green arrow, the minute S 12.5 in the live green, the rating; right on x W - 18, centred on y 23 */
+.rowOn {
+  position: absolute;
+  right: 6px;
+  top: 15px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4.5px;
+}
+.rowMin {
+  font: var(--fw-s) var(--fs-12p5) / 16px var(--font-sans);
+  color: var(--c-live);
+}
+/* 8 px between the minute and the rating (the flex gap is 4.5) */
+.rowRating {
+  margin-left: 3.5px;
+}
+.rowFor {
+  position: absolute;
+  right: 6px;
+  top: 33px;
+  font: var(--fw-r) var(--fs-11p5) / 20px var(--font-sans);
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+.rowUnused {
+  position: absolute;
+  right: 6px;
+  top: 22px;
+  font: var(--fw-r) var(--fs-12) / 20px var(--font-sans);
+  color: var(--c-dim);
+  white-space: nowrap;
+}
+/* the rule under the row, x 100 to W - 18 */
+.rowRule {
+  position: absolute;
+  left: 88px;
+  right: 6px;
+  bottom: 0;
+  height: 1px;
+  background: var(--c-hair);
+}
+
+.afterRows {
+  height: 30px;
+}
+.afterGroup {
+  height: 26px;
+}
+
+/* ---- the coach (coachRow, luau:5548) ------------------------------------------------------- */
+
+.coach {
+  position: relative;
+  height: 62px;
+}
+.coachPhoto {
+  position: absolute;
+  left: 16px;
+  top: 4px;
+}
+/* no photo: SURF disc r 21 on x 42, ringed in HAIR, the initials S 15 MUTED */
+.coachDisc {
+  position: absolute;
+  left: 21px;
+  top: 9px;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 0.5px solid var(--c-hair);
+  border-radius: 50%;
+  background: var(--c-surf);
+  font: var(--fw-s) var(--fs-15) / 1 var(--font-sans);
+  letter-spacing: var(--track-loose);
+  color: var(--c-muted);
+}
+.coachName {
+  position: absolute;
+  left: 100px;
+  top: 12px;
+  margin: 0;
+  font: var(--fw-s) var(--fs-15) / 20px var(--font-sans);
+  white-space: nowrap;
+  color: var(--c-text);
+}
+.coachRole {
+  position: absolute;
+  left: 100px;
+  top: 31px;
+  margin: 0;
+  font: var(--fw-r) var(--fs-12) / 20px var(--font-sans);
+  white-space: nowrap;
+  color: var(--c-muted);
+}
+
+/* ---- before kick-off: the note, then the squad by line (squadList, luau:5516) --------------- */
+
+.note {
+  position: relative;
+  height: 52px;
+  margin: 0 var(--gutter) 30px;
+}
+.noteTitle {
+  position: absolute;
+  left: 18px;
+  top: 7.12px;
+  margin: 0;
+  font: var(--fw-m) var(--fs-14) / 20px var(--font-sans);
+  white-space: nowrap;
+  color: var(--c-text);
+}
+.noteBody {
+  position: absolute;
+  left: 18px;
+  top: 25.82px;
+  margin: 0;
+  font: var(--fw-r) var(--fs-12) / 20px var(--font-sans);
+  white-space: nowrap;
+  color: var(--c-muted);
+}

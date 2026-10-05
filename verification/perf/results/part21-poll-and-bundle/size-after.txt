@@ -1,0 +1,10 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> scoreline@0.0.0 check:size
+> node scripts/size-budget.mjs
+
+assets/index-9I8RqK8J.js                                  45.28 KB gzip
+assets/rolldown-runtime-CbXtAM7H.js                        0.37 KB gzip
+assets/app-vendor-CA1omR8B.js                            128.53 KB gzip
+assets/colorOf-ClTxFktT.js                                 3.56 KB gzip
+Initial JavaScript: 177.74 KB gzip / 180 KB

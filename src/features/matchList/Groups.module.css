@@ -1,0 +1,296 @@
+/*
+ * League groups and match rows (drawGroup and drawRow, luau:3925–4044). A group is a label row, a
+ * rule 10 px under it, then its rows, 76 px each; the label row is the toggle. The group's open amount
+ * --k runs 1 → 0 in 0.5 s (GLIDE, luau:7231); the rows' height follows it, and each row fades and
+ * tucks up under the one above as the edge passes it.
+ */
+
+@property --k {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
+.group {
+  --k: 1;
+  --group-dur: 500ms;
+  position: relative;
+  margin-bottom: 28px;
+  transition: --k var(--group-dur) var(--ease-glide);
+}
+.group[data-collapsed] {
+  --k: 0;
+}
+
+/* the label row is 13.7 px tall; the toggle covers it and 10 px above, 34 px in all */
+.head {
+  position: relative;
+  height: 23.7px;
+}
+.toggle {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: -10px;
+  height: 34px;
+  cursor: pointer;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  /* a press fades the label, not the rule (luau:3963) */
+  opacity: calc(1 - var(--press-fade) * var(--dip));
+}
+.toggle:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: -2px;
+  border-radius: var(--r-4);
+}
+
+.label {
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 13.7px;
+  white-space: nowrap;
+}
+/* the country in grey, then the league's name 10 px after it (luau:4000) */
+.titles {
+  position: absolute;
+  left: 6px;
+  top: 10px;
+  display: flex;
+  gap: 10px;
+}
+.favTitle {
+  position: absolute;
+  left: 22px;
+  top: 10px;
+}
+.country {
+  color: var(--c-muted);
+}
+.name {
+  color: var(--c-text);
+}
+.num {
+  position: absolute;
+  top: 10px;
+  right: 28px;
+  color: var(--c-dim);
+}
+.star {
+  position: absolute;
+  left: 5.4px;
+  top: 11.4px;
+  width: 11.2px;
+  height: 11.2px;
+}
+.chev {
+  position: absolute;
+  right: 7px;
+  top: 14px;
+  color: var(--c-muted);
+  /* open: pointing down; closed: a quarter turn to the right (luau:3969) */
+  transform: rotate(calc(-90deg * (1 - var(--k))));
+  transform-origin: 5px 3px;
+}
+
+/* the rule under the label: HAIR when open, dimmer once the group is closing past halfway */
+.rule {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 0;
+  height: 1px;
+  background: var(--c-hair);
+}
+.group[data-collapsed] .rule {
+  background: rgb(255 255 255 / 0.06);
+}
+.rule {
+  transition: background-color 0s linear calc(var(--group-dur) * 0.5);
+}
+
+.rows {
+  position: relative;
+  margin-top: 1px;
+  height: calc(var(--full) * var(--k) * 1px);
+  /* the closing edge cuts the rows (clipBot, luau:4019), and only it: a row sliding in after a day
+     change (18 px across, 6 px down) is not cut at the sides, and the last row's rule is not hidden
+     under the bottom edge until the row has landed, as it was with overflow: hidden. Open, the
+     clip lies 12 px below the last row; it closes in with the group. */
+  clip-path: inset(-12px -40px calc(-12px * var(--k)) -40px);
+}
+.group[data-collapsed] .rows {
+  visibility: hidden;
+  transition: visibility 0s linear var(--group-dur);
+}
+
+/* a row's place in the group: where it rests, and the cascade block that lifts it after a day change */
+.place {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--top) * 1px);
+  height: 76px;
+}
+
+/* ...and it fades and tucks up under the one above as the closing edge reaches it (luau:4023) */
+.slot {
+  --vis: calc(var(--full) * var(--k));
+  --rq: clamp(0, calc((var(--vis) - var(--top)) / 76), 1);
+  --e0: clamp(0, calc((var(--rq) - 0.25) / 0.7), 1);
+  --e: calc(var(--e0) * var(--e0) * (3 - 2 * var(--e0)));
+  position: relative;
+  height: 76px;
+  opacity: var(--e);
+  translate: 0 calc(-10px * (1 - var(--e)));
+}
+
+.row {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: none;
+  color: var(--c-text);
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 0;
+  height: 76px;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 76px;
+  /* the glow: hover 3.5 %, press 6 %, a fresh goal 7 % fading over 1.6 s, the open match 6 % (luau:3930) */
+  --glow: calc(0.035 * var(--lit) + 0.06 * var(--dip) + 0.07 * var(--flash, 0) + var(--open, 0));
+}
+.row[aria-current='true'] {
+  --open: 0.06;
+}
+.row:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: -2px;
+  border-radius: 14px;
+}
+.row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 2px;
+  height: 72px;
+  border-radius: 14px;
+  background: rgb(255 255 255 / var(--glow));
+  pointer-events: none;
+}
+.row::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--c-hair);
+}
+
+/* the minute: live in green with a dot, otherwise the kick-off time in grey, centred on y = 37.5 */
+.time {
+  position: absolute;
+  top: 37.5px;
+  translate: 0 -50%;
+  left: 6px;
+  font: var(--fw-m) var(--fs-12) / normal var(--font-sans);
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+.time[data-live] {
+  left: 17px;
+  color: var(--c-live);
+}
+.dot {
+  position: absolute;
+  left: 6px;
+  top: 35px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--c-live);
+}
+
+.team {
+  position: absolute;
+  left: 66px;
+  right: 40px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+}
+.crestEnd {
+  display: flex;
+  flex: none;
+}
+.teamName {
+  margin-left: 10px;
+  font: var(--type-row);
+  letter-spacing: var(--track-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.team[data-trails] .teamName {
+  color: var(--c-muted);
+}
+
+/* both numbers stacked on the two lines' centres, right-aligned at x = 370; one shared element */
+.scores {
+  position: absolute;
+  right: 8px;
+  top: 8.5px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font: var(--fw-m) var(--fs-17) / normal var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text);
+}
+.score {
+  position: relative;
+  height: 29px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.score[data-trails] {
+  color: var(--c-muted);
+}
+.pop {
+  position: relative;
+  display: inline-block;
+  transform: scale(var(--bump, 1));
+}
+.ink {
+  position: relative;
+  opacity: calc(1 - var(--mk, 0));
+}
+/* the new number, in our spectrum while the goal is fresh (luau:3958) */
+.spectrum {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  translate: 0 -50%;
+  font-weight: var(--fw-s);
+  opacity: var(--mk, 0);
+  background: linear-gradient(135deg, var(--spectrum-3-stops));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

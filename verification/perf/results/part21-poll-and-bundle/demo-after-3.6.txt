@@ -1,0 +1,20 @@
+/?demo=fast at 3.6x, 390x844, Rive blocked: 63 frames over 50 ms in 120 s
+  start-up    n   6  median  106 ms  max  302 ms
+  poll        n  40  median   76 ms  max  356 ms
+  goal scene  n   8  median   77 ms  max  113 ms
+  toast       n   2  median   99 ms  max   99 ms
+  other       n   7  median   64 ms  max   84 ms
+
+worst frames:
+    42.9 s   356 ms  [poll]  188 ms TimerHandler:setTimeout src/data/demo/demoSource.ts:87
+     0.4 s   302 ms  [start-up]  249 ms import.then src/main.tsx:13 (forced layout 39 ms); 11 ms FrameRequestCallback node_modules/motion-dom/dist/es/frameloop/batcher.mjs:19
+     0.1 s   251 ms  [start-up]  194 ms MessagePort.onmessage node_modules/scheduler/cjs/scheduler.production.js:121 (forced layout 55 ms); 38 ms http://127.0.0.1:34199/assets/index-9I8RqK8J.js index-9I8RqK8J.js@0
+    47.1 s   209 ms  [poll]  189 ms TimerHandler:setTimeout src/data/demo/demoSource.ts:87
+   106.3 s   202 ms  [poll]  182 ms TimerHandler:setTimeout src/data/demo/demoSource.ts:87
+   106.5 s   165 ms  [poll]  153 ms TimerHandler:setTimeout src/data/demo/demoSource.ts:87
+    36.3 s   155 ms  [poll]  130 ms TimerHandler:setTimeout src/data/demo/demoSource.ts:87
+    67.1 s   147 ms  [poll]  139 ms TimerHandler:setTimeout src/data/demo/demoSource.ts:87
+    71.2 s   116 ms  [poll]  89 ms TimerHandler:setTimeout src/data/demo/demoSource.ts:87
+   104.9 s   113 ms  [poll]  100 ms TimerHandler:setTimeout src/data/demo/demoSource.ts:87
+    82.8 s   113 ms  [goal scene]  84 ms TimerHandler:setTimeout src/data/demo/demoSource.ts:87 (forced layout 9 ms)
+   112.8 s   112 ms  [poll]  103 ms TimerHandler:setTimeout src/data/demo/demoSource.ts:87

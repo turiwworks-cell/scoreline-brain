@@ -1,0 +1,230 @@
+
+Running 225 tests using 2 workers
+
+[1/225] [phone-390x844] › e2e/chunks.spec.ts:17:1 › a cold match tap keeps its loading chrome and transfers stacked focus when ready
+[2/225] [phone-390x844] › e2e/handoff.spec.ts:78:3 › the first frame and the header that replaces it › paints before the bundle, is only a picture, and React takes over in the same boxes with nothing moving
+[3/225] [phone-390x844] › e2e/handoff.spec.ts:131:3 › the first frame and the header that replaces it › the app runs after the frame has painted, its modules downloading from the start
+[4/225] [phone-390x844] › e2e/handoff.spec.ts:155:3 › the first frame and the header that replaces it › the frame has the header’s own type and colours
+[5/225] [phone-390x844] › e2e/chunks.spec.ts:35:1 › a cold player tap preserves focus through the reveal and returns it to the chip
+[6/225] [phone-390x844] › e2e/handoff.spec.ts:210:3 › Rive starts after the first data › nothing of it is asked for until the first rows are on screen, and the Live button works meanwhile
+[7/225] [phone-390x844] › e2e/handoff.spec.ts:232:3 › Rive starts after the first data › a feed that is late does not keep it away for good
+[8/225] [phone-390x844] › e2e/chunks.spec.ts:53:1 › back before the match chunk arrives cannot resurrect the abandoned screen
+[9/225] [phone-390x844] › e2e/chunks.spec.ts:69:1 › the first warmed match open has content on its first frame and plays its phone push
+[10/225] [phone-390x844] › e2e/insights.spec.ts:13:1 › insights is desktop-only; smaller layouts keep the existing player route
+[11/225] [phone-390x844] › e2e/insights.spec.ts:38:3 › desktop insights › the switch and default player prompt match the Lua geometry
+[12/225] [phone-390x844] › e2e/insights.spec.ts:58:3 › desktop insights › tables put the open league first and highlight its two teams
+[13/225] [phone-390x844] › e2e/insights.spec.ts:69:3 › desktop insights › leaders use 64 px rows, goal rows use 52 px, and tabs reset only insight scroll
+[14/225] [phone-390x844] › e2e/insights.spec.ts:99:3 › desktop insights › opening a leader opens the player in place, close returns to leaders with focus
+[15/225] [phone-390x844] › e2e/insights.spec.ts:128:3 › desktop insights › the player remains available across local tab switches and a lineup click selects Player
+[16/225] [phone-390x844] › e2e/insights.spec.ts:151:3 › desktop insights › a goal opens its own match and keyboard tabs and reduced motion work
+[17/225] [phone-390x844] › e2e/kit.spec.ts:3:1 › dev kit renders every material
+[18/225] [phone-390x844] › e2e/handoff.spec.ts:260:3 › Rive starts after the first data › with no data on its way, it does not wait for any: it starts once the page has painted
+[19/225] [phone-390x844] › e2e/kit.spec.ts:13:1 › the hover light follows the pointer through custom properties
+[20/225] [phone-390x844] › e2e/kit.spec.ts:25:1 › a glass pane nested in a tinted pane keeps the plain glass colour
+[21/225] [phone-390x844] › e2e/handoff.spec.ts:274:3 › the followed player’s photo › is asked for once, before the card that shows it, and it is the file the card shows
+[22/225] [phone-390x844] › e2e/kit.spec.ts:37:1 › the Part 7 primitives draw from the sprite and fit the page
+[23/225] [phone-390x844] › e2e/lineup.spec.ts:53:1 › the switch, the formation and the pitch sit where the Lua puts them
+[24/225] [phone-390x844] › e2e/kit.spec.ts:60:1 › a photo that fails to load falls back to the kit disc
+[25/225] [phone-390x844] › e2e/kit.spec.ts:65:1 › live clocks tick from the shared ticker
+[26/225] [phone-390x844] › e2e/kit.spec.ts:94:1 › every squad photo loads as AVIF, at 1x on a 1x screen
+[27/225] [phone-390x844] › e2e/lineup.spec.ts:93:1 › tags show the rating, the best player, goals and the followed star
+[28/225] [phone-390x844] › e2e/kit.spec.ts:107:3 › on a 2x screen › boxes wider than half a file take @2x, small tiles keep @1x
+[29/225] [phone-390x844] › e2e/lineup.spec.ts:111:1 › the switch shows the other team and plays its entrance again
+[30/225] [phone-390x844] › e2e/list.spec.ts:51:3 › Today › the header, the day tabs and the followed card sit where the Lua puts them
+[31/225] [phone-390x844] › e2e/lineup.spec.ts:131:1 › markers rise line by line, forwards first
+[32/225] [phone-390x844] › e2e/list.spec.ts:72:3 › Today › the rows are the demo evening: seven matches, 76 tall, 12 px in
+[33/225] [phone-390x844] › e2e/lineup.spec.ts:163:1 › a clock tick does not rebuild the pitch or play the entrance again
+[34/225] [phone-390x844] › e2e/list.spec.ts:95:3 › Today › a league folds its rows away and opens them again
+[35/225] [phone-390x844] › e2e/lineup.spec.ts:178:1 › photos: France and Argentina have them, another team keeps the kit disc, one manifest request
+[36/225] [phone-390x844] › e2e/list.spec.ts:105:3 › Today › the Show less button closes the card to its short form, and Show more opens it again
+[37/225] [phone-390x844] › e2e/lineup.spec.ts:207:1 › a chip opens the player through the app’s navigation, and back returns to the same tab and team
+[38/225] [phone-390x844] › e2e/list.spec.ts:117:3 › Today › Change opens the picker over the card, picking a player swaps the card, Unfollow shows the picker
+[39/225] [phone-390x844] › e2e/list.spec.ts:136:3 › Today › the followed player is remembered across a reload
+[40/225] [phone-390x844] › e2e/lineup.spec.ts:226:1 › before kick-off the tab is the squad, line by line
+[41/225] [phone-390x844] › e2e/list.spec.ts:143:3 › Today › tapping a match opens it; the card says it is the current one
+[42/225] [phone-390x844] › e2e/list.spec.ts:153:3 › Ongoing › five cards of 70 (a fifth of the width) on one baseline, then the followed card under them
+[43/225] [phone-390x844] › e2e/list.spec.ts:176:3 › Ongoing › the cards are the live matches only, and open their match
+[44/225] [phone-390x844] › e2e/lineup.spec.ts:246:1 › nothing overflows sideways
+[45/225] [phone-390x844] › e2e/list.spec.ts:193:3 › the day tabs › Live turns Today into Ongoing and back; the cards grow in and fold away
+[46/225] [phone-390x844] › e2e/list.spec.ts:209:3 › the day tabs › Yesterday and Tomorrow show their own days, the indicator follows the tab
+[47/225] [phone-390x844] › e2e/lineup.spec.ts:265:1 › with reduced motion the line-up is in place at once
+[48/225] [phone-390x844] › e2e/match.spec.ts:42:1 › the hero and Facts sit where the Lua puts them
+[49/225] [phone-390x844] › e2e/list.spec.ts:230:3 › the day tabs › the tabs strip fades at both edges and the page does not scroll sideways
+[50/225] [phone-390x844] › e2e/list.spec.ts:254:3 › The day tabs are sized by the face › the indicator lies under the chosen word, on every tab and in Ongoing
+[51/225] [phone-390x844] › e2e/match.spec.ts:95:1 › the Facts chart unmounts on tab change and returns once
+[52/225] [phone-390x844] › e2e/match.spec.ts:121:1 › Stats counts out to the possession and opens the bars
+[53/225] [phone-390x844] › e2e/match.spec.ts:145:1 › Table marks the top two and the sides playing now
+[54/225] [phone-390x844] › e2e/list.spec.ts:276:3 › The day tabs are sized by the face › a face that arrives late: laid out in the fallback first, the indicator follows when it loads
+[55/225] [phone-390x844] › e2e/match.spec.ts:164:1 › before kick-off, after full time and a friendly
+[56/225] [phone-390x844] › e2e/nav.spec.ts:80:1 › navigation, tabs, a player, then back and forward
+[57/225] [phone-390x844] › e2e/match.spec.ts:182:1 › a live event slides into Facts
+[58/225] [phone-390x844] › e2e/nav.spec.ts:111:1 › direct URLs open where they point
+[59/225] [phone-390x844] › e2e/nav.spec.ts:141:1 › each pane keeps its own scroll
+[60/225] [phone-390x844] › e2e/nav.spec.ts:211:1 › focus follows navigation
+[61/225] [phone-390x844] › e2e/match.spec.ts:207:1 › no horizontal overflow on any tab
+[62/225] [phone-390x844] › e2e/nav.spec.ts:239:1 › nothing flies between screens: the match pushes in, the player grows in at the centre
+[63/225] [phone-390x844] › e2e/nav.spec.ts:271:1 › rapid taps and interrupted navigation end in one clean state
+[64/225] [phone-390x844] › e2e/player.spec.ts:69:1 › the bust, the line of light and the sheet sit where the Lua puts them
+[65/225] [phone-390x844] › e2e/player.spec.ts:104:1 › real photos for France and Argentina, the kit disc for everyone else
+[66/225] [phone-390x844] › e2e/player.spec.ts:117:1 › opens from the line-up in place, nothing flying from his face; back restores focus
+[67/225] [phone-390x844] › e2e/nav.spec.ts:324:1 › no horizontal overflow on any screen
+[68/225] [phone-390x844] › e2e/shell.spec.ts:3:1 › empty app shell renders
+[69/225] [tablet-900x800] › e2e/chunks.spec.ts:17:1 › a cold match tap keeps its loading chrome and transfers stacked focus when ready
+[70/225] [phone-390x844] › e2e/player.spec.ts:137:1 › opens from the follow card in the list, and from a scorer in the match hero
+[71/225] [tablet-900x800] › e2e/chunks.spec.ts:35:1 › a cold player tap preserves focus through the reveal and returns it to the chip
+[72/225] [tablet-900x800] › e2e/chunks.spec.ts:53:1 › back before the match chunk arrives cannot resurrect the abandoned screen
+[73/225] [phone-390x844] › e2e/player.spec.ts:160:1 › the arrows glide to the next team-mate; back still leaves the page
+[74/225] [tablet-900x800] › e2e/chunks.spec.ts:69:1 › the first warmed match open has content on its first frame and plays its phone push
+[75/225] [tablet-900x800] › e2e/handoff.spec.ts:78:3 › the first frame and the header that replaces it › paints before the bundle, is only a picture, and React takes over in the same boxes with nothing moving
+[76/225] [phone-390x844] › e2e/player.spec.ts:181:1 › scrolling frosts the bar and fades the arrows; the page keeps its scroll on return
+[77/225] [tablet-900x800] › e2e/handoff.spec.ts:131:3 › the first frame and the header that replaces it › the app runs after the frame has painted, its modules downloading from the start
+[78/225] [tablet-900x800] › e2e/handoff.spec.ts:155:3 › the first frame and the header that replaces it › the frame has the header’s own type and colours
+[79/225] [tablet-900x800] › e2e/handoff.spec.ts:210:3 › Rive starts after the first data › nothing of it is asked for until the first rows are on screen, and the Live button works meanwhile
+[80/225] [phone-390x844] › e2e/player.spec.ts:192:1 › a direct link works for a player in a match that has not started, and for one who is unknown
+[81/225] [phone-390x844] › e2e/player.spec.ts:200:1 › a clock tick does not replay the entrance or rebuild the hero
+[82/225] [tablet-900x800] › e2e/handoff.spec.ts:232:3 › Rive starts after the first data › a feed that is late does not keep it away for good
+[83/225] [phone-390x844] › e2e/player.spec.ts:213:3 › reduced motion › nothing flies and the page is complete at once
+[84/225] [phone-390x844] › e2e/player.spec.ts:223:1 › a page shorter than the screen still pulls down under a finger and springs back (luau:8803)
+[85/225] [tablet-900x800] › e2e/handoff.spec.ts:260:3 › Rive starts after the first data › with no data on its way, it does not wait for any: it starts once the page has painted
+[86/225] [tablet-900x800] › e2e/handoff.spec.ts:274:3 › the followed player’s photo › is asked for once, before the card that shows it, and it is the file the card shows
+[87/225] [tablet-900x800] › e2e/kit.spec.ts:3:1 › dev kit renders every material
+[88/225] [tablet-900x800] › e2e/insights.spec.ts:13:1 › insights is desktop-only; smaller layouts keep the existing player route
+[89/225] [tablet-900x800] › e2e/insights.spec.ts:38:3 › desktop insights › the switch and default player prompt match the Lua geometry
+[90/225] [tablet-900x800] › e2e/insights.spec.ts:58:3 › desktop insights › tables put the open league first and highlight its two teams
+[91/225] [tablet-900x800] › e2e/insights.spec.ts:69:3 › desktop insights › leaders use 64 px rows, goal rows use 52 px, and tabs reset only insight scroll
+[92/225] [tablet-900x800] › e2e/insights.spec.ts:99:3 › desktop insights › opening a leader opens the player in place, close returns to leaders with focus
+[93/225] [tablet-900x800] › e2e/insights.spec.ts:128:3 › desktop insights › the player remains available across local tab switches and a lineup click selects Player
+[94/225] [tablet-900x800] › e2e/kit.spec.ts:13:1 › the hover light follows the pointer through custom properties
+[95/225] [tablet-900x800] › e2e/insights.spec.ts:151:3 › desktop insights › a goal opens its own match and keyboard tabs and reduced motion work
+[96/225] [tablet-900x800] › e2e/lineup.spec.ts:53:1 › the switch, the formation and the pitch sit where the Lua puts them
+[97/225] [tablet-900x800] › e2e/kit.spec.ts:25:1 › a glass pane nested in a tinted pane keeps the plain glass colour
+[98/225] [tablet-900x800] › e2e/kit.spec.ts:37:1 › the Part 7 primitives draw from the sprite and fit the page
+[99/225] [tablet-900x800] › e2e/kit.spec.ts:60:1 › a photo that fails to load falls back to the kit disc
+[100/225] [tablet-900x800] › e2e/lineup.spec.ts:93:1 › tags show the rating, the best player, goals and the followed star
+[101/225] [tablet-900x800] › e2e/kit.spec.ts:65:1 › live clocks tick from the shared ticker
+[102/225] [tablet-900x800] › e2e/kit.spec.ts:94:1 › every squad photo loads as AVIF, at 1x on a 1x screen
+[103/225] [tablet-900x800] › e2e/lineup.spec.ts:111:1 › the switch shows the other team and plays its entrance again
+[104/225] [tablet-900x800] › e2e/kit.spec.ts:107:3 › on a 2x screen › boxes wider than half a file take @2x, small tiles keep @1x
+[105/225] [tablet-900x800] › e2e/lineup.spec.ts:131:1 › markers rise line by line, forwards first
+[106/225] [tablet-900x800] › e2e/list.spec.ts:51:3 › Today › the header, the day tabs and the followed card sit where the Lua puts them
+[107/225] [tablet-900x800] › e2e/lineup.spec.ts:163:1 › a clock tick does not rebuild the pitch or play the entrance again
+[108/225] [tablet-900x800] › e2e/list.spec.ts:72:3 › Today › the rows are the demo evening: seven matches, 76 tall, 12 px in
+[109/225] [tablet-900x800] › e2e/lineup.spec.ts:178:1 › photos: France and Argentina have them, another team keeps the kit disc, one manifest request
+[110/225] [tablet-900x800] › e2e/list.spec.ts:95:3 › Today › a league folds its rows away and opens them again
+[111/225] [tablet-900x800] › e2e/lineup.spec.ts:207:1 › a chip opens the player through the app’s navigation, and back returns to the same tab and team
+[112/225] [tablet-900x800] › e2e/list.spec.ts:105:3 › Today › the Show less button closes the card to its short form, and Show more opens it again
+[113/225] [tablet-900x800] › e2e/list.spec.ts:117:3 › Today › Change opens the picker over the card, picking a player swaps the card, Unfollow shows the picker
+[114/225] [tablet-900x800] › e2e/lineup.spec.ts:226:1 › before kick-off the tab is the squad, line by line
+[115/225] [tablet-900x800] › e2e/list.spec.ts:136:3 › Today › the followed player is remembered across a reload
+[116/225] [tablet-900x800] › e2e/list.spec.ts:143:3 › Today › tapping a match opens it; the card says it is the current one
+[117/225] [tablet-900x800] › e2e/lineup.spec.ts:246:1 › nothing overflows sideways
+[118/225] [tablet-900x800] › e2e/list.spec.ts:153:3 › Ongoing › five cards of 70 (a fifth of the width) on one baseline, then the followed card under them
+[119/225] [tablet-900x800] › e2e/list.spec.ts:176:3 › Ongoing › the cards are the live matches only, and open their match
+[120/225] [tablet-900x800] › e2e/lineup.spec.ts:265:1 › with reduced motion the line-up is in place at once
+[121/225] [tablet-900x800] › e2e/list.spec.ts:193:3 › the day tabs › Live turns Today into Ongoing and back; the cards grow in and fold away
+[122/225] [tablet-900x800] › e2e/match.spec.ts:42:1 › the hero and Facts sit where the Lua puts them
+[123/225] [tablet-900x800] › e2e/match.spec.ts:95:1 › the Facts chart unmounts on tab change and returns once
+[124/225] [tablet-900x800] › e2e/list.spec.ts:209:3 › the day tabs › Yesterday and Tomorrow show their own days, the indicator follows the tab
+[125/225] [tablet-900x800] › e2e/list.spec.ts:230:3 › the day tabs › the tabs strip fades at both edges and the page does not scroll sideways
+[126/225] [tablet-900x800] › e2e/match.spec.ts:121:1 › Stats counts out to the possession and opens the bars
+[127/225] [tablet-900x800] › e2e/list.spec.ts:254:3 › The day tabs are sized by the face › the indicator lies under the chosen word, on every tab and in Ongoing
+[128/225] [tablet-900x800] › e2e/match.spec.ts:145:1 › Table marks the top two and the sides playing now
+[129/225] [tablet-900x800] › e2e/match.spec.ts:164:1 › before kick-off, after full time and a friendly
+[130/225] [tablet-900x800] › e2e/list.spec.ts:276:3 › The day tabs are sized by the face › a face that arrives late: laid out in the fallback first, the indicator follows when it loads
+[131/225] [tablet-900x800] › e2e/match.spec.ts:182:1 › a live event slides into Facts
+[132/225] [tablet-900x800] › e2e/nav.spec.ts:80:1 › navigation, tabs, a player, then back and forward
+[133/225] [tablet-900x800] › e2e/nav.spec.ts:111:1 › direct URLs open where they point
+[134/225] [tablet-900x800] › e2e/nav.spec.ts:141:1 › each pane keeps its own scroll
+[135/225] [tablet-900x800] › e2e/nav.spec.ts:211:1 › focus follows navigation
+[136/225] [tablet-900x800] › e2e/match.spec.ts:207:1 › no horizontal overflow on any tab
+[137/225] [tablet-900x800] › e2e/nav.spec.ts:239:1 › nothing flies between screens: the match pushes in, the player grows in at the centre
+[138/225] [tablet-900x800] › e2e/nav.spec.ts:271:1 › rapid taps and interrupted navigation end in one clean state
+[139/225] [tablet-900x800] › e2e/player.spec.ts:69:1 › the bust, the line of light and the sheet sit where the Lua puts them
+[140/225] [tablet-900x800] › e2e/player.spec.ts:104:1 › real photos for France and Argentina, the kit disc for everyone else
+[141/225] [tablet-900x800] › e2e/nav.spec.ts:324:1 › no horizontal overflow on any screen
+[142/225] [tablet-900x800] › e2e/player.spec.ts:117:1 › opens from the line-up in place, nothing flying from his face; back restores focus
+[143/225] [tablet-900x800] › e2e/shell.spec.ts:3:1 › empty app shell renders
+[144/225] [desktop-1280x892] › e2e/chunks.spec.ts:17:1 › a cold match tap keeps its loading chrome and transfers stacked focus when ready
+[145/225] [tablet-900x800] › e2e/player.spec.ts:137:1 › opens from the follow card in the list, and from a scorer in the match hero
+[146/225] [desktop-1280x892] › e2e/chunks.spec.ts:35:1 › a cold player tap preserves focus through the reveal and returns it to the chip
+[147/225] [desktop-1280x892] › e2e/chunks.spec.ts:53:1 › back before the match chunk arrives cannot resurrect the abandoned screen
+[148/225] [tablet-900x800] › e2e/player.spec.ts:160:1 › the arrows glide to the next team-mate; back still leaves the page
+[149/225] [desktop-1280x892] › e2e/chunks.spec.ts:69:1 › the first warmed match open has content on its first frame and plays its phone push
+[150/225] [desktop-1280x892] › e2e/handoff.spec.ts:78:3 › the first frame and the header that replaces it › paints before the bundle, is only a picture, and React takes over in the same boxes with nothing moving
+[151/225] [tablet-900x800] › e2e/player.spec.ts:181:1 › scrolling frosts the bar and fades the arrows; the page keeps its scroll on return
+[152/225] [desktop-1280x892] › e2e/handoff.spec.ts:131:3 › the first frame and the header that replaces it › the app runs after the frame has painted, its modules downloading from the start
+[153/225] [desktop-1280x892] › e2e/handoff.spec.ts:155:3 › the first frame and the header that replaces it › the frame has the header’s own type and colours
+[154/225] [tablet-900x800] › e2e/player.spec.ts:192:1 › a direct link works for a player in a match that has not started, and for one who is unknown
+[155/225] [desktop-1280x892] › e2e/handoff.spec.ts:210:3 › Rive starts after the first data › nothing of it is asked for until the first rows are on screen, and the Live button works meanwhile
+[156/225] [tablet-900x800] › e2e/player.spec.ts:200:1 › a clock tick does not replay the entrance or rebuild the hero
+[157/225] [desktop-1280x892] › e2e/handoff.spec.ts:232:3 › Rive starts after the first data › a feed that is late does not keep it away for good
+[158/225] [tablet-900x800] › e2e/player.spec.ts:213:3 › reduced motion › nothing flies and the page is complete at once
+[159/225] [tablet-900x800] › e2e/player.spec.ts:223:1 › a page shorter than the screen still pulls down under a finger and springs back (luau:8803)
+[160/225] [desktop-1280x892] › e2e/insights.spec.ts:13:1 › insights is desktop-only; smaller layouts keep the existing player route
+[161/225] [desktop-1280x892] › e2e/handoff.spec.ts:260:3 › Rive starts after the first data › with no data on its way, it does not wait for any: it starts once the page has painted
+[162/225] [desktop-1280x892] › e2e/insights.spec.ts:38:3 › desktop insights › the switch and default player prompt match the Lua geometry
+[163/225] [desktop-1280x892] › e2e/handoff.spec.ts:274:3 › the followed player’s photo › is asked for once, before the card that shows it, and it is the file the card shows
+[164/225] [desktop-1280x892] › e2e/kit.spec.ts:3:1 › dev kit renders every material
+[165/225] [desktop-1280x892] › e2e/insights.spec.ts:58:3 › desktop insights › tables put the open league first and highlight its two teams
+[166/225] [desktop-1280x892] › e2e/kit.spec.ts:13:1 › the hover light follows the pointer through custom properties
+[167/225] [desktop-1280x892] › e2e/kit.spec.ts:25:1 › a glass pane nested in a tinted pane keeps the plain glass colour
+[168/225] [desktop-1280x892] › e2e/insights.spec.ts:69:3 › desktop insights › leaders use 64 px rows, goal rows use 52 px, and tabs reset only insight scroll
+[169/225] [desktop-1280x892] › e2e/kit.spec.ts:37:1 › the Part 7 primitives draw from the sprite and fit the page
+[170/225] [desktop-1280x892] › e2e/kit.spec.ts:60:1 › a photo that fails to load falls back to the kit disc
+[171/225] [desktop-1280x892] › e2e/kit.spec.ts:65:1 › live clocks tick from the shared ticker
+[172/225] [desktop-1280x892] › e2e/kit.spec.ts:94:1 › every squad photo loads as AVIF, at 1x on a 1x screen
+[173/225] [desktop-1280x892] › e2e/insights.spec.ts:99:3 › desktop insights › opening a leader opens the player in place, close returns to leaders with focus
+[174/225] [desktop-1280x892] › e2e/insights.spec.ts:128:3 › desktop insights › the player remains available across local tab switches and a lineup click selects Player
+[175/225] [desktop-1280x892] › e2e/kit.spec.ts:107:3 › on a 2x screen › boxes wider than half a file take @2x, small tiles keep @1x
+[176/225] [desktop-1280x892] › e2e/insights.spec.ts:151:3 › desktop insights › a goal opens its own match and keyboard tabs and reduced motion work
+[177/225] [desktop-1280x892] › e2e/lineup.spec.ts:53:1 › the switch, the formation and the pitch sit where the Lua puts them
+[178/225] [desktop-1280x892] › e2e/list.spec.ts:51:3 › Today › the header, the day tabs and the followed card sit where the Lua puts them
+[179/225] [desktop-1280x892] › e2e/lineup.spec.ts:93:1 › tags show the rating, the best player, goals and the followed star
+[180/225] [desktop-1280x892] › e2e/list.spec.ts:72:3 › Today › the rows are the demo evening: seven matches, 76 tall, 12 px in
+[181/225] [desktop-1280x892] › e2e/list.spec.ts:95:3 › Today › a league folds its rows away and opens them again
+[182/225] [desktop-1280x892] › e2e/lineup.spec.ts:111:1 › the switch shows the other team and plays its entrance again
+[183/225] [desktop-1280x892] › e2e/list.spec.ts:105:3 › Today › the Show less button closes the card to its short form, and Show more opens it again
+[184/225] [desktop-1280x892] › e2e/lineup.spec.ts:131:1 › markers rise line by line, forwards first
+[185/225] [desktop-1280x892] › e2e/lineup.spec.ts:163:1 › a clock tick does not rebuild the pitch or play the entrance again
+[186/225] [desktop-1280x892] › e2e/list.spec.ts:117:3 › Today › Change opens the picker over the card, picking a player swaps the card, Unfollow shows the picker
+[187/225] [desktop-1280x892] › e2e/lineup.spec.ts:178:1 › photos: France and Argentina have them, another team keeps the kit disc, one manifest request
+[188/225] [desktop-1280x892] › e2e/list.spec.ts:136:3 › Today › the followed player is remembered across a reload
+[189/225] [desktop-1280x892] › e2e/list.spec.ts:143:3 › Today › tapping a match opens it; the card says it is the current one
+[190/225] [desktop-1280x892] › e2e/lineup.spec.ts:207:1 › a chip opens the player through the app’s navigation, and back returns to the same tab and team
+[191/225] [desktop-1280x892] › e2e/list.spec.ts:153:3 › Ongoing › five cards of 70 (a fifth of the width) on one baseline, then the followed card under them
+[192/225] [desktop-1280x892] › e2e/list.spec.ts:176:3 › Ongoing › the cards are the live matches only, and open their match
+[193/225] [desktop-1280x892] › e2e/lineup.spec.ts:226:1 › before kick-off the tab is the squad, line by line
+[194/225] [desktop-1280x892] › e2e/list.spec.ts:193:3 › the day tabs › Live turns Today into Ongoing and back; the cards grow in and fold away
+[195/225] [desktop-1280x892] › e2e/list.spec.ts:209:3 › the day tabs › Yesterday and Tomorrow show their own days, the indicator follows the tab
+[196/225] [desktop-1280x892] › e2e/lineup.spec.ts:246:1 › nothing overflows sideways
+[197/225] [desktop-1280x892] › e2e/list.spec.ts:230:3 › the day tabs › the tabs strip fades at both edges and the page does not scroll sideways
+[198/225] [desktop-1280x892] › e2e/list.spec.ts:254:3 › The day tabs are sized by the face › the indicator lies under the chosen word, on every tab and in Ongoing
+[199/225] [desktop-1280x892] › e2e/lineup.spec.ts:265:1 › with reduced motion the line-up is in place at once
+[200/225] [desktop-1280x892] › e2e/match.spec.ts:42:1 › the hero and Facts sit where the Lua puts them
+[201/225] [desktop-1280x892] › e2e/match.spec.ts:95:1 › the Facts chart unmounts on tab change and returns once
+[202/225] [desktop-1280x892] › e2e/list.spec.ts:276:3 › The day tabs are sized by the face › a face that arrives late: laid out in the fallback first, the indicator follows when it loads
+[203/225] [desktop-1280x892] › e2e/match.spec.ts:121:1 › Stats counts out to the possession and opens the bars
+[204/225] [desktop-1280x892] › e2e/nav.spec.ts:80:1 › navigation, tabs, a player, then back and forward
+[205/225] [desktop-1280x892] › e2e/match.spec.ts:145:1 › Table marks the top two and the sides playing now
+[206/225] [desktop-1280x892] › e2e/match.spec.ts:164:1 › before kick-off, after full time and a friendly
+[207/225] [desktop-1280x892] › e2e/nav.spec.ts:111:1 › direct URLs open where they point
+[208/225] [desktop-1280x892] › e2e/nav.spec.ts:141:1 › each pane keeps its own scroll
+[209/225] [desktop-1280x892] › e2e/match.spec.ts:182:1 › a live event slides into Facts
+[210/225] [desktop-1280x892] › e2e/nav.spec.ts:211:1 › focus follows navigation
+[211/225] [desktop-1280x892] › e2e/nav.spec.ts:239:1 › nothing flies between screens: the match pushes in, the player grows in at the centre
+[212/225] [desktop-1280x892] › e2e/match.spec.ts:207:1 › no horizontal overflow on any tab
+[213/225] [desktop-1280x892] › e2e/nav.spec.ts:271:1 › rapid taps and interrupted navigation end in one clean state
+[214/225] [desktop-1280x892] › e2e/nav.spec.ts:324:1 › no horizontal overflow on any screen
+[215/225] [desktop-1280x892] › e2e/player.spec.ts:69:1 › the bust, the line of light and the sheet sit where the Lua puts them
+[216/225] [desktop-1280x892] › e2e/shell.spec.ts:3:1 › empty app shell renders
+[217/225] [desktop-1280x892] › e2e/player.spec.ts:104:1 › real photos for France and Argentina, the kit disc for everyone else
+[218/225] [desktop-1280x892] › e2e/player.spec.ts:117:1 › opens from the line-up in place, nothing flying from his face; back restores focus
+[219/225] [desktop-1280x892] › e2e/player.spec.ts:137:1 › opens from the follow card in the list, and from a scorer in the match hero
+[220/225] [desktop-1280x892] › e2e/player.spec.ts:160:1 › the arrows glide to the next team-mate; back still leaves the page
+[221/225] [desktop-1280x892] › e2e/player.spec.ts:181:1 › scrolling frosts the bar and fades the arrows; the page keeps its scroll on return
+[222/225] [desktop-1280x892] › e2e/player.spec.ts:192:1 › a direct link works for a player in a match that has not started, and for one who is unknown
+[223/225] [desktop-1280x892] › e2e/player.spec.ts:200:1 › a clock tick does not replay the entrance or rebuild the hero
+[224/225] [desktop-1280x892] › e2e/player.spec.ts:213:3 › reduced motion › nothing flies and the page is complete at once
+[225/225] [desktop-1280x892] › e2e/player.spec.ts:223:1 › a page shorter than the screen still pulls down under a finger and springs back (luau:8803)
+  15 skipped
+  210 passed (5.9m)

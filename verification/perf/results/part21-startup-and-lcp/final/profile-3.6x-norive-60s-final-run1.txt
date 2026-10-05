@@ -1,0 +1,19 @@
+/?demo=fast at 3.6x, 390x844, Rive blocked: 31 frames over 50 ms in 60 s
+  start-up    n  10  median  145 ms  max  271 ms
+  poll        n  15  median   78 ms  max  121 ms
+  goal scene  n   4  median  121 ms  max  209 ms
+  toast       n   2  median  133 ms  max  133 ms
+
+worst frames:
+     0.3 s   271 ms  [start-up]  265 ms MessagePort.onmessage app-vendor-CCjG9T8J.js@9174 (forced layout 69 ms)
+    54.5 s   209 ms  [goal scene]  182 ms TimerHandler:setTimeout demo-CNuamVTL.js@34072 (forced layout 26 ms)
+     0.8 s   175 ms  [start-up]  157 ms TimerHandler:setTimeout index-k0rumXmd.js@131375
+     1.7 s   175 ms  [start-up]  
+     1.1 s   156 ms  [start-up]  52 ms MessagePort.onmessage app-vendor-CCjG9T8J.js@9174
+     0.6 s   145 ms  [start-up]  72 ms import.then (no source); 46 ms MessagePort.onmessage app-vendor-CCjG9T8J.js@9174
+     0.0 s   136 ms  [start-up]  
+    49.5 s   133 ms  [toast]  93 ms TimerHandler:setTimeout demo-CNuamVTL.js@34072
+     1.6 s   125 ms  [start-up]  60 ms http://127.0.0.1:4191/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js@0; 59 ms import.then (no source)
+    26.6 s   121 ms  [goal scene]  106 ms TimerHandler:setTimeout demo-CNuamVTL.js@34072 (forced layout 27 ms)
+    35.2 s   121 ms  [poll]  100 ms TimerHandler:setTimeout demo-CNuamVTL.js@34072
+     0.2 s   111 ms  [start-up]  111 ms http://127.0.0.1:4191/assets/index-k0rumXmd.js index-k0rumXmd.js@0

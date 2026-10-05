@@ -1,0 +1,28 @@
+name: Part 20 signed scene layout evidence
+on:
+  push:
+    branches: [codex/part-20-moments]
+    paths: ['src/features/moments/Scene.tsx', 'verification/moments/**', '.github/workflows/part20-export-layout.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Capture actual goal and red canvas inside the app in all three layouts
+        run: npx playwright test -c playwright.moments.config.ts -g 'goalHome|redHome' --reporter=line
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: part20-signed-app-layouts
+          path: test-results/*.png
+          retention-days: 7

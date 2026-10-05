@@ -1,0 +1,388 @@
+{
+ "path": "/?demo",
+ "rate": 4,
+ "width": 390,
+ "height": 844,
+ "noRive": false,
+ "results": [
+  {
+   "run": 1,
+   "fcp": 1572,
+   "lcp": {
+    "t": 4388,
+    "render": 4388,
+    "size": 18223,
+    "tag": "img",
+    "cls": "_chestImg_uaagh_307",
+    "text": ""
+   },
+   "lcpCandidates": [
+    {
+     "t": 1572,
+     "render": 1572,
+     "size": 2987,
+     "tag": "h1",
+     "cls": "sf-word",
+     "text": "scoreline"
+    },
+    {
+     "t": 2748,
+     "render": 2748,
+     "size": 3069,
+     "tag": "h1",
+     "cls": "_wordmark_1hm1u_45",
+     "text": "scoreline"
+    },
+    {
+     "t": 4388,
+     "render": 4388,
+     "size": 18223,
+     "tag": "img",
+     "cls": "_chestImg_uaagh_307",
+     "text": ""
+    }
+   ],
+   "resources": [
+    {
+     "name": "/fonts/hanken-grotesk-latin-wght-normal.woff2",
+     "start": 605.5999999996275,
+     "end": 1817.3999999999069,
+     "size": 35004
+    },
+    {
+     "name": "/assets/index-CLQoqotl.js",
+     "start": 606.5999999996275,
+     "end": 1936.2999999998137,
+     "size": 46154
+    },
+    {
+     "name": "/assets/rolldown-runtime-CbXtAM7H.js",
+     "start": 607.7999999998137,
+     "end": 1205.5999999996275,
+     "size": 889
+    },
+    {
+     "name": "/assets/colorOf-ClTxFktT.js",
+     "start": 607.8999999999069,
+     "end": 1300.7999999998137,
+     "size": 3821
+    },
+    {
+     "name": "/assets/app-vendor-CCjG9T8J.js",
+     "start": 607.8999999999069,
+     "end": 2389.7999999998137,
+     "size": 128782
+    },
+    {
+     "name": "/assets/index-k4qExRyO.css",
+     "start": 608,
+     "end": 1482.7999999998137,
+     "size": 13356
+    },
+    {
+     "name": "/assets/demo-BkacKGDk.js",
+     "start": 2524.399999999907,
+     "end": 3247.2999999998137,
+     "size": 13625
+    },
+    {
+     "name": "/assets/standings-CUdfNi5b.js",
+     "start": 2526.1999999997206,
+     "end": 3105.899999999907,
+     "size": 1250
+    },
+    {
+     "name": "/assets/data-DJxRtNur.js",
+     "start": 2526.7999999998137,
+     "end": 3231.5,
+     "size": 11908
+    },
+    {
+     "name": "/assets/rng-W439OvqJ.js",
+     "start": 2527.899999999907,
+     "end": 3121.2999999998137,
+     "size": 613
+    },
+    {
+     "name": "/img/players/manifest.json",
+     "start": 2763.5,
+     "end": 3343,
+     "size": 2461
+    },
+    {
+     "name": "/icon.svg",
+     "start": 2794,
+     "end": 3359.5999999996275,
+     "size": 492
+    },
+    {
+     "name": "/assets/Scene-B8EmphxU.js",
+     "start": 2801.2999999998137,
+     "end": 3843.2999999998137,
+     "size": 5651
+    },
+    {
+     "name": "/assets/MatchScreen-Cs7PC34o.js",
+     "start": 2805.2999999998137,
+     "end": 4018.0999999996275,
+     "size": 16915
+    },
+    {
+     "name": "/assets/StandingsTable-OF31hQnt.js",
+     "start": 2806.7999999998137,
+     "end": 3946.899999999907,
+     "size": 1567
+    },
+    {
+     "name": "/assets/StandingsTable-Dfa2LwMN.css",
+     "start": 2806.899999999907,
+     "end": 3677.399999999907,
+     "size": 1401
+    },
+    {
+     "name": "/assets/MatchScreen-CwEJmPYY.css",
+     "start": 2809.0999999996275,
+     "end": 3716.899999999907,
+     "size": 5425
+    },
+    {
+     "name": "/assets/PlayerScreen-ilwYmDNB.js",
+     "start": 2810.5999999996275,
+     "end": 4281.0999999996275,
+     "size": 6519
+    },
+    {
+     "name": "/assets/PlayerScreen-BVJSY1t5.css",
+     "start": 2811.1999999997206,
+     "end": 3811.2999999998137,
+     "size": 2504
+    },
+    {
+     "name": "/img/players/arg/10-bust@1x.avif",
+     "start": 3581.0999999996275,
+     "end": 4343.899999999907,
+     "size": 11595
+    },
+    {
+     "name": "/assets/LiveGraphic-CF-OthkW.js",
+     "start": 3945.2999999998137,
+     "end": 4519.699999999721,
+     "size": 978
+    },
+    {
+     "name": "/assets/RiveCanvas-DI9PcWmf.js",
+     "start": 3948.899999999907,
+     "end": 4534.799999999814,
+     "size": 1688
+    },
+    {
+     "name": "/assets/WordGraphic-CcDcooQ2.js",
+     "start": 3995.2999999998137,
+     "end": 4574.699999999721,
+     "size": 1520
+    },
+    {
+     "name": "/assets/runtime-Dbwfuf0d.js",
+     "start": 3999.5999999996275,
+     "end": 5003.799999999814,
+     "size": 60586
+    },
+    {
+     "name": "/rive/moments.riv",
+     "start": 4000.7999999998137,
+     "end": 5051.299999999814,
+     "size": 9867
+    },
+    {
+     "name": "/rive/live-icon.riv",
+     "start": 4000.7999999998137,
+     "end": 5043.5999999996275,
+     "size": 15424
+    }
+   ],
+   "seen": {
+    "h1": 621.8999999999069,
+    "staticFrame": 621.8999999999069,
+    "tabs": 2732.6999999997206,
+    "staticGone": 2732.6999999997206,
+    "rows": 3675.6999999997206
+   },
+   "shifts": [
+    {
+     "t": 1833.3999999999069,
+     "value": 0.0007815483142786549,
+     "hadInput": true
+    }
+   ],
+   "firstDataFrame": {
+    "start": 3663.5999999996275,
+    "dur": 176.3000000002794,
+    "block": 107.218,
+    "renderStart": 3697.7999999998137,
+    "scripts": [
+     {
+      "inv": "MessagePort.onmessage",
+      "url": "http://127.0.0.1:4189/assets/app-vendor-CCjG9T8J.js",
+      "dur": 12,
+      "layout": 0
+     },
+     {
+      "inv": "MessagePort.onmessage",
+      "url": "http://127.0.0.1:4189/assets/app-vendor-CCjG9T8J.js",
+      "dur": 15,
+      "layout": 0
+     },
+     {
+      "inv": "FrameRequestCallback",
+      "url": "http://127.0.0.1:4189/assets/app-vendor-CCjG9T8J.js",
+      "dur": 20,
+      "layout": 0
+     }
+    ]
+   },
+   "longFrames": [
+    {
+     "start": 573.0999999996275,
+     "dur": 978.4000000003725,
+     "block": 5.887,
+     "renderStart": 1508.7999999998137,
+     "scripts": []
+    },
+    {
+     "start": 2409.5999999996275,
+     "dur": 128.60000000009313,
+     "block": 77.664,
+     "renderStart": 2538.0999999996275,
+     "scripts": [
+      {
+       "inv": "http://127.0.0.1:4189/assets/index-CLQoqotl.js",
+       "url": "http://127.0.0.1:4189/assets/index-CLQoqotl.js",
+       "dur": 127,
+       "layout": 0
+      }
+     ]
+    },
+    {
+     "start": 2542,
+     "dur": 195.89999999990687,
+     "block": 144.754,
+     "renderStart": 2734.7999999998137,
+     "scripts": [
+      {
+       "inv": "MessagePort.onmessage",
+       "url": "http://127.0.0.1:4189/assets/app-vendor-CCjG9T8J.js",
+       "dur": 191,
+       "layout": 45
+      }
+     ]
+    },
+    {
+     "start": 3252.1999999997206,
+     "dur": 68.703,
+     "block": 18.703,
+     "renderStart": 0,
+     "scripts": [
+      {
+       "inv": "http://127.0.0.1:4189/assets/demo-BkacKGDk.js",
+       "url": "http://127.0.0.1:4189/assets/demo-BkacKGDk.js",
+       "dur": 13,
+       "layout": 0
+      },
+      {
+       "inv": "import.then",
+       "url": "http://127.0.0.1:4189/assets/index-CLQoqotl.js",
+       "dur": 54,
+       "layout": 0
+      }
+     ]
+    },
+    {
+     "start": 3321.1999999997206,
+     "dur": 159.5,
+     "block": 109.122,
+     "renderStart": 3475,
+     "scripts": [
+      {
+       "inv": "TimerHandler:setTimeout",
+       "url": "http://127.0.0.1:4189/assets/index-CLQoqotl.js",
+       "dur": 153,
+       "layout": 0
+      }
+     ]
+    },
+    {
+     "start": 3663.5999999996275,
+     "dur": 176.3000000002794,
+     "block": 107.218,
+     "renderStart": 3697.7999999998137,
+     "scripts": [
+      {
+       "inv": "MessagePort.onmessage",
+       "url": "http://127.0.0.1:4189/assets/app-vendor-CCjG9T8J.js",
+       "dur": 12,
+       "layout": 0
+      },
+      {
+       "inv": "MessagePort.onmessage",
+       "url": "http://127.0.0.1:4189/assets/app-vendor-CCjG9T8J.js",
+       "dur": 15,
+       "layout": 0
+      },
+      {
+       "inv": "FrameRequestCallback",
+       "url": "http://127.0.0.1:4189/assets/app-vendor-CCjG9T8J.js",
+       "dur": 20,
+       "layout": 0
+      }
+     ]
+    },
+    {
+     "start": 5014,
+     "dur": 110.257,
+     "block": 60.257,
+     "renderStart": 0,
+     "scripts": [
+      {
+       "inv": "http://127.0.0.1:4189/assets/runtime-Dbwfuf0d.js",
+       "url": "http://127.0.0.1:4189/assets/runtime-Dbwfuf0d.js",
+       "dur": 58,
+       "layout": 0
+      },
+      {
+       "inv": "import.then",
+       "url": "http://127.0.0.1:4189/assets/index-CLQoqotl.js",
+       "dur": 52,
+       "layout": 0
+      }
+     ]
+    }
+   ],
+   "longtasks": [
+    {
+     "start": 2409.5999999996275,
+     "dur": 127
+    },
+    {
+     "start": 2542,
+     "dur": 191
+    },
+    {
+     "start": 3252.1999999997206,
+     "dur": 68
+    },
+    {
+     "start": 3321.1999999997206,
+     "dur": 153
+    },
+    {
+     "start": 3697.6999999997206,
+     "dur": 158
+    },
+    {
+     "start": 5014,
+     "dur": 110
+    }
+   ]
+  }
+ ]
+}

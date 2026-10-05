@@ -1,0 +1,33 @@
+run 1: / at 3.6x 390x844
+  FCP 480 ms  LCP 480 ms (<p> "No matches yet.Play the demo m")  h1 in DOM 456 ms  rows in DOM n/a  CLS 0.0000
+  LCP candidates: 480 ms <p> "No matches yet.Play the demo m" 4288px²
+  frames over 50 ms until 2.5 s after the first rows: 7
+       12 ms    81 ms  
+      103 ms   107 ms  101 ms http://127.0.0.1:4180/assets/index-9I8RqK8J.js index-9I8RqK8J.js
+      212 ms   254 ms  244 ms MessagePort.onmessage app-vendor-CA1omR8B.js (forced layout 65 ms)
+      604 ms    90 ms  45 ms import.then index-9I8RqK8J.js
+      714 ms    59 ms  
+      773 ms    85 ms  
+      874 ms   860 ms  852 ms IdleRequestCallback index-9I8RqK8J.js
+run 2: / at 3.6x 390x844
+  FCP 604 ms  LCP 604 ms (<p> "No matches yet.Play the demo m")  h1 in DOM 565 ms  rows in DOM n/a  CLS 0.0000
+  LCP candidates: 604 ms <p> "No matches yet.Play the demo m" 4288px²
+  frames over 50 ms until 2.5 s after the first rows: 8
+       11 ms    89 ms  
+      113 ms   116 ms  112 ms http://127.0.0.1:4180/assets/index-9I8RqK8J.js index-9I8RqK8J.js
+      233 ms   350 ms  335 ms MessagePort.onmessage app-vendor-CA1omR8B.js (forced layout 76 ms)
+      811 ms   148 ms  73 ms http://127.0.0.1:4180/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+      971 ms    66 ms  
+     1037 ms    86 ms  
+     1127 ms   946 ms  937 ms IdleRequestCallback index-9I8RqK8J.js
+     2075 ms    51 ms  39 ms FrameRequestCallback runtime-Dbwfuf0d.js
+run 3: / at 3.6x 390x844
+  FCP 536 ms  LCP 536 ms (<p> "No matches yet.Play the demo m")  h1 in DOM 502 ms  rows in DOM n/a  CLS 0.0000
+  LCP candidates: 536 ms <p> "No matches yet.Play the demo m" 4288px²
+  frames over 50 ms until 2.5 s after the first rows: 6
+        8 ms    70 ms  
+      102 ms   111 ms  108 ms http://127.0.0.1:4180/assets/index-9I8RqK8J.js index-9I8RqK8J.js
+      218 ms   300 ms  287 ms MessagePort.onmessage app-vendor-CA1omR8B.js (forced layout 71 ms)
+      645 ms    87 ms  44 ms import.then index-9I8RqK8J.js
+      802 ms    99 ms  
+      904 ms   922 ms  914 ms IdleRequestCallback index-9I8RqK8J.js

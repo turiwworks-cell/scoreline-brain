@@ -1,0 +1,148 @@
+/*
+ * The list header (luau:4602–4654). The Lua draws on a 390 x 844 artboard with the header's centre
+ * line at y = 82; here the row starts 62 px below the top (the status bar's room) and its items sit
+ * on that centre line, so every x and y of the Lua comes out the same.
+ */
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 18px;
+}
+
+/* three bars of the spectrum, 6 px wide, 16 / 22 / 12 tall, their tops 6 / 0 / 4 down (luau:4605) */
+.mark {
+  display: flex;
+  align-items: flex-start;
+  height: 22px;
+  margin-right: 10px;
+  /* the mark's box starts at y = 72.5, the centre line is 82 */
+  position: relative;
+  top: 1.5px;
+  flex: none;
+}
+.mark > span {
+  display: block;
+  width: 6px;
+}
+.bar1 {
+  height: 16px;
+  margin-top: 6px;
+  background: var(--spectrum-2-v);
+}
+.bar2 {
+  height: 22px;
+  background: var(--spectrum-3-v);
+}
+.bar3 {
+  height: 12px;
+  margin-top: 4px;
+  background: var(--spectrum-5-v);
+}
+
+.wordmark {
+  margin: 0;
+  font: var(--type-wordmark);
+  letter-spacing: var(--track-45);
+  white-space: nowrap;
+}
+.wordmark:focus {
+  outline: none;
+}
+
+/* the Live pill: 38 tall, the green capsule 27 tall inside it, the count's badge 24 x 18 (luau:4617) */
+.live {
+  appearance: none;
+  border: 0;
+  margin: 0 8px 0 auto;
+  padding: 0 10px 0 6px;
+  height: 38px;
+  border-radius: 19px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--c-text);
+  font: var(--fw-s) var(--fs-14) / normal var(--font-sans);
+  cursor: pointer;
+  flex: none;
+  -webkit-tap-highlight-color: transparent;
+}
+/* the Rive button's hover light: the glass's spot and rim catch (materials .m-light) on the
+   capsule as wide as it is now. The capsule widens when Live comes on (about 0.5 s in the art),
+   right-aligned in the button; --cap-w follows it. */
+@property --cap-w {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+.liveLight {
+  --cap-w: var(--cap-off);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--cap-w);
+  border-radius: 20px;
+  --light-dx: calc(var(--cap-on) - var(--cap-w));
+  transition: --cap-w 500ms var(--ease-glide);
+}
+.liveLight[data-on] {
+  --cap-w: var(--cap-on);
+}
+
+.live:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 2px;
+}
+
+/* the capsule's green fades in with the Live section (liveK); the word and the dot turn dark with it */
+.capsule {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 27px;
+  padding: 0 11px 0 9px;
+  border-radius: 13.5px;
+  color: color-mix(in srgb, var(--c-ink-dark) calc(var(--live-k) * 100%), var(--c-text));
+}
+.capsule::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--c-live);
+  opacity: var(--live-k);
+}
+.capsule > * {
+  position: relative;
+}
+.count {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 18px;
+  border: 1.4px solid var(--c-text);
+  border-radius: 4.3px;
+  font: var(--fw-b) var(--fs-11) / 1 var(--font-sans);
+}
+
+.menu {
+  position: relative;
+  width: 16px;
+  height: 10px;
+}
+.menu > span {
+  position: absolute;
+  left: 0;
+  width: 16px;
+  height: 1.6px;
+  background: var(--c-text);
+}
+.menu > span:first-child {
+  top: 0;
+}
+.menu > span:last-child {
+  top: 8.4px;
+}

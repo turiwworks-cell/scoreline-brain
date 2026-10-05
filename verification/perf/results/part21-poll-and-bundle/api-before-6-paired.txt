@@ -1,0 +1,60 @@
+{
+  "rate": 6,
+  "matches": "demo fixtures",
+  "samples": 40,
+  "callback": {
+    "median": 48.200000000186265,
+    "max": 85.5
+  },
+  "untilPaint": {
+    "median": 78.5,
+    "max": 112.3999999994412
+  },
+  "longTasks": [
+    {
+      "start": 2671.5,
+      "duration": 73
+    },
+    {
+      "start": 2770.5999999996275,
+      "duration": 65
+    },
+    {
+      "start": 2953,
+      "duration": 59
+    },
+    {
+      "start": 3033.699999999255,
+      "duration": 62
+    },
+    {
+      "start": 3119.399999999441,
+      "duration": 55
+    },
+    {
+      "start": 3202,
+      "duration": 57
+    },
+    {
+      "start": 3734.399999999441,
+      "duration": 56
+    },
+    {
+      "start": 3820.7999999998137,
+      "duration": 52
+    },
+    {
+      "start": 4450.199999999255,
+      "duration": 66
+    },
+    {
+      "start": 4934.0999999996275,
+      "duration": 54
+    },
+    {
+      "start": 5251.0999999996275,
+      "duration": 59
+    }
+  ],
+  "errors": []
+}

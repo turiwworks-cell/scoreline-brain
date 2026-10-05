@@ -1,0 +1,332 @@
+.kit {
+  min-height: 100%;
+  padding: 24px var(--gutter) 64px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.top {
+  margin-bottom: 24px;
+}
+
+.title {
+  margin: 0 0 4px;
+  font: var(--type-title);
+  letter-spacing: var(--track-3);
+}
+
+.note {
+  margin: 0 0 14px;
+  font: var(--type-body);
+  color: var(--c-muted);
+}
+
+/* phone-width columns: 354 px of content, as in the Lua's 390 px screen */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(354px, 100%), 1fr));
+  gap: 40px 46px;
+  align-items: start;
+}
+
+.section {
+  min-width: 0;
+  max-width: 354px;
+}
+
+.head {
+  margin: 0 0 6px;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--c-muted);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--c-hair);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.gap {
+  height: 18px;
+}
+
+/* ----- header ----- */
+.header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 56px;
+}
+.mark {
+  display: flex;
+  align-items: flex-start;
+  height: 22px;
+  margin-right: 10px;
+}
+.mark > span {
+  display: block;
+  width: 6px;
+}
+.wordmark {
+  font: var(--type-wordmark);
+  letter-spacing: var(--track-45);
+  margin-top: -2px;
+}
+.livePill {
+  appearance: none;
+  border: 0;
+  margin: 0 8px 0 auto;
+  padding: 0 9px 0 6px;
+  height: 38px;
+  border-radius: 19px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--c-text);
+  font: var(--fw-s) var(--fs-14) / normal var(--font-sans);
+  cursor: pointer;
+}
+.liveIn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 27px;
+  padding: 0 11px 0 9px;
+  border-radius: 13.5px;
+  transition: background-color var(--t-live-dur) var(--t-live-ease), color var(--t-live-dur) var(--t-live-ease);
+}
+.liveOn {
+  background: var(--c-live);
+  color: var(--c-ink-dark);
+}
+.count {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 18px;
+  border: 1.4px solid var(--c-text);
+  border-radius: 4.3px;
+  font: var(--fw-b) var(--fs-11) / 1 var(--font-sans);
+}
+.menu {
+  position: relative;
+  width: 16px;
+  height: 10px;
+}
+.menu > span {
+  position: absolute;
+  left: 0;
+  width: 16px;
+  height: 1.6px;
+  background: var(--c-text);
+}
+.menu > span:first-child {
+  top: 0;
+}
+.menu > span:last-child {
+  top: 8.4px;
+}
+
+/* ----- colours ----- */
+.swatches {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px 10px;
+}
+.swatches li {
+  display: grid;
+  gap: 2px;
+}
+.chip {
+  height: 40px;
+  border-radius: var(--r-12);
+  box-shadow: inset 0 0 0 1px var(--c-hair);
+}
+.swName {
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  margin-top: 4px;
+}
+.swHex {
+  font: var(--type-body);
+  color: var(--c-muted);
+}
+
+/* ----- spectrum ----- */
+.spectra {
+  display: grid;
+  gap: 8px;
+}
+.spectrumRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.spectrumN {
+  width: 10px;
+  font: var(--type-label);
+  color: var(--c-muted);
+}
+.bar {
+  flex: 1;
+  height: 22px;
+  border-radius: var(--r-4);
+}
+.columns {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  margin-top: 12px;
+  height: 160px;
+}
+.gradWord {
+  margin: 12px 0 0;
+  font: var(--type-hero);
+  letter-spacing: var(--track-35);
+}
+
+/* ----- type ----- */
+.type {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.type li {
+  display: grid;
+  gap: 2px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--c-hair);
+}
+.typeRole {
+  font: var(--type-body);
+  color: var(--c-muted);
+}
+.typeSample {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ----- glass ----- */
+.followCard {
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  padding: 22px 18px 20px;
+  min-height: 160px;
+}
+.cardEyebrow {
+  font: var(--fw-r) var(--fs-12p5) / normal var(--font-sans);
+  color: var(--c-muted);
+}
+.cardName {
+  font: var(--fw-s) var(--fs-22) / normal var(--font-sans);
+  letter-spacing: var(--track-2);
+  margin-bottom: 4px;
+}
+.cardSub {
+  font: var(--fw-r) var(--fs-12p5) / normal var(--font-sans);
+  color: var(--c-muted);
+  margin-bottom: 8px;
+}
+.photo {
+  position: relative;
+  margin-top: 12px;
+  height: 120px;
+  border-radius: var(--r-16);
+  overflow: hidden;
+  padding: 44px 18px 0;
+  background:
+    radial-gradient(60% 90% at 25% 30%, #2b6cb0 0%, transparent 70%),
+    radial-gradient(50% 80% at 80% 60%, #c53030 0%, transparent 70%),
+    linear-gradient(135deg, #1a365d, #742a2a);
+}
+.thinPane {
+  padding: 12px 14px 4px;
+}
+.tintedCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 14px 14px 6px 18px;
+}
+.swatchPane {
+  width: 80px;
+  height: 52px;
+}
+
+/* ----- soft light ----- */
+.lightBox {
+  position: relative;
+  height: 300px;
+  background: var(--c-bg);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-16);
+  box-shadow: inset 0 0 0 1px var(--c-hair);
+}
+.lightNum {
+  position: relative;
+  font: var(--fw-s) var(--fs-60) / normal var(--font-sans);
+  letter-spacing: var(--track-5);
+}
+.horizon {
+  position: relative;
+  height: 130px;
+  margin-top: 12px;
+}
+.horizonLine {
+  position: absolute;
+  left: calc(50% - 150px);
+  top: 88.5px;
+  width: 300px;
+  height: 3px;
+  border-radius: 1.5px;
+  /* the hairline fades out at both ends and blooms (lookPaint feather 8) */
+  background: linear-gradient(90deg, rgb(179 209 237 / 0), rgb(179 209 237 / 0.9) 50%, rgb(179 209 237 / 0));
+  box-shadow: 0 0 8px rgb(179 209 237 / 0.6);
+}
+.lightTile {
+  position: relative;
+  flex: 1;
+  height: 120px;
+  border-radius: var(--r-22);
+  overflow: hidden;
+  background: var(--c-bg);
+  box-shadow: inset 0 0 0 1px var(--c-hair);
+}
+
+/* ----- hover ----- */
+.hoverPad {
+  display: grid;
+  place-items: center;
+  height: 140px;
+}
+.frozen {
+  width: 140px;
+  height: 64px;
+}
+
+.segment {
+  width: 300px;
+  max-width: 100%;
+}
+
+@media (min-width: 1200px) {
+  .wide {
+    grid-column: span 2;
+    max-width: none;
+  }
+}

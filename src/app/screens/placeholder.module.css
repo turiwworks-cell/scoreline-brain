@@ -1,0 +1,126 @@
+/*
+ * Placeholder screens (Part 9). Just enough to prove the shell: navigation, panes, scrolling,
+ * focus and the two shared elements. Parts 10–15 replace them with the real screens; the match
+ * screen's Lineup tab is the real one since Part 13.
+ * Content of a shared element is styled through its own classes (see motion/Shared.tsx).
+ */
+
+.page {
+  padding: 18px var(--gutter) 48px;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--hit-min);
+  margin-bottom: 18px;
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font: var(--type-heading);
+  letter-spacing: var(--track-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.heading:focus {
+  outline: none;
+}
+
+.heading:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* ---- list ---------------------------------------------------------------------------------- */
+
+.label {
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+
+.empty {
+  margin: 48px 0;
+  font: var(--type-empty);
+  letter-spacing: var(--track-2);
+  color: var(--c-muted);
+  text-align: center;
+}
+
+.empty a {
+  color: var(--c-text);
+}
+
+.block {
+  height: 64px;
+  margin-bottom: 10px;
+  padding: 14px 16px;
+  border-radius: var(--r-16);
+  font: var(--type-body);
+  color: var(--c-muted);
+}
+
+/* ---- player --------------------------------------------------------------------------------- */
+
+.bustStage {
+  position: relative;
+  display: grid;
+  place-items: end center;
+  height: 300px;
+  margin: 0 calc(-1 * var(--gutter)) 18px;
+  overflow: hidden;
+}
+
+.bigNumber {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font: var(--fw-l) 220px / 1 var(--font-sans);
+  letter-spacing: var(--track-5);
+  color: rgb(255 255 255 / 0.06);
+  pointer-events: none;
+  user-select: none;
+}
+
+.bust {
+  display: block;
+  width: 230px;
+  height: 288px;
+}
+
+.bustImg {
+  display: block;
+  width: 230px;
+  height: 288px;
+}
+
+.playerName {
+  margin: 0 0 4px;
+  font: var(--type-title);
+  letter-spacing: var(--track-3);
+  text-align: center;
+}
+
+.playerMeta {
+  margin: 0 0 22px;
+  font: var(--type-body);
+  color: var(--c-muted);
+  text-align: center;
+}
+
+/* ---- insights ------------------------------------------------------------------------------- */
+
+.segment {
+  margin: 0 auto 22px;
+  width: 300px;
+  max-width: 100%;
+}

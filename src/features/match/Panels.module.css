@@ -1,0 +1,590 @@
+/*
+ * The Facts tab and the pieces the tabs share (luau:4704, 4990-5326). Every block spans the
+ * pane; x positions are the Lua's, kept from the nearer edge, so a wider pane only moves the
+ * right-hand items. Text is placed by its centre line (see Hero.module.css).
+ */
+
+/* lab(): M 10.5, +0.16 em, uppercase, a 13.7 px line */
+.label {
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 13.7px;
+  white-space: nowrap;
+  color: var(--c-muted);
+}
+
+/* ---- h4: the muted label left, the white one right, 13.7 + 14 px (luau:4704) ---------------- */
+
+.h4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  height: 13.7px;
+  margin: 0 var(--gutter) 14px;
+}
+.h4Left,
+.h4Right {
+  margin: 0;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 13.7px;
+  white-space: nowrap;
+}
+.h4Left {
+  color: var(--c-muted);
+}
+.h4Right {
+  display: flex;
+  align-items: center;
+  color: var(--c-text);
+}
+.h4Clock {
+  color: inherit;
+}
+
+/* "Live" with a small pulsing dot 6.4 px before it (luau:5313): r 2.6, a ring to r 5.1 */
+.liveLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6.4px;
+}
+.liveDot {
+  position: relative;
+  width: 5.2px;
+  height: 5.2px;
+  border-radius: 50%;
+  background: var(--c-live);
+}
+.liveDot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgb(52 227 154 / 0.25);
+  /* 0.5 + 0.5 cos(4t): the ring is widest where it has faded out */
+  animation: breathe 1.5708s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+}
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(calc(5.1 / 2.6));
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ---- Facts -------------------------------------------------------------------------------- */
+
+.facts {
+  position: relative;
+}
+
+.gap34 {
+  height: 34px;
+}
+
+/* before kick-off: the time in L 40, -0.04 em, its baseline 40 px under the heading (luau:5303) */
+.bigTime {
+  height: 52px;
+  margin: 0 var(--gutter) 34px;
+  font: var(--type-time);
+  letter-spacing: var(--track-4);
+  line-height: 52px;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text);
+}
+
+/*
+ * The momentum block (luau:4892): headline 43.8 + 18, the chart's glass 184 tall, the minute axis
+ * under it; 36 px before Events. Momentum owns the heading, glass and axis inside this block.
+ */
+.momentum {
+  position: relative;
+  height: 269.8px;
+  margin-bottom: 36px;
+}
+/* ---- match info: glass tiles two by two, 68 tall, 8 apart (luau:5246) ------------------------ */
+
+/* every row of tiles takes 76 px, the last one too (luau:5266) */
+.tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0 var(--gutter) 8px;
+}
+.tile {
+  position: relative;
+  height: 68px;
+  min-width: 0;
+}
+.tileLabel {
+  position: absolute;
+  left: 14px;
+  top: 11.49px;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 13.7px;
+  white-space: nowrap;
+  color: var(--c-muted);
+}
+/* M 15 or smaller to fit (fit, luau:1634), its baseline at 43 */
+.tileValue {
+  position: absolute;
+  left: 14px;
+  top: calc(33px - 0.3485em);
+  font-weight: var(--fw-m);
+  font-family: var(--font-sans);
+  line-height: 20px;
+  white-space: nowrap;
+  color: var(--c-text);
+}
+/* R 11, its baseline at 58.5 */
+.tileSub {
+  position: absolute;
+  left: 14px;
+  top: 46.67px;
+  font: var(--fw-r) var(--fs-11) / 16px var(--font-sans);
+  white-space: nowrap;
+  color: var(--c-muted);
+}
+
+/* ---- form: a 42 px row per side and a rule (formBlock, luau:5269) --------------------------- */
+
+/* 42 px and the rule under it (box-sizing is border-box) */
+.formRow {
+  position: relative;
+  height: 43px;
+  margin: 0 var(--gutter);
+  border-bottom: 1px solid var(--c-hair);
+}
+.formCrest {
+  position: absolute;
+  left: 0;
+  top: 13px;
+}
+.formName {
+  position: absolute;
+  left: 28px;
+  right: 132px;
+  top: 10.5px;
+  overflow: hidden;
+  font: var(--fw-m) var(--fs-16) / 21px var(--font-sans);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--c-text);
+}
+/* five 22 px boxes every 25 px, right on x 372 */
+.formBoxes {
+  position: absolute;
+  right: 0;
+  top: 10px;
+  display: flex;
+  gap: 3px;
+}
+.formBox {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  font: var(--fw-b) var(--fs-11) / 1 var(--font-sans);
+  color: var(--c-muted);
+}
+.formBox[data-r='W'] {
+  background: var(--c-text);
+  color: var(--c-bg);
+}
+.formBox[data-r='D'] {
+  background: #232321;
+}
+.formBox[data-r='L'] {
+  border: 1px solid var(--c-dim);
+}
+
+/* ---- the events feed (eventsFeed, luau:5052) ---------------------------------------------- */
+
+.kickoffSoon {
+  height: 13.7px;
+  margin: 0 var(--gutter);
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 13.7px;
+  color: var(--c-muted);
+}
+
+/* the Lua clips the feed to its own height (+1): rows coming in from above start under its top */
+.feed {
+  position: relative;
+  clip-path: inset(0 0 -1px 0);
+}
+
+/* the rail: x 60, from 14 px under the top to 22 px above the end, white 12 % */
+.rail {
+  position: absolute;
+  left: 59.5px;
+  top: 14px;
+  width: 1px;
+  height: max(0px, calc(100% - 36px));
+  background: rgb(255 255 255 / 0.12);
+  transform-origin: top;
+}
+
+/* each row paints over the rail */
+.slot {
+  position: relative;
+}
+
+/* half-time and kick-off: a 24 px glass capsule centred in a 44 px row */
+.marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+}
+
+.showAll {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.row {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+}
+
+/* the minute: M 13 at x 18, MUTED (TEXT on a goal); 11 px past 90 */
+.min {
+  position: absolute;
+  left: var(--gutter);
+  top: 13.5px;
+  font: var(--fw-m) var(--fs-13) / 17px var(--font-sans);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-muted);
+}
+.min[data-tone='text'] {
+  color: var(--c-text);
+}
+.minLong {
+  font-size: var(--fs-11);
+}
+
+/* -- a goal: 70 + 19 px a line; text wraps at 246 from x 128 (luau:5182) -- */
+
+.goal {
+  width: 100%;
+  min-height: 70px;
+  margin: 0;
+  padding: 51.795px 16px 18.205px 128px;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+}
+.goal .min {
+  top: 16.5px;
+}
+
+.goalButton {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* the hover and press light: x 70 to W - 10, 2 px under the top, 6 px shorter than the row */
+.goalButton::before {
+  content: '';
+  position: absolute;
+  left: 70px;
+  right: 10px;
+  top: 2px;
+  bottom: 4px;
+  border-radius: var(--r-16);
+  background: rgb(255 255 255 / calc(0.03 * var(--lit) + 0.05 * var(--dip)));
+  pointer-events: none;
+}
+.goalButton:focus-visible {
+  outline: none;
+}
+.goalButton:focus-visible::before {
+  outline: 2px solid var(--c-text);
+  outline-offset: -2px;
+}
+
+/* the node on the rail: BG r 7, the side's colour r 5, a white ring at r 5.8 */
+.goalNode {
+  position: absolute;
+  left: 53px;
+  top: 18px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--c-bg);
+}
+.goalNode::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: var(--c);
+}
+.goalNode::after {
+  content: '';
+  position: absolute;
+  inset: 0.7px;
+  border: 1px solid rgb(255 255 255 / 0.5);
+  border-radius: 50%;
+}
+
+.goalPhoto {
+  position: absolute;
+  left: 77px;
+  top: 4px;
+  width: 42px;
+  height: 42px;
+}
+
+/* GOAL in the live green, its baseline at 18 */
+.goalKind {
+  position: absolute;
+  left: 128px;
+  top: 7.49px;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 13.7px;
+  white-space: nowrap;
+  color: var(--c-live);
+}
+
+/* the scorer S 16 and "Assist X" R 12 MUTED 8 px after him, both on the baseline at 38 */
+.goalWho {
+  position: absolute;
+  left: 128px;
+  top: 21.97px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+}
+.goalName {
+  font: var(--fw-s) var(--fs-16) / 20.9px var(--font-sans);
+  color: var(--c-text);
+}
+.goalAssist {
+  font: var(--fw-r) var(--fs-12) / normal var(--font-sans);
+  color: var(--c-muted);
+}
+
+/* the score after it, B 13 INK on the match's colours, right on W - 36 */
+.chip {
+  position: absolute;
+  right: 36px;
+  top: 13px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: var(--r-12);
+  font: var(--fw-b) var(--fs-13) / 24px var(--font-sans);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-ink);
+}
+
+.chev {
+  position: absolute;
+  right: 19px;
+  top: 20.5px;
+  color: var(--c-muted);
+}
+
+.goalText {
+  display: block;
+  font: var(--fw-r) var(--fs-13p5) / 19px var(--font-sans);
+  overflow-wrap: break-word;
+  color: #d9d7d2;
+}
+
+/* a goal VAR took back (contract v2; the Lua has none): GOAL goes muted, the score chip fades */
+.goal[data-cancelled] .goalKind {
+  color: var(--c-muted);
+}
+.goal[data-cancelled] .chip {
+  opacity: 0.35;
+}
+
+/* -- a substitution: 74 tall, centred and 8 % larger, the minute beside it (luau:5023) -- */
+
+.sub {
+  height: 74px;
+}
+
+/* BG r 5.5 with a MUTED ring r 4, 9 px above the row's centre */
+.subNode {
+  position: absolute;
+  left: 54.5px;
+  top: 22.5px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--c-bg);
+}
+.subNode::after {
+  content: '';
+  position: absolute;
+  inset: 0.9px;
+  border: 1.2px solid var(--c-muted);
+  border-radius: 50%;
+}
+
+/* the box's y 19 sits on the row's centre; it scales about that point */
+.subBox {
+  position: absolute;
+  left: 50%;
+  top: 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  white-space: nowrap;
+  transform: translateX(-50%) scale(1.08);
+  transform-origin: 50% 19px;
+}
+.subMin {
+  font: var(--fw-m) var(--fs-13) / 23px var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  color: var(--c-muted);
+}
+.subBody {
+  display: flex;
+  flex-direction: column;
+}
+.subHead {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 23px;
+}
+.subHead > svg {
+  display: block;
+}
+/* on: an up arrow in the live green, his name S 14; off: a red down arrow, R 13.5 MUTED */
+.subWho {
+  display: flex;
+  align-items: center;
+  height: 12px;
+}
+.subUp {
+  margin-right: 6px;
+  color: var(--c-live);
+}
+.subOn {
+  margin-right: 14px;
+  font: var(--fw-s) var(--fs-14) / normal var(--font-sans);
+  color: var(--c-text);
+}
+.subDown {
+  margin-right: 6px;
+  color: var(--c-red);
+}
+.subOff {
+  font: var(--fw-r) var(--fs-13p5) / normal var(--font-sans);
+  color: var(--c-muted);
+}
+
+/* -- every other event: 44 + 19 px a line; text wraps at 290 from x 78 (luau:5210) -- */
+
+.plain {
+  min-height: 44px;
+  padding: 33.795px 22px 10.205px 78px;
+}
+
+/* a quiet dot on the rail: the side's colour at 90 %, r 3, on BG r 5 */
+.dotNode {
+  position: absolute;
+  left: 55px;
+  top: 17px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--c-bg);
+}
+.dotNode::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: var(--c);
+  opacity: 0.9;
+}
+
+/* a card: 6 by 9, radius 1, on BG r 6.5 */
+.cardNode {
+  position: absolute;
+  left: 53.5px;
+  top: 15.5px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--c-bg);
+}
+.cardNode::after {
+  content: '';
+  position: absolute;
+  left: 3.5px;
+  top: 2px;
+  width: 6px;
+  height: 9px;
+  border-radius: 1px;
+  background: var(--c-card);
+}
+.cardNode[data-kind='red']::after {
+  background: var(--c-red);
+}
+
+.plainCrest {
+  position: absolute;
+  left: 78px;
+  top: 15.5px;
+}
+
+/* what it was, x 97: TEXT for a big chance, RED for a red card, else MUTED */
+.plainKind {
+  position: absolute;
+  left: 97px;
+  top: 15.15px;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 13.7px;
+  white-space: nowrap;
+  color: var(--c-muted);
+}
+.plainKind[data-kind='bigChance'] {
+  color: var(--c-text);
+}
+.plainKind[data-kind='red'] {
+  color: var(--c-red);
+}
+
+.plainText {
+  display: block;
+  font: var(--fw-r) var(--fs-13p5) / 19px var(--font-sans);
+  overflow-wrap: break-word;
+  color: var(--c-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liveDot::before {
+    animation: none;
+    opacity: 0;
+  }
+}

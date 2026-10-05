@@ -1,0 +1,85 @@
+/*
+ * The match screen (drawDetailScreen, luau:5781). The Lua draws on a 390 × 844 artboard: a bar
+ * 96 px tall stays at the top (the status bar's room, then the round buttons at y 50) and the
+ * screen scrolls under it, cut at y 96. Here the bar is a sticky block, so every y below comes out
+ * the same. --w is the screen's width; x positions of the 390 px screen keep their distance from
+ * the nearer edge.
+ */
+
+.page {
+  --bar-top: max(50px, env(safe-area-inset-top));
+  position: relative;
+  padding-bottom: calc(56px + env(safe-area-inset-bottom));
+  /* a row opening in the commentary pushes what is under it down, as the Lua does: the browser
+     must not hold the scroll on something below it instead */
+  overflow-anchor: none;
+}
+
+/* ---- the bar (luau:5828-5839) -------------------------------------------------------------- */
+
+.bar {
+  position: sticky;
+  top: 0;
+  /* stays put while the page is pulled past an edge (useElasticEdges.ts) */
+  translate: 0 calc(var(--pull, 0px) * -1);
+  z-index: 4;
+  height: calc(var(--bar-top) + 46px);
+  background: var(--c-bg);
+}
+
+.back {
+  position: absolute;
+  left: 14px;
+  top: var(--bar-top);
+}
+
+.fav {
+  position: absolute;
+  right: 14px;
+  top: var(--bar-top);
+}
+.fav[aria-disabled='true'] {
+  cursor: default;
+}
+
+/* the league, centred on y 70 (lab, luau:5835) */
+.league {
+  position: absolute;
+  left: 60px;
+  right: 60px;
+  top: calc(var(--bar-top) + 20px - 6.85px);
+  margin: 0;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 13.7px;
+  color: var(--c-muted);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* the screen's name, for screen readers and the focus on navigation; the hero shows the teams */
+.title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.title:focus {
+  outline: none;
+}
+
+/* ---- the tab bar: 38 px, the rule under it, then 22 px (luau:5791-5807) --------------------- */
+
+.tabs {
+  margin: 0 var(--gutter);
+}
+
+.panel {
+  margin-top: 22px;
+}

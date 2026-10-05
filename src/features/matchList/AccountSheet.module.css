@@ -1,0 +1,185 @@
+/*
+ * The account sheet (drawSheet, luau:6680–6758) on the Lua's 390 × 844 artboard. The top half is
+ * placed from the top as the Lua places it; the buttons, "Not now" and the note keep their
+ * distances from the bottom (844 − y), so a taller or shorter screen opens up the space between.
+ */
+
+.sheet {
+  position: absolute;
+  inset: 0;
+  /* over the list's screen, under the desktop pane's rim (Shell .pane::after, z 5) */
+  z-index: 4;
+  overflow: hidden;
+  background: var(--c-bg);
+  /* closed: below the screen. Opening glides 0.6 s; closing eases 0.45 s (luau:6683–6687) */
+  transform: translateY(100%);
+  visibility: hidden;
+  transition:
+    transform 450ms var(--ease),
+    visibility 0s linear 450ms;
+}
+.sheet[data-open] {
+  transform: none;
+  visibility: visible;
+  transition:
+    transform 600ms var(--ease-glide),
+    visibility 0s;
+}
+
+/* "Account", centred on y 74, 22 px in (luau:6692) */
+.label {
+  position: absolute;
+  left: 22px;
+  top: calc(74px - 13.7px / 2);
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 13.7px;
+  color: var(--c-muted);
+}
+.close {
+  position: absolute;
+  right: 22px;
+  top: 54px;
+}
+
+/* seven bars across the width, clipped to y 120–290 (luau:6696–6704) */
+.bars {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 120px;
+  height: 170px;
+  overflow: hidden;
+  display: flex;
+}
+.bar {
+  position: relative;
+  flex: 1 1 0;
+  /* + 0.5 px each, so no seam shows between neighbours */
+  margin-right: -0.5px;
+  transform: translateY(340px);
+  /* closing: they stay risen until the sheet is gone */
+  transition: transform 0s linear 450ms;
+}
+.sheet[data-open] .bar {
+  transform: none;
+  transition: transform 900ms var(--ease-glide) calc(120ms + var(--i) * 50ms);
+}
+
+/* the copy from y 320, 346 px wide on the 390 artboard (luau:6706–6712) */
+.copy {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  top: 320px;
+  max-width: 346px;
+}
+/* R 40, tracking −0.05, 40 px lines */
+.title {
+  margin: 0;
+  font-weight: var(--fw-r);
+  font-size: 40px;
+  line-height: 40px;
+  letter-spacing: -0.05em;
+  color: var(--c-text);
+}
+/* R 14 muted, 21.7 px lines, 14 px under the title (luau:6710) */
+.body {
+  margin: 14px 0 0;
+  font-weight: var(--fw-r);
+  font-size: 14px;
+  line-height: 21.7px;
+  color: var(--c-muted);
+}
+
+/* the buttons as they were: solid white, then an outline, 346 × 52, radius 26 (luau:6716–6748) */
+.actions {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  max-width: 346px;
+  margin: 0 auto;
+  bottom: env(safe-area-inset-bottom);
+  height: 216.5px;
+}
+.primary,
+.secondary {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 52px;
+  border: 0;
+  border-radius: 26px;
+  font-weight: var(--fw-s);
+  font-size: 15px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  /* a click dips them 3 %; the labels stay still */
+  transform: scale(calc(1 - 0.03 * var(--dip)));
+}
+.primary {
+  top: 0;
+  background: var(--c-text);
+  color: var(--c-bg);
+}
+.secondary {
+  top: 62px;
+  background: transparent;
+  color: var(--c-text);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.22);
+}
+/* the outline button's light: a faint spot and a brighter catch on its rim (luau:6729) */
+.secondaryLight {
+  inset: 0;
+  border-radius: inherit;
+  --light-gain: 0.8;
+}
+.secondary > :not(.secondaryLight) {
+  position: relative;
+}
+/* "Not now", M 14 muted, centred on y 770.6; a press fades it 40 % (luau:6751) */
+.later {
+  position: absolute;
+  left: calc(50% - 55px);
+  top: 128px;
+  width: 110px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-weight: var(--fw-m);
+  font-size: 14px;
+  color: var(--c-muted);
+  cursor: pointer;
+  opacity: calc(1 - 0.4 * var(--dip));
+}
+.note {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(802.9px - 627.5px - 0.3485 * 11px - 0.6525 * 11px);
+  margin: 0;
+  text-align: center;
+  font-weight: var(--fw-r);
+  font-size: 11px;
+  line-height: normal;
+  color: var(--c-dim);
+}
+
+.primary:focus-visible,
+.secondary:focus-visible,
+.later:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet,
+  .sheet[data-open],
+  .bar,
+  .sheet[data-open] .bar {
+    transition-duration: 1ms;
+    transition-delay: 0s;
+  }
+}

@@ -1,0 +1,333 @@
+/*
+ * The Live section and its cards (luau:3705–3924). 366 px for the cards, 244 px tall, bottom-aligned;
+ * each card is 128 px tall at kick-off and 244 at 90 minutes. Everything inside is placed from the
+ * card's own width (cardLayout.ts), which reaches the DOM as inline sizes. Colours and the goal
+ * choreography reach it as custom properties (goalFeel.ts, written every frame while a goal plays).
+ */
+
+@property --live-k {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+/* the section opens to 300 px with the page's Live tween: the list below slides down with it */
+.section {
+  position: relative;
+  height: calc(var(--live-k) * 300px);
+  overflow: hidden;
+}
+.inner {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 300px;
+}
+
+.head {
+  position: relative;
+  height: 26px;
+  /* the label fades in over the second half of the opening (luau:4543) */
+  opacity: clamp(0, calc(var(--live-k) * 1.6 - 0.3), 1);
+}
+.label {
+  position: absolute;
+  top: 0;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 13.7px;
+  white-space: nowrap;
+}
+.title {
+  left: 18px;
+  color: var(--c-text);
+}
+.count {
+  right: 18px;
+  color: var(--c-muted);
+}
+
+.strip {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 26px;
+  height: 244px;
+  display: flex;
+  align-items: flex-end;
+  --fold: 700ms; /* a card's width settles in 0.7 s (GLIDE), luau:3906 */
+}
+
+/* one card's place in the strip: equal shares, folding to nothing when the match ends */
+.slot {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 244px;
+  display: flex;
+  align-items: flex-end;
+  transition:
+    flex-grow var(--fold) var(--ease-glide),
+    margin-left var(--fold) var(--ease-glide),
+    opacity 450ms linear;
+}
+.slot + .slot {
+  margin-left: 4px;
+}
+/* the entrance's two motions (LiveCard useEntrance): the rise, and the settle-and-fade on close */
+.rise,
+.settle {
+  width: 100%;
+}
+
+/* a card that arrives while Live is open grows in from nothing */
+.slot[data-grow='0'] {
+  flex-grow: 0;
+  margin-left: 0;
+}
+/* a match that has ended fades in 0.45 s and folds away in 0.7 s */
+.slot[data-leaving] {
+  flex-grow: 0;
+  margin-left: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.card {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  display: block;
+  width: 100%;
+  /* 128 + 116 × minutes / 90; --mm is written once a second */
+  height: calc((128 + 116 * var(--mm, 0) / 90) * 1px);
+  color: var(--c-ink);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  /* the dip of a goal, the step the other cards take, and the press: scale about the card's centre.
+     No hover: a card never lifts or lights under the pointer (only the press dips it). */
+  transform: translateY(calc(var(--gdy, 0) * 1px)) scale(calc(var(--gsc, 1) * (1 - 0.03 * var(--dip))));
+  transform-origin: 50% 50%;
+}
+.card:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 2px;
+}
+
+/* the soft light behind the card when it scores, in the scorer's colour (luau:3766) */
+.halo {
+  position: absolute;
+  inset: -4px;
+  border-radius: 10px;
+  box-shadow: 0 0 26px 2px var(--halo-c, transparent);
+  opacity: calc(var(--halo, 0) * 0.55);
+  pointer-events: none;
+}
+.card[data-flood='home'] .halo {
+  --halo-c: var(--halo-h);
+}
+.card[data-flood='away'] .halo {
+  --halo-c: var(--halo-a);
+}
+
+.surface {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  --top: var(--g0);
+  --bot: var(--g3);
+  --p1: 42%;
+  --p2: 62%;
+  background: linear-gradient(180deg, var(--top) 0%, var(--g1) var(--p1), var(--g2) var(--p2), var(--bot) 100%);
+}
+/* the scorer's colour floods in from its side: the end colour warms toward the team's, the middle stops move (luau:3797) */
+.card[data-flood='home'] .surface {
+  --top: color-mix(in srgb, var(--hot-h) calc(var(--q, 0) * 28%), var(--g0));
+  --p1: calc(42% + 36% * var(--q, 0));
+  --p2: calc(62% + 30% * var(--q, 0));
+}
+.card[data-flood='away'] .surface {
+  --bot: color-mix(in srgb, var(--hot-a) calc(var(--q, 0) * 28%), var(--g3));
+  --p2: calc(62% - 36% * var(--q, 0));
+  --p1: calc(42% - 30% * var(--q, 0));
+}
+/* another match just scored: this card steps back into grey (a saturation veil, luau:3852) */
+.card[data-grey] .surface {
+  filter: saturate(calc(1 - var(--grey, 0)));
+}
+
+/* a band of light crosses the card from the side that scored (luau:3823) */
+.sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 110px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0), rgb(255 255 255 / 0.55) 50%, rgb(255 255 255 / 0));
+  transform: translateY(calc(var(--sweep-y, -110) * 1px));
+  visibility: hidden;
+  pointer-events: none;
+}
+.card[data-sweep] .sweep {
+  visibility: visible;
+}
+
+/* a team's line: crest, name, and the card's score on the right */
+.row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+}
+.name {
+  font-weight: var(--fw-s);
+  letter-spacing: var(--track-loose);
+  white-space: nowrap;
+  /* drawn whole or not at all: nameChoice leaves it out when it does not fit (luau:3836) */
+  flex: none;
+  color: var(--c-ink);
+}
+.name[data-hidden] {
+  visibility: hidden;
+}
+/* the side that is behind steps back (luau:3829) */
+.row[data-trails] .name {
+  color: rgb(0 0 0 / 0.5);
+}
+
+/* both numbers, stacked on the rows' centre lines: one shared element with the match page's score */
+.scores {
+  position: absolute;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-weight: var(--fw-b);
+  font-variant-numeric: tabular-nums;
+}
+.score {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: var(--c-ink);
+}
+.score[data-trails] {
+  color: rgb(0 0 0 / 0.5);
+}
+.num {
+  position: relative;
+  display: inline-block;
+  transform: scale(var(--bump, 1));
+}
+/* the new number, in our spectrum on a small dark chip so it reads on any card (luau:3856) */
+.num::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -0.26em;
+  right: -0.26em;
+  height: 1.08em;
+  translate: 0 -50%;
+  border-radius: 0.346em;
+  background: var(--c-ink);
+  opacity: var(--mk, 0);
+}
+.ink {
+  position: relative;
+  opacity: calc(1 - var(--mk, 0));
+}
+.spectrum {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  translate: 0 -50%;
+  opacity: var(--mk, 0);
+  background: linear-gradient(135deg, var(--spectrum-3-stops));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* the minute in light weight; below it the 2 px track and its progress (luau:3860) */
+.clock {
+  position: absolute;
+  left: 0;
+  font-weight: var(--fw-l);
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  line-height: normal;
+}
+.track {
+  position: absolute;
+  height: 2px;
+  background: rgb(0 0 0 / 0.16);
+}
+.fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: calc(var(--mm, 0) / 90 * 100%);
+  background: var(--c-ink);
+}
+.dot {
+  position: absolute;
+  top: 1px;
+  left: calc(var(--mm, 0) / 90 * 100%);
+  width: 5.2px;
+  height: 5.2px;
+  margin: -2.6px 0 0 -2.6px;
+  border-radius: 50%;
+  background: var(--c-ink);
+}
+/* the ring breathes between 3 and 5.5 px, 0.14 → 0 black (pulse = ½ + ½ cos 4t, luau:3846) */
+.dot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.14);
+  animation: breathe 785ms cubic-bezier(0.37, 0, 0.63, 1) infinite alternate;
+}
+@keyframes breathe {
+  from {
+    transform: scale(2.115);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1.154);
+    opacity: 1;
+  }
+}
+.card[data-ended] .dot,
+.card[data-ended] .dot::before {
+  display: none;
+}
+
+/* the line under the card whose match is open beside the list (luau:3874) */
+.marker {
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  width: 18px;
+  height: 3px;
+  margin-left: -9px;
+  border-radius: 1.5px;
+  background: var(--c-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot::before {
+    animation: none;
+    opacity: 0;
+  }
+  .slot {
+    transition-duration: 1ms;
+  }
+}

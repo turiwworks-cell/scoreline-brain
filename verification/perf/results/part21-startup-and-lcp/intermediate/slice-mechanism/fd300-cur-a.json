@@ -1,0 +1,434 @@
+{
+  "rate": 3.6,
+  "matches": 300,
+  "parse": [
+    {
+      "bytes": 2119532,
+      "json": 46.699999999953434,
+      "validate": 406.60000000009313
+    },
+    {
+      "bytes": 2119532,
+      "json": 45.800000000046566,
+      "validate": 361.30000000004657
+    },
+    {
+      "bytes": 2119532,
+      "json": 50.300000000046566,
+      "validate": 460.69999999995343
+    },
+    {
+      "bytes": 2119532,
+      "json": 63.199999999953434,
+      "validate": 377.60000000009313
+    },
+    {
+      "bytes": 2119532,
+      "json": 48.0999999998603,
+      "validate": 514.6000000000931
+    }
+  ],
+  "results": [
+    {
+      "run": 1,
+      "callback": 56.60000000009313,
+      "frame": {
+        "start": 536,
+        "duration": 513.5,
+        "forced": 0
+      },
+      "parts": {
+        "beforeApply": 449,
+        "apply": 56.60000000009313,
+        "afterApply": 7.899999999906868,
+        "renderStart": 507.39999999990687
+      },
+      "later": [
+        {
+          "start": 1179.8999999999069,
+          "duration": 111.60000000009313,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 13
+            }
+          ]
+        },
+        {
+          "start": 1495.8999999999069,
+          "duration": 53.700000000186265,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 10
+            }
+          ]
+        }
+      ],
+      "laterTimer": 0,
+      "fillMs": 1883.6000000000931,
+      "rows": 175,
+      "groups": 5,
+      "pending": 0,
+      "unique": 175,
+      "filled": true,
+      "errors": []
+    },
+    {
+      "run": 2,
+      "callback": 85,
+      "frame": {
+        "start": 563.3000000000466,
+        "duration": 528.6000000000931,
+        "forced": 0
+      },
+      "parts": {
+        "beforeApply": 434.89999999990687,
+        "apply": 85,
+        "afterApply": 8.700000000186265,
+        "renderStart": 521.3999999999069
+      },
+      "later": [
+        {
+          "start": 1266.1999999999534,
+          "duration": 120.5,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 5
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 17
+            }
+          ]
+        },
+        {
+          "start": 1400.5,
+          "duration": 58.800000000046566,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 18
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 14
+            }
+          ]
+        },
+        {
+          "start": 1606.1000000000931,
+          "duration": 68.0999999998603,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 6
+            }
+          ]
+        },
+        {
+          "start": 2684.1999999999534,
+          "duration": 58.300000000046566,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 27
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 7
+            }
+          ]
+        }
+      ],
+      "laterTimer": 0,
+      "fillMs": 2241.8000000000466,
+      "rows": 175,
+      "groups": 5,
+      "pending": 0,
+      "unique": 175,
+      "filled": true,
+      "errors": []
+    },
+    {
+      "run": 3,
+      "callback": 57.300000000046566,
+      "frame": {
+        "start": 559.0999999998603,
+        "duration": 493.30000000004657,
+        "forced": 0
+      },
+      "parts": {
+        "beforeApply": 429.10000000009313,
+        "apply": 57.300000000046566,
+        "afterApply": 6.899999999906868,
+        "renderStart": 488
+      },
+      "later": [
+        {
+          "start": 1190.2999999998137,
+          "duration": 106.5,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 14
+            }
+          ]
+        },
+        {
+          "start": 1310.8999999999069,
+          "duration": 51.699999999953434,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 16
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 13
+            }
+          ]
+        },
+        {
+          "start": 1442.8999999999069,
+          "duration": 64.89999999990687,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 5
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 10
+            }
+          ]
+        },
+        {
+          "start": 3059.1999999999534,
+          "duration": 63.699999999953434,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 20
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 19
+            }
+          ]
+        },
+        {
+          "start": 3686.2999999998137,
+          "duration": 70.4000000001397,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 11
+            }
+          ]
+        }
+      ],
+      "laterTimer": 0,
+      "fillMs": 2290.5,
+      "rows": 175,
+      "groups": 5,
+      "pending": 0,
+      "unique": 175,
+      "filled": true,
+      "errors": []
+    },
+    {
+      "run": 4,
+      "callback": 54.4000000001397,
+      "frame": {
+        "start": 565.5,
+        "duration": 506,
+        "forced": 0
+      },
+      "parts": {
+        "beforeApply": 442.5,
+        "apply": 54.4000000001397,
+        "afterApply": 9.099999999860302,
+        "renderStart": 498.69999999995343
+      },
+      "later": [
+        {
+          "start": 1188.6000000000931,
+          "duration": 110.30000000004657,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 5
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 10
+            }
+          ]
+        },
+        {
+          "start": 1311.5,
+          "duration": 64.10000000009313,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 18
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 15
+            }
+          ]
+        },
+        {
+          "start": 1604.1999999999534,
+          "duration": 79.20000000018626,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 5
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 18
+            }
+          ]
+        },
+        {
+          "start": 3149.600000000093,
+          "duration": 55.5,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 18
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 13
+            }
+          ]
+        },
+        {
+          "start": 3438.600000000093,
+          "duration": 51.5,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "Animation.onfinish",
+              "dur": 33
+            }
+          ]
+        }
+      ],
+      "laterTimer": 0,
+      "fillMs": 2349.9000000001397,
+      "rows": 175,
+      "groups": 5,
+      "pending": 0,
+      "unique": 175,
+      "filled": true,
+      "errors": []
+    },
+    {
+      "run": 5,
+      "callback": 67.19999999995343,
+      "frame": {
+        "start": 585.3000000000466,
+        "duration": 545.3000000000466,
+        "forced": 0
+      },
+      "parts": {
+        "beforeApply": 471.4000000001397,
+        "apply": 67.19999999995343,
+        "afterApply": 6.699999999953434,
+        "renderStart": 540
+      },
+      "later": [
+        {
+          "start": 1235.3000000000466,
+          "duration": 173.80000000004657,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 5
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 5
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 63
+            }
+          ]
+        },
+        {
+          "start": 1426.3000000000466,
+          "duration": 57,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 17
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 7
+            }
+          ]
+        },
+        {
+          "start": 1726.5,
+          "duration": 64,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 8
+            }
+          ]
+        },
+        {
+          "start": 3497.5,
+          "duration": 55.300000000046566,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 20
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 12
+            }
+          ]
+        }
+      ],
+      "laterTimer": 0,
+      "fillMs": 2693.2999999998137,
+      "rows": 175,
+      "groups": 5,
+      "pending": 0,
+      "unique": 175,
+      "filled": true,
+      "errors": []
+    }
+  ]
+}

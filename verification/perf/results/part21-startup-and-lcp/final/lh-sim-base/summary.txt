@@ -1,0 +1,19 @@
+file                       perf  FCP    LCP    TBT    TTI    SI     CLS    LCP element
+demo-run1.json             0.65   2.27  2.64  2.72  6.54  2.39  0.000   scoreline <h1>
+                           LCP phases (unthrottled trace): Time to first byte 8 ms, Element render delay 210 ms
+demo-run2.json             0.65   2.36  2.76  2.11  6.05  2.39  0.000   scoreline <h1>
+                           LCP phases (unthrottled trace): Time to first byte 7 ms, Element render delay 168 ms
+demo-run3.json             0.64   2.37  2.76  2.69  6.40  2.45  0.000   scoreline <h1>
+                           LCP phases (unthrottled trace): Time to first byte 6 ms, Element render delay 232 ms
+root-run1.json             0.67   2.25  2.54  2.08  5.74  2.25  0.000   No matches yet.
+Play the demo matchday <p>
+                           LCP phases (unthrottled trace): Time to first byte 7 ms, Element render delay 163 ms
+root-run2.json             0.67   2.15  2.56  2.18  5.71  2.15  0.000   No matches yet.
+Play the demo matchday <p>
+                           LCP phases (unthrottled trace): Time to first byte 8 ms, Element render delay 189 ms
+root-run3.json             0.68   2.14  2.43  2.06  5.65  2.14  0.000   No matches yet.
+Play the demo matchday <p>
+                           LCP phases (unthrottled trace): Time to first byte 9 ms, Element render delay 159 ms
+
+Lighthouse 13.5.0; benchmarkIndex 2078.5; Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.0.0 Safari/537.36
+median of 6: FCP  2.27  LCP  2.64  TBT  2.18  TTI  6.05  SI  2.39  (seconds)

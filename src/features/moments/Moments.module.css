@@ -1,0 +1,543 @@
+/*
+ * The notification and the goal / red card scenes (luau:6186-6656). Positions are the Lua's, in
+ * px from the toast's or the scene's top-left; text sits at the Lua's baselines (a line-height 1
+ * box starts about 0.82 em above its baseline). Motion values set the moving parts' transforms.
+ */
+
+/* ── The toast (drawToast, luau:6205) ──────────────────────────────────────────── */
+
+.toastSlot {
+  position: absolute;
+  z-index: 4;
+  top: 50px;
+  left: 16px;
+  right: 16px;
+  touch-action: none;
+}
+
+:global([data-layout='phone']) > .toastSlot {
+  top: calc(50px + env(safe-area-inset-top));
+}
+
+.toast {
+  height: 66px;
+  overflow: hidden;
+  user-select: none;
+}
+
+.toastBody {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* the whole pane is the button: a tap opens the match, a swipe sends it away */
+.toastHit {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.toastHit:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 2px;
+}
+
+/* the player, chest-up, standing on the bottom edge of a 54 px slot (luau:6233) */
+.photoSlot {
+  position: absolute;
+  left: 12px;
+  top: 0;
+  width: 54px;
+  height: 66px;
+}
+
+.photoRise {
+  position: absolute;
+  left: 0;
+  top: 12px;
+}
+
+.discRise {
+  position: absolute;
+  left: 7px;
+  top: 13px;
+}
+
+/* the flag: 36 px on arrival, an 18 px badge on the photo's corner once he is in (luau:6252) */
+.badge {
+  position: absolute;
+  left: 20px;
+  top: 15px;
+  width: 36px;
+  height: 36px;
+  transform-origin: 0 0;
+}
+
+.redCard {
+  position: absolute;
+  left: 6.5px;
+  top: 1.5px;
+  width: 23px;
+  height: 33px;
+  border-radius: 3.6px;
+  background: var(--c-red);
+  transform: rotate(0.2rad);
+}
+
+.toastText {
+  position: absolute;
+  left: 60px;
+  top: 0;
+  right: 120px;
+}
+
+.toastLabel {
+  position: absolute;
+  left: 0;
+  top: 16px;
+  display: flex;
+  gap: 8px;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.toastName {
+  position: absolute;
+  left: 0;
+  top: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--c-text);
+  font-weight: var(--fw-s);
+  font-size: var(--fs-17);
+  letter-spacing: var(--track-1);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.star {
+  width: 10px;
+  height: 10px;
+  margin-left: 4px;
+}
+
+.toastScore {
+  position: absolute;
+  right: 16px;
+  top: 17px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.toastScoreRow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 15px;
+}
+
+.toastScoreNum {
+  color: var(--c-text);
+  font-weight: var(--fw-b);
+  font-size: var(--fs-15);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.toastShorts {
+  margin-top: 11px;
+  color: var(--c-dim);
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* the grip under it says it can be swiped (luau:6282) */
+.grip {
+  position: absolute;
+  left: calc(50% - 14px);
+  bottom: 4px;
+  width: 28px;
+  height: 3px;
+  border-radius: 1.5px;
+  background: rgb(255 255 255 / 0.22);
+  pointer-events: none;
+}
+
+.summaryCount {
+  position: absolute;
+  left: 14px;
+  top: 13px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--c-surf);
+  color: var(--c-text);
+  font-weight: var(--fw-b);
+  font-size: var(--fs-17);
+  font-variant-numeric: tabular-nums;
+}
+
+.live {
+  color: var(--c-live);
+}
+
+.red {
+  color: var(--c-red);
+}
+
+.muted {
+  color: var(--c-muted);
+}
+
+.text {
+  color: var(--c-text);
+}
+
+/* ── The scene (drawScene, luau:6656) ──────────────────────────────────────────── */
+
+.scene {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sceneFade {
+  position: absolute;
+  inset: 0;
+  background: var(--c-bg);
+}
+
+.sceneArt {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* on the top line (TOP.mid, choreo.ts): 40 px, centred on y 72 */
+.sceneClose {
+  position: absolute;
+  z-index: 2;
+  top: 52px;
+  right: 20px;
+}
+
+:global([data-layout='phone']) > .scene .sceneClose {
+  top: calc(52px + env(safe-area-inset-top));
+}
+
+.clip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+}
+
+.wallCard {
+  position: absolute;
+  overflow: hidden;
+}
+
+.wallSheen {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 45%;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0));
+}
+
+.wallFlash {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 46px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0));
+}
+
+.bust {
+  position: absolute;
+  overflow: hidden;
+}
+
+.bust img {
+  position: absolute;
+  max-width: none;
+}
+
+/* under the floor: the stage's black, the line, his name and the commentary */
+.floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--c-bg);
+}
+
+.floorLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  transform-origin: 0 50%;
+}
+
+.story {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  top: 0;
+}
+
+.first {
+  position: absolute;
+  top: 23px;
+  color: var(--c-muted);
+  font-weight: var(--fw-r);
+  font-size: var(--fs-16);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.last {
+  position: absolute;
+  top: 43px;
+  color: var(--c-text);
+  font-weight: var(--fw-s);
+  letter-spacing: var(--track-3);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.meta {
+  position: absolute;
+  top: 92px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.metaStar {
+  width: 10px;
+  height: 10px;
+}
+
+.commentary {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  top: 124px;
+}
+
+.commentaryHead {
+  position: absolute;
+  top: -4px;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.commentaryBar {
+  width: 18px;
+  height: 2px;
+}
+
+.commentaryText {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  max-height: 84px;
+  overflow: hidden;
+  color: var(--c-text);
+  font-weight: var(--fw-r);
+  font-size: var(--fs-15);
+  letter-spacing: -0.005em;
+  line-height: 21px;
+}
+
+/* the headline */
+.flag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 64px;
+  height: 64px;
+}
+
+.flare {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 340px;
+}
+
+.word {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.topLine {
+  position: absolute;
+  top: 0;
+}
+
+.topName {
+  position: absolute;
+  top: 55px;
+  color: var(--c-text);
+  font-weight: var(--fw-s);
+  font-size: var(--fs-17);
+  letter-spacing: var(--track-1);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.topSub {
+  position: absolute;
+  top: 79px;
+  color: var(--c-muted);
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* the crest's box is the crest alone, centred on the line; the name's cap top (57) and the label's
+   baseline (87.6) sit either side of it */
+.topCrest {
+  position: absolute;
+  top: 61px;
+  display: flex;
+}
+
+/* the score strip, top right (luau:6497) */
+.strip {
+  position: absolute;
+  right: 72px;
+  top: 57px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.strip > svg:first-child {
+  margin-right: 2px;
+}
+
+.strip > svg:last-child {
+  margin-left: 2px;
+}
+
+.digit {
+  position: relative;
+  height: 30px;
+  overflow: hidden;
+  color: var(--c-text);
+  font-weight: var(--fw-m);
+  font-size: var(--fs-22);
+  font-variant-numeric: tabular-nums;
+}
+
+.digitCol {
+  display: flex;
+  flex-direction: column;
+  padding-top: 2px;
+}
+
+.digitCol > span {
+  height: 26px;
+  line-height: 26px;
+  text-align: right;
+}
+
+.dash {
+  color: var(--c-dim);
+  font-weight: var(--fw-l);
+  font-size: var(--fs-22);
+  line-height: 1;
+}
+
+/* the red card itself (luau:6630) */
+.bigCard {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 150px;
+  height: 214px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ff4b3e 0%, #e01a22 55%, #9c0c12 100%);
+  box-shadow:
+    6px 10px 0 rgb(0 0 0 / 0.45),
+    inset 0 0 0 1px rgb(255 255 255 / 0.35);
+}
+
+.bigCard::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 90px;
+  border-radius: 16px 16px 0 0;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.28), rgb(255 255 255 / 0));
+}
+
+.slash {
+  position: absolute;
+  left: 0;
+  width: 260px;
+  background: var(--c-red-glow);
+  transform-origin: 0 0;
+}
+
+.flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}

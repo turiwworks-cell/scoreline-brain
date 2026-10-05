@@ -1,0 +1,39 @@
+/*
+ * The Table tab (standingsView and leagueRows, luau:5700). Columns keep the Lua's x from the
+ * nearer edge: #, the crest and the name from the left; P, W-D-L, GD and Pts right-aligned on
+ * W - 154, - 102, - 70 and - 38.
+ */
+
+.table {
+  position: relative;
+}
+
+/* friendlies: R 20, -0.02 em, MUTED on y 23; the note DIM on y 52.3; 70 in all */
+.none {
+  position: relative;
+  height: 70px;
+  margin: 0 var(--gutter);
+}
+.noneTitle {
+  position: absolute;
+  left: 0;
+  top: 10.03px;
+  margin: 0;
+  font: var(--type-empty);
+  letter-spacing: var(--track-2);
+  line-height: 26px;
+  white-space: nowrap;
+  color: var(--c-muted);
+}
+.noneNote {
+  position: absolute;
+  left: 0;
+  top: 45.49px;
+  margin: 0;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 13.7px;
+  white-space: nowrap;
+  color: var(--c-dim);
+}

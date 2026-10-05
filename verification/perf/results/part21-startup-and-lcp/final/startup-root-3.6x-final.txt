@@ -1,0 +1,30 @@
+run 1: / at 3.6x 390x844
+  FCP 132 ms  LCP 484 ms (<p> "No matches yet.Play the demo m")  h1 in DOM 47 ms  rows in DOM n/a  CLS 0.0000
+  LCP candidates: 132 ms <h1> "scoreline" 3069px² → 484 ms <p> "No matches yet.Play the demo m" 4288px²
+  frames over 50 ms until 2.5 s after the first rows: 6
+       10 ms   109 ms  
+      162 ms   105 ms  102 ms http://127.0.0.1:4191/assets/index-k0rumXmd.js index-k0rumXmd.js
+      272 ms   201 ms  197 ms MessagePort.onmessage app-vendor-CCjG9T8J.js (forced layout 55 ms)
+      676 ms    88 ms  47 ms http://127.0.0.1:4191/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+      815 ms    92 ms  
+      938 ms   806 ms  798 ms IdleRequestCallback index-k0rumXmd.js
+run 2: / at 3.6x 390x844
+  FCP 140 ms  LCP 460 ms (<p> "No matches yet.Play the demo m")  h1 in DOM 78 ms  rows in DOM n/a  CLS 0.0000
+  LCP candidates: 140 ms <h1> "scoreline" 3069px² → 460 ms <p> "No matches yet.Play the demo m" 4288px²
+  frames over 50 ms until 2.5 s after the first rows: 6
+        8 ms   119 ms  
+      167 ms    99 ms  97 ms http://127.0.0.1:4191/assets/index-k0rumXmd.js index-k0rumXmd.js
+      269 ms   179 ms  175 ms MessagePort.onmessage app-vendor-CCjG9T8J.js (forced layout 43 ms)
+      626 ms    91 ms  45 ms http://127.0.0.1:4191/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+      762 ms    87 ms  
+      890 ms   823 ms  816 ms IdleRequestCallback index-k0rumXmd.js
+run 3: / at 3.6x 390x844
+  FCP 120 ms  LCP 436 ms (<p> "No matches yet.Play the demo m")  h1 in DOM 53 ms  rows in DOM n/a  CLS 0.0000
+  LCP candidates: 120 ms <h1> "scoreline" 3069px² → 436 ms <p> "No matches yet.Play the demo m" 4288px²
+  frames over 50 ms until 2.5 s after the first rows: 6
+        9 ms    99 ms  
+      145 ms    95 ms  94 ms http://127.0.0.1:4191/assets/index-k0rumXmd.js index-k0rumXmd.js
+      244 ms   178 ms  174 ms MessagePort.onmessage app-vendor-CCjG9T8J.js (forced layout 41 ms)
+      589 ms    96 ms  47 ms http://127.0.0.1:4191/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js
+      740 ms    88 ms  
+      876 ms   803 ms  795 ms IdleRequestCallback index-k0rumXmd.js

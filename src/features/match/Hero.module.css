@@ -1,0 +1,194 @@
+/*
+ * The hero (drawHero, luau:4721). Heights come from heroLayout.ts as inline sizes; everything
+ * inside is placed with the Lua's numbers. Text is placed by its centre line: a line box of any
+ * height centred on cy puts the baseline where the Lua's bc(cy, size) does.
+ */
+
+.hero {
+  position: relative;
+}
+
+/* the 1 px rules: under the matchday line and under each side */
+.rule {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  height: 1px;
+  background: var(--c-hair);
+}
+
+/* ---- matchday and the clock, centred on y 22.45 -------------------------------------------- */
+
+.meta {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  top: 0;
+  height: 44.9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.matchday {
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 13.7px;
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+
+/* Full time / Kick-off 20:45: M 13, +0.02 em, MUTED */
+.state {
+  font: var(--fw-m) var(--fs-13) / 16.9px var(--font-sans);
+  letter-spacing: var(--track-loose);
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+
+/* live: a 6 px dot, 7 px of air, the clock in the live green, then +N in an outlined badge */
+.clock {
+  display: flex;
+  align-items: center;
+  color: var(--c-live);
+  white-space: nowrap;
+}
+.clockDot {
+  width: 6px;
+  height: 6px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: var(--c-live);
+}
+.clockMain {
+  font: var(--fw-m) var(--fs-13) / 16.9px var(--font-sans);
+  letter-spacing: var(--track-loose);
+  font-variant-numeric: tabular-nums;
+}
+.clockPlus {
+  box-sizing: border-box;
+  height: 14px;
+  margin-left: 7px;
+  padding: 0 3px;
+  border: 1px solid rgb(52 227 154 / 0.45);
+  border-radius: var(--r-4);
+  font: var(--fw-m) var(--fs-10p5) / 12px var(--font-sans);
+}
+
+/* ---- a side: crest at 18, name at 72, score right at 372 ------------------------------------ */
+
+.side {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+.crest {
+  position: absolute;
+  left: var(--gutter);
+  top: calc(50% - 19px);
+  width: 38px;
+  height: 38px;
+}
+.crest svg {
+  display: block;
+}
+
+/* name and scorers, a block centred on the row */
+.block {
+  position: absolute;
+  left: 72px;
+  right: var(--gutter);
+}
+
+/* M 26, -0.035 em: its line is 27.3 px, the baseline at 22.7 (luau:4785) */
+.name {
+  margin: 0 0 6px;
+  font: var(--type-hero);
+  letter-spacing: var(--track-35);
+  line-height: 27.3px;
+  color: var(--c-text);
+  white-space: nowrap;
+}
+
+/* scorer lines: R 11.5 every 16.1 px; name #C9C7C2, minutes MUTED, " · " DIM between */
+.scorers {
+  display: flex;
+  align-items: center;
+  height: 16.1px;
+  font: var(--fw-r) var(--fs-11p5) / 16.1px var(--font-sans);
+  white-space: pre;
+}
+.sep {
+  color: var(--c-dim);
+}
+
+.scorer {
+  display: inline-flex;
+  gap: 4px;
+  color: #c9c7c2;
+}
+.scorerMins {
+  color: var(--c-muted);
+}
+
+/* the hit area reaches 3 px each side and is 18 px tall (luau:4799) */
+.scorerLink {
+  appearance: none;
+  border: 0;
+  margin: -1px -3px;
+  padding: 1px 3px;
+  height: 18px;
+  align-items: center;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  /* the hover light lifts the name toward TEXT, a press fades it by 40 % */
+  opacity: calc(1 - 0.4 * var(--dip));
+}
+.scorerLink .scorerName {
+  color: color-mix(in srgb, var(--c-text) calc(var(--lit) * 100%), #c9c7c2);
+}
+.scorerLink:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 0;
+  border-radius: var(--r-4);
+}
+
+/* ---- the score: one column for both rows, each number centred on its row ------------------- */
+
+.scoreBlock {
+  position: absolute;
+  right: var(--gutter);
+}
+
+.scoreCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  height: 100%;
+}
+
+.scoreCell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.scoreCell + .scoreCell {
+  margin-top: 1px;
+}
+
+/* L 86, -0.05 em, the baseline 30 px under the row's centre (luau:4815) */
+.score {
+  display: block;
+  font: var(--type-score-xl);
+  letter-spacing: var(--track-5);
+  line-height: 86px;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text);
+}
+.score[data-dim] {
+  color: var(--c-dim);
+}

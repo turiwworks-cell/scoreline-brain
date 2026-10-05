@@ -1,0 +1,8 @@
+assets/index-BVV9qu36.js                                 161.58 KB gzip
+assets/rolldown-runtime-CbXtAM7H.js                        0.37 KB gzip
+assets/jsx-runtime-BuqwL3YU.js                             3.15 KB gzip
+assets/preload-helper-DjzSQ1t3.js                          0.75 KB gzip
+assets/domain-Ikb4SffP.js                                 19.89 KB gzip
+assets/motion-CLBlMk9z.js                                 31.54 KB gzip
+Initial JavaScript: 217.29 KB gzip / 180 KB
+Initial JavaScript exceeds the budget.

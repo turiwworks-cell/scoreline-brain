@@ -1,0 +1,5 @@
+/* clocks and scores use tabular figures so the text doesn't shift as the digits turn (ARCHITECTURE §7) */
+.clock {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

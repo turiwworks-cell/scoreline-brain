@@ -1,0 +1,149 @@
+.tabs {
+  position: relative;
+  display: flex;
+}
+
+.tab {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: none;
+  color: var(--c-dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: -2px;
+  border-radius: var(--r-4);
+}
+
+.indicator {
+  position: absolute;
+  left: 0;
+  pointer-events: none;
+  transform-origin: 0 0;
+}
+
+/* ----- line: match tabs (luau:5791-5804) ----- */
+.line {
+  --hover-mix: 50%;
+  border-bottom: 1px solid var(--c-hair);
+}
+.line .tab {
+  flex: 1 1 0;
+  height: 38px;
+  font: var(--type-tab);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+/* tracked uppercase: take back the spacing after the last letter so the word centres */
+.line .label {
+  margin-right: calc(-1 * var(--track-label));
+}
+.line .indicator,
+.day .indicator {
+  bottom: -1px;
+  width: 100px;
+  height: 2px;
+  background: var(--spectrum-accent);
+}
+.line .indicator[data-ready] {
+  transition: transform var(--t-tabs-dur) var(--t-tabs-ease);
+}
+
+/* ----- day: day tabs (luau:4656-4687) ----- */
+.day {
+  --hover-mix: 35%;
+  border-bottom: 1px solid var(--c-hair);
+}
+.day .tab {
+  flex: none;
+  height: 40px;
+  padding: 0 13px;
+  font: var(--type-row);
+  letter-spacing: var(--track-1);
+}
+.day .indicator[data-ready] {
+  transition: transform var(--t-list-dur) var(--t-list-ease);
+}
+
+/* line and day: chosen = TEXT, others DIM, the hover light lifts them toward TEXT,
+   a press fades them by 35 % */
+.line .tab,
+.day .tab {
+  color: color-mix(in srgb, var(--c-text) calc(var(--lit) * var(--hover-mix)), var(--c-dim));
+  opacity: calc(1 - var(--press-fade) * var(--dip));
+}
+.line .tab[aria-selected='true'],
+.day .tab[aria-selected='true'] {
+  color: var(--c-text);
+}
+
+/* ----- segment: the desktop pane switch (luau:6798-6825) ----- */
+.segment {
+  height: 36px;
+  padding: 4px;
+  border-radius: 18px;
+}
+.segment .indicator {
+  top: 4px;
+  left: 0;
+  height: 28px;
+  border-radius: var(--r-14);
+  background: var(--spectrum-accent);
+}
+.segment .indicator[data-ready] {
+  transition: transform var(--t-tabs-dur) var(--t-tabs-ease);
+}
+.segment .tab {
+  position: relative;
+  flex: 1 1 0;
+  height: 28px;
+  border-radius: var(--r-14);
+  font: var(--type-button);
+  /* lerp(MUTED, TEXT, 0.6 * lit), then INK when chosen */
+  color: color-mix(in srgb, var(--c-text) calc(var(--lit) * 60%), var(--c-muted));
+  transition: color var(--t-tabs-dur) var(--t-tabs-ease);
+}
+.segment .tab[aria-selected='true'] {
+  color: var(--c-ink);
+}
+/* the label dips 4 % */
+.segment .label {
+  transform: scale(calc(1 - var(--press-depth-segment) * var(--dip)));
+}
+/* a segment not chosen shows a faint hover light (0.1 * lit, luau:6809-6813) */
+.segment .tab::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  --a: calc(var(--lit) * 0.09);
+  background: radial-gradient(
+    circle var(--spot-r, 52px) at var(--mx, 50%) var(--my, 50%),
+    rgb(255 255 255 / calc(var(--a) * 1)) 0%,
+    rgb(255 255 255 / calc(var(--a) * 0.9801)) 10%,
+    rgb(255 255 255 / calc(var(--a) * 0.9216)) 20%,
+    rgb(255 255 255 / calc(var(--a) * 0.8281)) 30%,
+    rgb(255 255 255 / calc(var(--a) * 0.7056)) 40%,
+    rgb(255 255 255 / calc(var(--a) * 0.5625)) 50%,
+    rgb(255 255 255 / calc(var(--a) * 0.4096)) 60%,
+    rgb(255 255 255 / calc(var(--a) * 0.2601)) 70%,
+    rgb(255 255 255 / calc(var(--a) * 0.1296)) 80%,
+    rgb(255 255 255 / calc(var(--a) * 0.0361)) 90%,
+    rgb(255 255 255 / 0) 100%
+  );
+}
+.segment .tab[aria-selected='true']::before {
+  content: none;
+}

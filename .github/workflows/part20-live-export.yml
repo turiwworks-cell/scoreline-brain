@@ -1,0 +1,40 @@
+name: Part 20 corrected Live export
+on:
+  push:
+    branches: [codex/part-20-moments]
+    paths: ['public/rive/live-icon.riv', 'verification/rive/exports/live-icon.candidate.riv', 'verification/rive/editor-exports.js', 'verification/rive/editor-exports.spec.ts', 'verification/rive/live-host.*', 'src/rive/LiveGraphic.tsx', 'src/rive/LiveIcon.tsx', 'playwright.live-export.config.ts', '.github/workflows/part20-live-export.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test -c playwright.live-export.config.ts --reporter=line
+      - name: Small native Live images for visual inspection
+        if: always()
+        run: |
+          node --input-type=module <<'JS'
+          import { existsSync, readdirSync, readFileSync } from 'node:fs';
+          if (existsSync('test-results')) {
+            for (const name of readdirSync('test-results')) {
+              if (/^(editor-live-candidate|live-host)-(off|on)-phone-390x844\.png$/.test(name)) {
+                console.log('LIVE_PNG_B64 ' + name + ' ' + readFileSync('test-results/' + name).toString('base64'));
+              }
+            }
+          }
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: part20-corrected-live-evidence
+          path: test-results/
+          retention-days: 7

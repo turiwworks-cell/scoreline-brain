@@ -1,0 +1,158 @@
+.partHead {
+  margin: 56px 0 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--c-hair);
+}
+.partTitle {
+  margin: 0;
+  font: var(--type-title);
+  letter-spacing: var(--track-3);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(354px, 100%), 1fr));
+  gap: 40px 46px;
+  align-items: start;
+}
+
+.caption {
+  font: var(--type-body);
+  color: var(--c-muted);
+}
+
+/* ----- icons ----- */
+.icons {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px 8px;
+}
+.icons li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 48px auto;
+  align-items: center;
+  column-gap: 6px;
+  color: var(--c-text);
+}
+.icons .caption {
+  grid-column: span 2;
+}
+.iconBox {
+  display: grid;
+  place-items: center;
+  min-width: 26px;
+}
+
+/* ----- tags ----- */
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.tagList {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+.tagList li {
+  display: grid;
+  grid-template-columns: 150px 80px 1fr;
+  align-items: center;
+  height: 30px;
+  border-bottom: 1px solid var(--c-hair);
+}
+
+/* ----- clock ----- */
+.clocks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.clocks li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--c-hair);
+}
+.clock {
+  font: var(--fw-m) var(--fs-13) / normal var(--font-sans);
+}
+
+/* ----- photos ----- */
+.photoRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+}
+.card {
+  width: 84px;
+  height: 100px;
+  overflow: hidden;
+}
+.card > span {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+
+.feedCrests {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.feedCrests li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ----- teams ----- */
+.teams {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(354px, 100%), 1fr));
+  column-gap: 46px;
+}
+.teams li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--c-hair);
+}
+.teams li > * {
+  flex: none;
+}
+.teamName {
+  display: grid;
+  width: 52px;
+  flex: none;
+  font: var(--fw-s) var(--fs-13) / normal var(--font-sans);
+  overflow: hidden;
+}
+.teamName .caption {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--fs-11);
+}
+
+@media (min-width: 1200px) {
+  .grid > :last-child {
+    grid-column: 1 / -1;
+    max-width: none;
+  }
+}

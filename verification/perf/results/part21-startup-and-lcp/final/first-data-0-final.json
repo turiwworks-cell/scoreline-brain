@@ -1,0 +1,471 @@
+{
+  "rate": 3.6,
+  "matches": 0,
+  "parse": [
+    {
+      "bytes": 126611,
+      "json": 3.7000000001862645,
+      "validate": 30.100000000558794
+    },
+    {
+      "bytes": 126611,
+      "json": 2.5,
+      "validate": 24.700000000186265
+    },
+    {
+      "bytes": 126611,
+      "json": 3.2000000001862645,
+      "validate": 26.799999999813735
+    },
+    {
+      "bytes": 126611,
+      "json": 0.7000000001862645,
+      "validate": 30.09999999962747
+    },
+    {
+      "bytes": 126611,
+      "json": 3.099999999627471,
+      "validate": 33.40000000037253
+    }
+  ],
+  "results": [
+    {
+      "run": 1,
+      "callback": 27.200000000186265,
+      "frame": {
+        "start": 581.5,
+        "duration": 71,
+        "forced": 0
+      },
+      "parts": {
+        "beforeApply": 32.69999999925494,
+        "apply": 27.200000000186265,
+        "afterApply": 11.100000000558794,
+        "renderStart": 65.19999999925494
+      },
+      "later": [
+        {
+          "start": 819.1999999992549,
+          "duration": 168.6000000005588,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 54
+            }
+          ]
+        },
+        {
+          "start": 1006.6999999992549,
+          "duration": 60.80000000074506,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 18
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 16
+            }
+          ]
+        },
+        {
+          "start": 1377.5,
+          "duration": 90.29999999981374,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "http://127.0.0.1:36345/assets/runtime-Dbwfuf0d.js",
+              "dur": 39
+            },
+            {
+              "inv": "import.then",
+              "dur": 41
+            }
+          ]
+        },
+        {
+          "start": 1517.699999999255,
+          "duration": 103.6000000005588,
+          "timer": false,
+          "scripts": []
+        }
+      ],
+      "laterTimer": 0,
+      "fillMs": 261.40000000037253,
+      "fill": [
+        {
+          "t": -564,
+          "rows": 0
+        },
+        {
+          "t": 261,
+          "rows": 7
+        }
+      ],
+      "rows": 7,
+      "groups": 5,
+      "pending": 0,
+      "unique": 7,
+      "filled": true,
+      "errors": []
+    },
+    {
+      "run": 2,
+      "callback": 31,
+      "frame": {
+        "start": 481.20000000018626,
+        "duration": 74.5,
+        "forced": 0
+      },
+      "parts": {
+        "beforeApply": 32.60000000055879,
+        "apply": 31,
+        "afterApply": 10.899999999441206,
+        "renderStart": 69.5
+      },
+      "later": [
+        {
+          "start": 676.6000000005588,
+          "duration": 115.59999999962747,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 16
+            }
+          ]
+        },
+        {
+          "start": 805.4000000003725,
+          "duration": 83.20000000018626,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 16
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 24
+            }
+          ]
+        },
+        {
+          "start": 1148.4000000003725,
+          "duration": 74.70000000018626,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "http://127.0.0.1:36345/assets/runtime-Dbwfuf0d.js",
+              "dur": 32
+            },
+            {
+              "inv": "import.then",
+              "dur": 32
+            }
+          ]
+        },
+        {
+          "start": 1236.6000000005588,
+          "duration": 131.09999999962747,
+          "timer": false,
+          "scripts": []
+        }
+      ],
+      "laterTimer": 0,
+      "fillMs": 180.3999999994412,
+      "fill": [
+        {
+          "t": -473,
+          "rows": 0
+        },
+        {
+          "t": 180,
+          "rows": 7
+        }
+      ],
+      "rows": 7,
+      "groups": 5,
+      "pending": 0,
+      "unique": 7,
+      "filled": true,
+      "errors": []
+    },
+    {
+      "run": 3,
+      "callback": 32.700000000186265,
+      "frame": {
+        "start": 668.2000000001863,
+        "duration": 84.29999999981374,
+        "forced": 0
+      },
+      "parts": {
+        "beforeApply": 34.59999999962747,
+        "apply": 32.700000000186265,
+        "afterApply": 17,
+        "renderStart": 74.8999999994412
+      },
+      "later": [
+        {
+          "start": 914.5,
+          "duration": 134.79999999981374,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 5
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 14
+            }
+          ]
+        },
+        {
+          "start": 1062.0999999996275,
+          "duration": 61.10000000055879,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 17
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 14
+            }
+          ]
+        },
+        {
+          "start": 1414.9000000003725,
+          "duration": 133.5,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "http://127.0.0.1:36345/assets/runtime-Dbwfuf0d.js",
+              "dur": 64
+            },
+            {
+              "inv": "import.then",
+              "dur": 59
+            }
+          ]
+        },
+        {
+          "start": 1562.0999999996275,
+          "duration": 164.6000000005588,
+          "timer": false,
+          "scripts": []
+        }
+      ],
+      "laterTimer": 0,
+      "fillMs": 239.6000000005588,
+      "fill": [
+        {
+          "t": -653,
+          "rows": 0
+        },
+        {
+          "t": 240,
+          "rows": 7
+        }
+      ],
+      "rows": 7,
+      "groups": 5,
+      "pending": 0,
+      "unique": 7,
+      "filled": true,
+      "errors": []
+    },
+    {
+      "run": 4,
+      "callback": 24.699999999254942,
+      "frame": {
+        "start": 581.8999999994412,
+        "duration": 68.5,
+        "forced": 0
+      },
+      "parts": {
+        "beforeApply": 36.10000000055879,
+        "apply": 24.699999999254942,
+        "afterApply": 7.7000000001862645,
+        "renderStart": 61.700000000186265
+      },
+      "later": [
+        {
+          "start": 768.5,
+          "duration": 110.59999999962747,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 5
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 5
+            },
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 15
+            }
+          ]
+        },
+        {
+          "start": 891.8999999994412,
+          "duration": 61.700000000186265,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 19
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 14
+            }
+          ]
+        },
+        {
+          "start": 1241.0999999996275,
+          "duration": 85.29999999981374,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "http://127.0.0.1:36345/assets/runtime-Dbwfuf0d.js",
+              "dur": 35
+            },
+            {
+              "inv": "import.then",
+              "dur": 44
+            }
+          ]
+        },
+        {
+          "start": 1338.199999999255,
+          "duration": 181.80000000074506,
+          "timer": false,
+          "scripts": []
+        }
+      ],
+      "laterTimer": 0,
+      "fillMs": 178.19999999925494,
+      "fill": [
+        {
+          "t": -574,
+          "rows": 0
+        },
+        {
+          "t": 178,
+          "rows": 7
+        }
+      ],
+      "rows": 7,
+      "groups": 5,
+      "pending": 0,
+      "unique": 7,
+      "filled": true,
+      "errors": []
+    },
+    {
+      "run": 5,
+      "callback": 27.59999999962747,
+      "frame": {
+        "start": 563.6000000005588,
+        "duration": 76.79999999981374,
+        "forced": 0
+      },
+      "parts": {
+        "beforeApply": 38.200000000186265,
+        "apply": 27.59999999962747,
+        "afterApply": 11,
+        "renderStart": 71.79999999981374
+      },
+      "later": [
+        {
+          "start": 793.7000000001863,
+          "duration": 99.40000000037253,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 12
+            }
+          ]
+        },
+        {
+          "start": 904.3000000007451,
+          "duration": 71.5,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 22
+            },
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 18
+            }
+          ]
+        },
+        {
+          "start": 1062.5,
+          "duration": 57.30000000074506,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "MessagePort.onmessage",
+              "dur": 17
+            }
+          ]
+        },
+        {
+          "start": 1274,
+          "duration": 99.5,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "http://127.0.0.1:36345/assets/runtime-Dbwfuf0d.js",
+              "dur": 39
+            },
+            {
+              "inv": "import.then",
+              "dur": 44
+            }
+          ]
+        },
+        {
+          "start": 1385.800000000745,
+          "duration": 141.3999999994412,
+          "timer": false,
+          "scripts": [
+            {
+              "inv": "FrameRequestCallback",
+              "dur": 17
+            }
+          ]
+        }
+      ],
+      "laterTimer": 0,
+      "fillMs": 206.69999999925494,
+      "fill": [
+        {
+          "t": -549,
+          "rows": 0
+        },
+        {
+          "t": 207,
+          "rows": 7
+        }
+      ],
+      "rows": 7,
+      "groups": 5,
+      "pending": 0,
+      "unique": 7,
+      "filled": true,
+      "errors": []
+    }
+  ]
+}

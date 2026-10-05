@@ -1,0 +1,51 @@
+.switch {
+  position: absolute;
+  z-index: 8;
+  left: 50%;
+  top: 12px;
+  width: 300px;
+  transform: translateX(-50%);
+}
+.hidden {
+  display: none;
+}
+.close {
+  position: absolute;
+  left: 14px;
+  top: 50px;
+  z-index: 7;
+}
+.empty {
+  position: absolute;
+  inset: 0;
+  text-align: center;
+  color: var(--c-muted);
+}
+.empty h1 {
+  position: absolute;
+  top: 380px;
+  left: 18px;
+  right: 18px;
+  margin: 0;
+  font: var(--type-empty);
+  letter-spacing: var(--track-2);
+  line-height: 26px;
+}
+.empty p {
+  position: absolute;
+  top: 415.49px;
+  left: 18px;
+  right: 18px;
+  margin: 0;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  line-height: 13.7px;
+  text-transform: uppercase;
+  color: var(--c-dim);
+}
+.empty h1:focus {
+  outline: none;
+}
+.empty h1:focus-visible {
+  outline: 2px solid var(--c-text);
+}

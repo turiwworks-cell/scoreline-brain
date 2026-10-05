@@ -1,0 +1,17 @@
+/?demo=fast at 3.6x, 390x844, Rive blocked: 15 frames over 50 ms in 20 s
+  start-up    n  10  median  109 ms  max  239 ms
+  poll        n   5  median   74 ms  max   88 ms
+
+worst frames:
+     0.2 s   239 ms  [start-up]  235 ms MessagePort.onmessage app-vendor-CCjG9T8J.js@9174 (forced layout 76 ms)
+     0.6 s   145 ms  [start-up]  137 ms TimerHandler:setTimeout index-DyTVBxgN.js@130473
+     1.0 s   139 ms  [start-up]  50 ms MessagePort.onmessage app-vendor-CCjG9T8J.js@9174
+     0.1 s   113 ms  [start-up]  112 ms http://127.0.0.1:4185/assets/index-DyTVBxgN.js index-DyTVBxgN.js@0
+     3.8 s   109 ms  [start-up]  95 ms TimerHandler:setTimeout demo-DK4skDUj.js@34072
+     1.4 s   106 ms  [start-up]  
+     1.3 s    90 ms  [start-up]  43 ms http://127.0.0.1:4185/assets/runtime-Dbwfuf0d.js runtime-Dbwfuf0d.js@0; 36 ms import.then (no source)
+     0.5 s    88 ms  [start-up]  63 ms import.then (no source); 23 ms http://127.0.0.1:4185/assets/demo-DK4skDUj.js demo-DK4skDUj.js@0
+    10.0 s    88 ms  [poll]  67 ms TimerHandler:setTimeout demo-DK4skDUj.js@34072; 5 ms TimerHandler:setTimeout demo-DK4skDUj.js@34072
+    13.1 s    81 ms  [poll]  76 ms TimerHandler:setTimeout demo-DK4skDUj.js@34072
+     7.0 s    74 ms  [poll]  61 ms TimerHandler:setTimeout demo-DK4skDUj.js@34072
+     0.0 s    71 ms  [start-up]  
