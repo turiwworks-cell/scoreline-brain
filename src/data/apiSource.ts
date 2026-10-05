@@ -14,7 +14,7 @@
 // - stop(): clears every timer, aborts the request in flight, closes the stream and removes the
 //   environment listeners. Callbacks that arrive late from the old run are ignored.
 
-import { parseEvent, parseFeed, type LiveEvent } from '../domain';
+import { createFeedParser, parseEvent, type LiveEvent } from '../domain';
 import { backoffDelay, DEFAULT_BACKOFF, type BackoffOptions } from './backoff';
 import { browserEnvironment, realScheduler, type EnvironmentChange, type Scheduler, type SyncEnvironment, type TimerHandle } from './environment';
 import { IDLE_STATUS, type EventHandler, type FeedHandler, type Source, type StatusHandler, type SyncPhase, type SyncStatus } from './source';
@@ -61,6 +61,7 @@ export function createApiSource(options: ApiSourceOptions): Source {
   const pollMs = options.pollMs ?? POLL_MS;
   const backoff = options.backoff ?? DEFAULT_BACKOFF;
   const maxHeld = options.maxHeld ?? MAX_HELD;
+  let readFeed = createFeedParser();
 
   // ── Run state. `session` bumps on every start and stop; async work from an older session is
   // dropped on arrival.
@@ -178,7 +179,7 @@ export function createApiSource(options: ApiSourceOptions): Source {
           feedError = true;
         } else {
           etag = res.etag;
-          handlers?.onFeed(parseFeed(res.body));
+          handlers?.onFeed(readFeed(res.body));
           if (s !== session) return; // the handler stopped us
           if (!trusted && afterOpen && streamOpen && gen === openGen) {
             trusted = true;
@@ -313,6 +314,7 @@ export function createApiSource(options: ApiSourceOptions): Source {
       if (running) return;
       running = true;
       session += 1;
+      readFeed = createFeedParser();
       handlers = { onFeed, onEvent, onStatus };
       lastStatus = IDLE_STATUS;
       feedError = false;
@@ -336,6 +338,7 @@ export function createApiSource(options: ApiSourceOptions): Source {
       suspended = null;
       emitStatus();
       handlers = null;
+      readFeed = createFeedParser();
     },
 
     ensureMatchDetails(id) {

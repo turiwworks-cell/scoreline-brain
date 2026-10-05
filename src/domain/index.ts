@@ -2,7 +2,8 @@
 export * from './types';
 export { applyEvent, applyFeed, emptyState, playerKey } from './apply';
 export { liveMinute, syncClock, type MatchTime } from './clock';
-export { colorOf, feedSchema, liveEventSchema, parseEvent, parseFeed } from './schemas';
+export { colorOf } from './colorOf';
+export { createFeedParser, feedSchema, liveEventSchema, parseEvent, parseFeed } from './schemas';
 export { share } from './share';
 export { leaders, lineupOf, type Leader } from './leaders';
 export { liveMatches } from './live';

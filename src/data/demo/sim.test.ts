@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { feedSchema, parseEvent, parseFeed, standings, type Feed } from '../../domain';
+import { createFeedParser, feedSchema, parseEvent, parseFeed, standings, type Feed } from '../../domain';
 import { STORED_KINDS } from '../../domain/schemas';
 import { DEMO_BASES, demoState } from '../../domain/testing/demo';
 import { FIXTURES } from './data';
@@ -116,9 +116,11 @@ describe('DemoSim', () => {
 describe('the wire', () => {
   it('feeds conform to the v2 feed schema and lose nothing in parsing', () => {
     const { feeds } = play(new DemoSim({ seed: 11, loop: false }));
+    const parse = createFeedParser();
     for (const raw of feeds) {
       expect(feedSchema.safeParse(raw).success).toBe(true);
       const f: Feed = parseFeed(raw);
+      expect(parse(raw)).toEqual(f);
       const r = raw as { teams: unknown[]; leagues: Json[]; matches: { id: number; events: Json[]; stats?: unknown; players?: unknown }[]; squads: Json };
       expect(f.version).toBe(2);
       expect(f.teams.length).toBe(r.teams.length);

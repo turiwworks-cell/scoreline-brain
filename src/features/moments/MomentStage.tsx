@@ -41,9 +41,11 @@ export function MomentStage({ slot, onOpenMatch, isFollowed, director, reducedMo
   const p = useMomentStage(d);
   const prefers = useReducedMotion() ?? false;
   const reduced = reducedMotion ?? prefers;
-  const domain = useScoreline((s) => s.domain);
+  const shown = !!p && (slot === 'all' || (slot === 'scene') === (p.kind === 'scene'));
+  // An idle stage (or the other desktop slot) needs no matchday subscription on a poll.
+  const domain = useScoreline((s) => shown ? s.domain : null);
   const { manifest } = usePhotoManifest();
-  if (!p) return null;
+  if (!p || !domain) return null;
   const scene = p.kind === 'scene';
   if ((slot === 'scene' && !scene) || (slot === 'toast' && scene)) return null;
   const info = momentInfo(domain, p.moment);

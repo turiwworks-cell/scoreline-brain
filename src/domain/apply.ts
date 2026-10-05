@@ -18,6 +18,7 @@ import type {
   DomainState,
   Feed,
   FeedMatch,
+  FeedSquad,
   League,
   LiveEvent,
   Match,
@@ -31,7 +32,7 @@ import type {
   Team,
   WireEvent,
 } from './types';
-import { STORED_KINDS } from './schemas';
+import { STORED_KINDS } from './kinds';
 
 /** Events held for a match that has no snapshot yet. Beyond this, the oldest are dropped. */
 const PENDING_MAX = 100;
@@ -176,7 +177,31 @@ function play(m: Match, moments: readonly Moment[]): { match: Match; moments: Mo
 
 // ── Snapshot ─────────────────────────────────────────────────────────────────
 
+// The last validated snapshot behind a normalized match. Weak keys keep this bounded by the
+// live domain state, and an SSE-produced match has no entry: its snapshot must reconcile events.
+const snapshots = new WeakMap<Match, FeedMatch>();
+
 function fromSnapshot(prev: Match | undefined, fm: FeedMatch, quiet: boolean, now: number): { match: Match; moments: Moment[] } {
+  const last = prev ? snapshots.get(prev) : undefined;
+  if (prev && last && fm.seq >= prev.seq) {
+    const keys = Object.keys(fm) as (keyof FeedMatch)[];
+    // An event without a minute inherits the snapshot's minute during normalization.
+    const stableEventMinutes = fm.minute === last.minute || fm.events.every((e) => e.minute !== undefined);
+    if (stableEventMinutes && keys.length === Object.keys(last).length && keys.every((k) => k === 'minute' || k === 'second' || Object.is(fm[k], last[k]))) {
+      // A repeated snapshot can still correct a paused/drifting clock without rebuilding its
+      // events, stats, lineups or player lines. Never fast-path by seq alone (§4's late events).
+      const clock = syncClock(prev.clock, prev.status, fm.status, fm.minute, fm.second, now);
+      const match = clock === prev.clock ? prev : { ...prev, clock };
+      snapshots.set(match, fm);
+      return { match, moments: [] };
+    }
+  }
+  const result = buildSnapshot(prev, fm, quiet, now);
+  if (!prev || fm.seq >= prev.seq) snapshots.set(result.match, fm);
+  return result;
+}
+
+function buildSnapshot(prev: Match | undefined, fm: FeedMatch, quiet: boolean, now: number): { match: Match; moments: Moment[] } {
   const snapshot = fm.events.map((e) => toMatchEvent(e, e.id, e.seq ?? 0, fm.minute));
 
   if (prev && fm.seq < prev.seq) {
@@ -296,6 +321,16 @@ function onEvent(m: Match, ev: LiveEvent, quiet: boolean, now: number): { match:
 
 // ── Public API ───────────────────────────────────────────────────────────────
 
+const squads = new WeakMap<FeedSquad, { team: string; players: readonly Player[] }>();
+
+function squadPlayers(team: string, sq: FeedSquad): readonly Player[] {
+  const cached = squads.get(sq);
+  if (cached?.team === team) return cached.players;
+  const players = sq.players.map((p) => ({ ...p, id: playerKey(team, p.n), team }));
+  squads.set(sq, { team, players });
+  return players;
+}
+
 /** Applies a `feed` snapshot. `now` is epoch ms. */
 export function applyFeed(state: DomainState, feed: Feed, now: number): Applied {
   const quiet = !state.loaded;
@@ -310,7 +345,7 @@ export function applyFeed(state: DomainState, feed: Feed, now: number): Applied 
   const players: Record<string, Player> = { ...state.players };
   for (const [team, sq] of Object.entries(feed.squads)) {
     for (const k of Object.keys(players)) if (players[k]?.team === team) delete players[k];
-    for (const p of sq.players) players[playerKey(team, p.n)] = { ...p, id: playerKey(team, p.n), team };
+    for (const p of squadPlayers(team, sq)) players[p.id] = p;
     const t = teams[team];
     if (t && sq.coach !== undefined) teams[team] = { ...t, coach: sq.coach };
   }

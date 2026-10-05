@@ -1,6 +1,7 @@
 import { act, cleanup, render, screen, within } from '@testing-library/react';
+import { Profiler } from 'react';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { parseFeed } from '../../domain';
+import { createFeedParser, parseFeed } from '../../domain';
 import { demoFeedJson } from '../../domain/testing/demo';
 import { scorelineStore } from '../../store';
 import { IconSprite } from '../../ui';
@@ -45,6 +46,25 @@ const full = () => root().style.getPropertyValue('--full');
 
 beforeEach(() => {
   show({});
+});
+
+it('does not render the followed card when a poll changes only another match', () => {
+  const parse = createFeedParser();
+  const raw = demoFeedJson();
+  const now = Date.now();
+  scorelineStore.getState().actions.resetFeed(parse(raw), now);
+  const commits = vi.fn();
+  render(
+    <Profiler id="follow" onRender={commits}>
+      <FollowCard followed={{ team: 'arg', n: 10 }} live={FRESH} open hidden={false} onToggle={vi.fn()} onOpenPlayer={vi.fn()} />
+    </Profiler>,
+  );
+  commits.mockClear();
+  raw.matches[1]!.seq += 1;
+  raw.matches[1]!.minute += 1;
+  act(() => scorelineStore.getState().actions.applyFeed(parse(raw), now));
+  expect(commits).not.toHaveBeenCalled();
+  expect(screen.getByRole('button', { name: 'Lionel Messi, the player you follow' })).toBeTruthy();
 });
 
 describe('before kick-off', () => {

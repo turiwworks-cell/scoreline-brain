@@ -1,4 +1,5 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { Profiler, type ProfilerOnRenderCallback } from 'react';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { parseEvent, parseFeed } from '../../domain';
 import { demoFeedJson } from '../../domain/testing/demo';
@@ -23,7 +24,7 @@ afterEach(() => {
 });
 
 /** The app store, a director over it with a hand-driven clock and timers, and the stage rendered. */
-function setup(view: MomentView, slot: StageSlot = 'all', reduced = false) {
+function setup(view: MomentView, slot: StageSlot = 'all', reduced = false, onRender: ProfilerOnRenderCallback = () => {}) {
   let t = 50;
   type Timer = { at: number; fn: () => void };
   let timers: Timer[] = [];
@@ -50,7 +51,9 @@ function setup(view: MomentView, slot: StageSlot = 'all', reduced = false) {
   const tree = (s: StageSlot) => (
     <>
       <IconSprite />
-      <MomentStage slot={s} director={d} onOpenMatch={onOpenMatch} isFollowed={isFollowed} reducedMotion={reduced} />
+      <Profiler id="stage" onRender={onRender}>
+        <MomentStage slot={s} director={d} onOpenMatch={onOpenMatch} isFollowed={isFollowed} reducedMotion={reduced} />
+      </Profiler>
     </>
   );
   const rendered = render(tree(slot));
@@ -91,6 +94,16 @@ describe('MomentStage', () => {
     setup({ front: false });
     expect(screen.queryByTestId('moment-scene')).toBeNull();
     expect(screen.queryByTestId('moment-toast')).toBeNull();
+  });
+
+  it('does not render an empty stage when one match changes on a poll', () => {
+    const commits = vi.fn();
+    setup({ front: false }, 'all', false, commits);
+    commits.mockClear();
+    const raw = demoFeedJson();
+    raw.matches[1]!.minute += 1;
+    act(() => scorelineStore.getState().actions.applyFeed(parseFeed(raw), Date.now()));
+    expect(commits).not.toHaveBeenCalled();
   });
 });
 
@@ -276,4 +289,3 @@ describe('the toast', () => {
     expect(photo.style.opacity).toBe('1');
   });
 });
-

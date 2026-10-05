@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { applyEvent, applyFeed, emptyState } from './apply';
-import { parseEvent, parseFeed } from './schemas';
+import { createFeedParser, parseEvent, parseFeed } from './schemas';
 import type { DomainState, Moment } from './types';
 
 const T0 = 1_760_000_000_000;
@@ -50,6 +50,54 @@ const kinds = (ms: readonly Moment[]) => ms.map((m) => `${m.kind}:${m.side ?? ''
 const goal1 = { id: 'g1', seq: 5, kind: 'goal', side: 'home', minute: 61, player: 7, score: [1, 0] };
 
 describe('applyFeed', () => {
+  it('fast-paths a repeated v2 snapshot while preserving identity and changed-seq moments', () => {
+    const parse = createFeedParser();
+    const raw = { version: 2, teams: [{ id: 'a' }, { id: 'b' }], matches: [{ id: 1, seq: 4, home: 'a', away: 'b', status: 'live', minute: 60, score: [0, 0] }] };
+    const a = applyFeed(emptyState(), parse(raw), T0).state;
+    const b = applyFeed(a, parse(structuredClone(raw)), T0 + 1000);
+    expect(b.state).toBe(a);
+    expect(b.state.matches[1]).toBe(a.matches[1]);
+    const c = applyFeed(b.state, parse({ ...raw, matches: [{ ...raw.matches[0], seq: 5, score: [1, 0] }] }), T0 + 2000);
+    expect(c.state.matches[1]?.score).toEqual([1, 0]);
+    expect(kinds(c.moments)).toEqual(['goal:home']);
+  });
+
+  it('resynchronizes a drifting clock even when the cached snapshot is unchanged', () => {
+    const parse = createFeedParser();
+    const raw = { version: 2, teams: [{ id: 'a' }, { id: 'b' }], matches: [{ id: 1, seq: 4, home: 'a', away: 'b', status: 'live', minute: 60, second: 10 }] };
+    const a = applyFeed(emptyState(), parse(raw), T0).state;
+    const b = applyFeed(a, parse(raw), T0 + 120_000);
+    expect(b.state.matches[1]?.clock).toEqual({ minute: 60, second: 10, at: T0 + 120_000 });
+    expect(b.moments).toEqual([]);
+  });
+
+  it('updates an event that inherits the snapshot minute on a clock-only correction', () => {
+    const parse = createFeedParser();
+    const raw = { version: 2, teams: [{ id: 'a' }, { id: 'b' }], matches: [{ id: 1, seq: 4, home: 'a', away: 'b', status: 'live', minute: 60, events: [{ id: 'shot', kind: 'shot' }] }] };
+    const a = applyFeed(emptyState(), parse(raw), T0).state;
+    expect(a.matches[1]?.events[0]?.minute).toBe(60);
+    const next = { ...raw, matches: [{ ...raw.matches[0], minute: 61 }] };
+    const b = applyFeed(a, parse(next), T0 + 1000);
+    expect(b).toEqual(applyFeed(a, parseFeed(next), T0 + 1000));
+    expect(b.state.matches[1]?.events[0]?.minute).toBe(61);
+    expect(b.moments).toEqual([]);
+  });
+
+  it('reconciles SSE followed by an equal-seq snapshot, and learns stale late events', () => {
+    const parse = createFeedParser();
+    const raw = { version: 2, teams: [{ id: 'ars' }, { id: 'che' }], matches: [{ id: 501, seq: 4, home: 'ars', away: 'che', status: 'live', minute: 60, score: [0, 0], events: [] as Record<string, unknown>[] }] };
+    const a = applyFeed(emptyState(), parse(raw), T0).state;
+    const b = applyEvent(a, event(goal1), T0 + 1000);
+    const old = { ...raw, matches: [{ ...raw.matches[0], events: [{ id: 'late', seq: 3, kind: 'yellow', side: 'away' }] }] };
+    const c = applyFeed(b.state, parse(old), T0 + 2000);
+    expect(c.state.matches[501]?.score).toEqual([1, 0]);
+    expect(c.state.matches[501]?.events.map((e) => e.id)).toEqual(['late', 'g1']);
+    expect(c.moments).toEqual([]);
+    const fresh = { ...raw, matches: [{ ...raw.matches[0], seq: 5, score: [1, 0], events: [goal1] }] };
+    const d = applyFeed(c.state, parse(fresh), T0 + 3000);
+    expect(d.state.matches[501]?.events.map((e) => e.id)).toEqual(['g1']);
+    expect(d.moments).toEqual([]);
+  });
   it('sets the stage quietly on the first feed', () => {
     const r = applyFeed(emptyState(), feed({ seq: 5, score: [2, 1], events: [goal1] }), T0);
     expect(r.moments).toEqual([]);

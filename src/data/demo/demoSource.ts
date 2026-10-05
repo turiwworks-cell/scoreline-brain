@@ -10,9 +10,9 @@
 // carries on from where it stopped, beginning with a full feed.
 //
 // One timer at a time: the next tick or the followed player's next action, whichever is due
-// first. Everything goes through `parseFeed` / `parseEvent`, exactly like ApiSource's output.
+// first. Everything goes through the session feed parser / `parseEvent`, like ApiSource's output.
 
-import { parseEvent, parseFeed } from '../../domain';
+import { createFeedParser, parseEvent } from '../../domain';
 import { realScheduler, type Scheduler, type TimerHandle } from '../environment';
 import { IDLE_STATUS, type EventHandler, type FeedHandler, type Source, type StatusHandler } from '../source';
 import { clearActiveDemoSource, setActiveDemoSource } from './active';
@@ -59,6 +59,7 @@ export function createDemoSource(options: DemoSourceOptions = {}): DemoSource {
   const sched = options.scheduler ?? realScheduler;
   const speed = options.speed !== undefined && options.speed > 0 ? options.speed : 1;
   let sim = new DemoSim(options);
+  let readFeed = createFeedParser();
 
   // Match time (ms) the simulation has reached, and when its next tick and action are due.
   let simMs = 0;
@@ -117,7 +118,7 @@ export function createDemoSource(options: DemoSourceOptions = {}): DemoSource {
 
   function sendFeed(s: number, reset = false): void {
     if (s !== session || !handlers) return;
-    handlers.onFeed(parseFeed(feedJson(sim)), reset ? { reset: true } : undefined);
+    handlers.onFeed(readFeed(feedJson(sim)), reset ? { reset: true } : undefined);
   }
 
   const source: DemoSource = {
@@ -132,6 +133,7 @@ export function createDemoSource(options: DemoSourceOptions = {}): DemoSource {
       if (handlers) return;
       session += 1;
       const s = session;
+      readFeed = createFeedParser();
       handlers = { onFeed, onEvent, onStatus };
       paused = false;
       setActiveDemoSource(source);
@@ -146,6 +148,7 @@ export function createDemoSource(options: DemoSourceOptions = {}): DemoSource {
       clearTimer();
       const h = handlers;
       handlers = null;
+      readFeed = createFeedParser();
       paused = false;
       clearActiveDemoSource(source);
       h.onStatus?.(IDLE_STATUS);
@@ -185,6 +188,7 @@ export function createDemoSource(options: DemoSourceOptions = {}): DemoSource {
       clearTimer();
       const followed = sim.followed;
       sim = new DemoSim(options);
+      readFeed = createFeedParser();
       sim.followed = followed;
       simMs = 0;
       tickDue = TICK_MS;
