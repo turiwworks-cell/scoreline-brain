@@ -82,7 +82,9 @@ node verification/perf/compression.mjs --base https://example.org
 ```
 
 `startup.mjs` takes timings from runs without `--trace` and anatomy from runs with it: tracing
-slows the page. Keep every run's file, outliers included. **`poll-replay.mjs` and `profile.mjs`
+slows the page. `--first-data` waits for the page's own first render to paint and go idle before
+the feed, as in the app (without that wait the feed could render outside the measured callback),
+and records when each slice of a long list arrived (`fill`). Keep every run's file, outliers included. **`poll-replay.mjs` and `profile.mjs`
 answer different questions.** `poll-replay.mjs` replays recorded wire JSON through the real
 `ApiSource`, parser, store and UI, so it measures the app's work for one feed with no demo
 generation; `--first-data` is the first feed of a page, one fresh page per run. `profile.mjs` plays
@@ -90,11 +92,18 @@ the whole demo, whose timer also builds the feed (simulation, JSON) and delivers
 "time until paint" is never a task's duration: it adds the wait for the next frame.
 
 **Lighthouse, simulated and applied.** The default (lantern) computes FCP and LCP from a model of the
-page: it counts script requests that finished before the observed paint, so a page that paints
-a static frame at 0.3 s is still modelled as waiting for its bundle. To see what a browser under
-that throttle does, add `--throttling-method=devtools` (applied: CPU 4× and the slow-4G network
-happen in the browser). Report both and say which is which; the container's benchmark index is
-about 1480, so every number is on a slower machine than a typical laptop. Whether a run's window catches
+page built from an unthrottled run. For FCP it keeps the requests with a render-blocking priority
+that finished before the observed paint, unless their script was evaluated after it; for LCP it
+keeps every request that finished before the observed paint except low-priority images
+(`@paulirish/trace_engine` `lantern/metrics/{FirstContentfulPaint,LargestContentfulPaint}.js`). It
+ties a script to its evaluation through `EvaluateScript` trace events only, and keeps a script it
+cannot tie as possibly needed. On localhost the whole bundle has downloaded before the first paint,
+so the wordmark's simulated LCP includes the bundle's download however early the static frame
+paints (Part 21 report). To see what
+a browser under that throttle does, add `--throttling-method=devtools` (applied: CPU 4× and the
+slow-4G network happen in the browser). Report both and say which is which; the container's
+benchmark index varies between about 1500 and 2600 from run to run (it is in each report), so
+compare runs from the same session only. Whether a run's window catches
 the Rive requests depends on timing (on `/?demo` it usually does, after the first rows; read the
 report's network requests); the container draws Rive's WebGL in software either way, so none of
 this says how Rive performs on a phone.
