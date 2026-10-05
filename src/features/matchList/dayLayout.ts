@@ -7,6 +7,13 @@ import { lerp } from './curve';
 /** Space each side of a tab's word (luau:3709). */
 export const DAY_PAD = 13;
 
+/**
+ * The type of a tab's word, as `.tab` sets it in DayTabs.module.css: `font: var(--type-row)` (weight
+ * 500, 15 px) with `letter-spacing: var(--track-1)` (−0.01 em). The widths are measured on a canvas
+ * with these, so dayLayout.test.ts holds them to the stylesheet and the tokens.
+ */
+export const DAY_TYPE = { weight: 500, size: 15, track: -0.01 } as const;
+
 export interface DayWidths {
   /** the width of each tab's word, in order */
   readonly words: readonly number[];

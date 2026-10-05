@@ -1,13 +1,18 @@
-import { useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
-import { feel } from '../../ui';
-import { dayLayout, dayPlace, type DayWidths } from './dayLayout';
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
+import { feel, textWidth, useFontVersion } from '../../ui';
+import { DAY_TYPE, dayLayout, dayPlace, type DayWidths } from './dayLayout';
 import styles from './DayTabs.module.css';
 
 /*
  * The day tabs. Not the shared Tabs: these centre the chosen tab, fade at both ends and carry the
  * Today↔Ongoing morph. The strip and the indicator are placed by writing a transform from the
- * measured words (so a slide is a CSS transition on transform alone); the Today tab's width and
+ * words' widths (so a slide is a CSS transition on transform alone); the Today tab's width and
  * the cross-fade of its two words follow --live-k, the page's Live tween.
+ *
+ * The widths come from a canvas measure of the face (ui/measure.ts), not from the DOM: reading
+ * getBoundingClientRect in a layout effect forced a layout of everything committed so far, which on
+ * the first feed was the whole matchday. They are known in the first render, and measured again when
+ * the face loads (useFontVersion).
  */
 
 export type DayTab = { id: string; label: string };
@@ -23,43 +28,23 @@ export type DayTabsProps = {
 
 const ONGOING = 'Ongoing';
 
+const wordWidth = (text: string) => textWidth(DAY_TYPE.weight, DAY_TYPE.size, DAY_TYPE.track, text);
+
 export function DayTabs({ items, value, morph, live, onChange }: DayTabsProps) {
   const viewRef = useRef<HTMLDivElement>(null);
   const stripRef = useRef<HTMLDivElement>(null);
   const indRef = useRef<HTMLSpanElement>(null);
-  const [words, setWords] = useState<DayWidths | null>(null);
   const [ready, setReady] = useState(false);
   const morphAt = items.findIndex((t) => t.id === morph);
   const labels = items.map((t) => `${t.id}:${t.label}`).join('|');
 
-  // the words' widths, measured; again when the face loads or the labels change
-  useLayoutEffect(() => {
-    const strip = stripRef.current;
-    if (!strip) return;
-    const measure = () => {
-      const w: number[] = [];
-      let today = 0;
-      let ongoing = 0;
-      strip.querySelectorAll<HTMLElement>('[role="tab"]').forEach((tab, i) => {
-        const spans = tab.querySelectorAll<HTMLElement>('[data-word]');
-        if (i === morphAt) {
-          today = spans[0]?.getBoundingClientRect().width ?? 0;
-          ongoing = spans[1]?.getBoundingClientRect().width ?? 0;
-          w.push(today);
-        } else w.push(spans[0]?.getBoundingClientRect().width ?? 0);
-      });
-      setWords((prev) => (prev && prev.today === today && prev.ongoing === ongoing && prev.words.length === w.length && prev.words.every((x, i) => x === w[i]) ? prev : { words: w, morph: morphAt, today, ongoing }));
-    };
-    measure();
-    const fonts = typeof document === 'undefined' ? undefined : document.fonts;
-    let alive = true;
-    void fonts?.ready.then(() => alive && measure());
-    fonts?.addEventListener?.('loadingdone', measure);
-    return () => {
-      alive = false;
-      fonts?.removeEventListener?.('loadingdone', measure);
-    };
-  }, [labels, morphAt]);
+  // the words' widths: again when the labels change and when the face loads
+  const fontVersion = useFontVersion();
+  const words = useMemo<DayWidths>(() => {
+    const today = morphAt >= 0 ? wordWidth(items[morphAt]!.label) : 0;
+    const ongoing = morphAt >= 0 ? wordWidth(ONGOING) : 0;
+    return { words: items.map((t, i) => (i === morphAt ? today : wordWidth(t.label))), morph: morphAt, today, ongoing };
+  }, [labels, morphAt, fontVersion]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // where the strip and the indicator go, for the layout Live is heading to
   const [vw, setVw] = useState(354);
@@ -74,7 +59,7 @@ export function DayTabs({ items, value, morph, live, onChange }: DayTabsProps) {
   }, []);
 
   const at = items.findIndex((t) => t.id === value);
-  const place = words && at >= 0 ? dayPlace(dayLayout(words, live ? 1 : 0), at, vw) : null;
+  const place = at >= 0 ? dayPlace(dayLayout(words, live ? 1 : 0), at, vw) : null;
   useLayoutEffect(() => {
     if (!place) return;
     // placing is a style write, so it never goes through React's render
@@ -104,7 +89,7 @@ export function DayTabs({ items, value, morph, live, onChange }: DayTabsProps) {
       ?.focus();
   };
 
-  const vars = words ? ({ '--wt': words.today, '--wo': words.ongoing } as CSSProperties) : undefined;
+  const vars = { '--wt': words.today, '--wo': words.ongoing } as CSSProperties;
   return (
     <div className={styles.wrap}>
       <div ref={viewRef} className={styles.tabs} role="tablist" aria-label="Day" onKeyDown={onKeyDown}>

@@ -233,3 +233,66 @@ test.describe('the day tabs', () => {
     await expect(pane(page).getByRole('tablist', { name: 'Day' })).toHaveCSS('overflow', 'hidden');
   });
 });
+
+/*
+ * Part 21: the tabs' widths come from a canvas measure of the face, not from the DOM. The indicator
+ * (placed from those widths) has to lie under the chosen word (laid out by the browser), with the
+ * face fallen back and with it loaded, on every tab, and while Today turns into Ongoing.
+ */
+test.describe('The day tabs are sized by the face', () => {
+  const indicator = (page: Page) => pane(page).getByRole('tablist', { name: 'Day' }).locator('xpath=../span[@data-ready]');
+
+  /** How far the indicator is from lying under the chosen tab's word: left edges and widths, in px. */
+  async function offBy(page: Page) {
+    const [tab, ind] = await Promise.all([pane(page).getByRole('tab', { selected: true }).boundingBox(), indicator(page).boundingBox()]);
+    if (!tab || !ind) throw new Error('not on screen');
+    // a tab is its word and 13 px either side
+    return Math.max(Math.abs(ind.x - (tab.x + 13)), Math.abs(ind.width - (tab.width - 26)));
+  }
+  const underWord = (page: Page) => expect.poll(() => offBy(page), { timeout: 10_000 }).toBeLessThan(0.75);
+
+  test('the indicator lies under the chosen word, on every tab and in Ongoing', async ({ page }) => {
+    await open(page);
+    await underWord(page);
+    // two by touch, the ends and the way back by keyboard (the tabs further out are clipped, not reachable by a press)
+    for (const name of ['Yesterday', 'Tomorrow']) {
+      await dayTab(page, name).click();
+      await expect(dayTab(page, name)).toHaveAttribute('aria-selected', 'true');
+      await underWord(page);
+    }
+    for (const [key, name] of [['Home', 'Sat 19'], ['End', 'Wed 23'], ['ArrowLeft', 'Tomorrow'], ['ArrowLeft', 'Today']] as const) {
+      await page.keyboard.press(key);
+      await expect(dayTab(page, name)).toHaveAttribute('aria-selected', 'true');
+      await underWord(page);
+    }
+    // Live turns the Today tab into Ongoing: its width, and the indicator under it, follow
+    const today = (await dayTab(page, 'Today').boundingBox())!.width;
+    await liveToggle(page).click();
+    await expect(dayTab(page, 'Ongoing')).toHaveAttribute('aria-selected', 'true');
+    await expect.poll(async () => (await dayTab(page, 'Ongoing').boundingBox())!.width).toBeGreaterThan(today + 10);
+    await underWord(page);
+  });
+
+  test('a face that arrives late: laid out in the fallback first, the indicator follows when it loads', async ({ page }) => {
+    // the face is held back until the test lets it go
+    let release = () => {};
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    await page.route('**/fonts/*.woff2', async (route) => {
+      await gate;
+      await route.continue();
+    });
+    await page.goto('/?demo', { waitUntil: 'commit' });
+    await expect(rows(page).first()).toBeVisible();
+    const loaded = () => page.evaluate(() => document.fonts.check('500 15px "Hanken Grotesk"'));
+    expect(await loaded()).toBe(false);
+    await underWord(page);
+    const fallback = (await dayTab(page, 'Yesterday').boundingBox())!.width;
+    release();
+    await expect.poll(loaded, { timeout: 10_000 }).toBe(true);
+    // the face changed the words' widths, and the indicator was placed again from the new ones
+    await expect.poll(async () => Math.abs((await dayTab(page, 'Yesterday').boundingBox())!.width - fallback)).toBeGreaterThan(0.5);
+    await underWord(page);
+    await dayTab(page, 'Tomorrow').click();
+    await underWord(page);
+  });
+});

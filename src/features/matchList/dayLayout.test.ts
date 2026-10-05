@@ -1,5 +1,7 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { DAY_PAD, dayLayout, dayPlace, type DayWidths } from './dayLayout';
+import { DAY_PAD, DAY_TYPE, dayLayout, dayPlace, type DayWidths } from './dayLayout';
 
 const widths: DayWidths = { words: [40, 60, 40, 70, 50], morph: 2, today: 40, ongoing: 60 };
 
@@ -29,5 +31,23 @@ describe('day tabs layout', () => {
   it('rounds the shift to whole pixels', () => {
     const p = dayPlace({ xs: [0], ws: [51] }, 0, 100);
     expect(Number.isInteger(p.shift)).toBe(true);
+  });
+});
+
+describe('the type the tab words are measured in', () => {
+  const css = (...path: string[]) => readFileSync(join(__dirname, ...path), 'utf8');
+  const token = (name: string) => new RegExp(`${name}:\\s*([^;]+);`).exec(css('..', '..', 'styles', 'tokens.css'))?.[1]?.trim();
+  const tab = /\.tab\s*\{([^}]*)\}/.exec(css('DayTabs.module.css'))?.[1] ?? '';
+
+  it('is what .tab sets: --type-row with --track-1', () => {
+    expect(tab).toMatch(/font:\s*var\(--type-row\)/);
+    expect(tab).toMatch(/letter-spacing:\s*var\(--track-1\)/);
+  });
+
+  it('is what the tokens say: weight 500, 15 px, −0.01 em', () => {
+    expect(token('--type-row')).toMatch(/^var\(--fw-m\) var\(--fs-15\) \//);
+    expect(Number(token('--fw-m'))).toBe(DAY_TYPE.weight);
+    expect(token('--fs-15')).toBe(`${DAY_TYPE.size}px`);
+    expect(token('--track-1')).toBe(`${DAY_TYPE.track}em`);
   });
 });
