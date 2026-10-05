@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useNavigationType } from 'react-router';
-import { selectFeaturedMatchId, selectLiveMatchIds, selectMatchIdOfTeam, useScoreline } from '../../store';
-import { preloadRive } from '../../rive/preload';
+import { selectFeaturedMatchId, selectMatchIdOfTeam, useScoreline } from '../../store';
 import { afterPaint } from '../../rive/afterPaint';
 import { prepareScreen, preloadScreens } from '../screens/screenChunks';
 import { canonicalPath, parseNav } from '../nav/url';
 import { useLayoutMode } from './layoutMode';
 import { ListPane } from './ListPane';
 import { PhoneStack } from './PhoneStack';
+import { RiveGate } from './RiveGate';
 import { resolve } from './resolve';
 import { Stage } from './Stage';
 import { ThreePane } from './ThreePane';
@@ -30,8 +30,6 @@ export function Shell() {
   const layout = useLayoutMode();
   const nav = useMemo(() => parseNav(location.pathname, location.search, location.state), [location.pathname, location.search, location.state]);
   const featured = useScoreline(selectFeaturedMatchId);
-  const hasLiveMatch = useScoreline(selectLiveMatchIds).length > 0;
-  useEffect(() => preloadRive(hasLiveMatch), [hasLiveMatch]);
   const teamMatch = useScoreline(selectMatchIdOfTeam(nav.player?.team ?? ''));
   const r = useMemo(() => resolve(nav, layout, { featured, teamMatch }), [nav, layout, featured, teamMatch]);
 
@@ -57,19 +55,23 @@ export function Shell() {
   useNavFocus(r, location.key, navType, root, announce);
 
   const phone = layout === 'phone';
+  // Rive (runtime, artwork, the word) starts once the first data is drawn and painted, not with the page. The gate keeps its state
+  // in RiveGate, so opening it does not render the shell again.
   return (
-    <main ref={root} className={styles.shell} data-layout={layout} data-testid="app-shell" aria-label="Scoreline" onPointerDownCapture={(e) => prepareScreen(e.target)} onFocusCapture={(e) => prepareScreen(e.target)}>
-      <ListPane key="list" layout={layout} shifted={phone && !!r.match} covered={phone && !!(r.match || r.player)} list={r.list} openId={r.match?.id} />
-      {phone ? <PhoneStack key="phone" r={r} /> : layout === 'two' ? <TwoPane key="two" r={r} /> : <ThreePane key="three" r={r} />}
-      {/* the phone plays toasts and scenes over everything; the panes play them inside (Part 18) */}
-      {phone && <Stage key="stage" slot="all" />}
-      <p key="announcer" className={styles.announcer} aria-live="polite">
-        {said}
-      </p>
-      {/* goals, red cards, kick-offs and full time, as the MomentDirector delivers them (Part 17) */}
-      <p key="moments" className={styles.announcer} role="status" aria-atomic="true" data-testid="moment-announcer">
-        {moment ? <span key={moment.n}>{moment.text}</span> : null}
-      </p>
-    </main>
+    <RiveGate>
+      <main ref={root} className={styles.shell} data-layout={layout} data-testid="app-shell" aria-label="Scoreline" onPointerDownCapture={(e) => prepareScreen(e.target)} onFocusCapture={(e) => prepareScreen(e.target)}>
+        <ListPane key="list" layout={layout} shifted={phone && !!r.match} covered={phone && !!(r.match || r.player)} list={r.list} openId={r.match?.id} />
+        {phone ? <PhoneStack key="phone" r={r} /> : layout === 'two' ? <TwoPane key="two" r={r} /> : <ThreePane key="three" r={r} />}
+        {/* the phone plays toasts and scenes over everything; the panes play them inside (Part 18) */}
+        {phone && <Stage key="stage" slot="all" />}
+        <p key="announcer" className={styles.announcer} aria-live="polite">
+          {said}
+        </p>
+        {/* goals, red cards, kick-offs and full time, as the MomentDirector delivers them (Part 17) */}
+        <p key="moments" className={styles.announcer} role="status" aria-atomic="true" data-testid="moment-announcer">
+          {moment ? <span key={moment.n}>{moment.text}</span> : null}
+        </p>
+      </main>
+    </RiveGate>
   );
 }

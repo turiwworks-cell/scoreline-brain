@@ -2,6 +2,7 @@ import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react
 import { motionValue } from 'motion/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { LiveIcon } from './LiveIcon';
+import { RiveStartContext } from './startGate';
 import LiveGraphic from './LiveGraphic';
 import WordGraphic from './WordGraphic';
 import type { RiveCanvasProps } from './RiveCanvas';
@@ -41,6 +42,31 @@ describe('Live icon binding and hit target', () => {
     act(() => mock.canvas!.onError?.(new Error('renderer failed')));
     expect(button.classList.contains('m-glass')).toBe(true);
     expect(view.getByText('8')).toBeTruthy(); expect(view.getByText('Live')).toBeTruthy();
+  });
+  it('is the DOM button alone until the shell lets Rive start, and the same button after', async () => {
+    mock.source = '/rive/live-icon.riv';
+    const icon = (start: boolean) => (
+      <RiveStartContext.Provider value={start}>
+        <LiveIcon live={false} count={4} onChange={vi.fn()} fallback={<span>Live</span>}><span>4</span></LiveIcon>
+      </RiveStartContext.Provider>
+    );
+    const view = render(icon(false));
+    const button = view.getByRole('button', { name: 'Live, 4 in play' });
+    button.focus();
+    // nothing of Rive has been asked for: no graphic chunk, no canvas
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(view.container.querySelector('canvas')).toBeNull();
+    expect(mock.canvas).toBeNull();
+    expect(view.getByText('Live')).toBeTruthy(); expect(view.getByText('4')).toBeTruthy();
+    view.rerender(icon(true));
+    await waitFor(() => expect(view.container.querySelector('canvas')).not.toBeNull());
+    // the artwork starts behind the fallback: the button is the one that was there, still focused, the fallback still showing
+    expect(view.getByRole('button', { name: 'Live, 4 in play' })).toBe(button);
+    expect(document.activeElement).toBe(button);
+    expect(view.getByText('Live')).toBeTruthy(); expect(view.getByText('4')).toBeTruthy();
+    expect(button.getAttribute('data-rive-live')).toBeNull();
+    act(() => mock.canvas!.onReady?.());
+    expect(button.getAttribute('data-rive-live')).toBe('true');
   });
   it('keeps a DOM button, static fallback and controlled pressed state', () => {
     const change = vi.fn();
