@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { demoMode } from '../../data';
 import type { PhotoOf } from './FollowCard';
 import { selectDays, selectLiveMatchIds, selectLoaded, useScoreline } from '../../store';
@@ -50,7 +50,10 @@ export type MatchListProps = {
 
 export function MatchList({ list, openId, onDay, onLive, onOpenMatch, onOpenPlayer, onMenu, photoOf, defaultFollowed = null, pref }: MatchListProps) {
   const days = useScoreline(selectDays);
-  const loaded = useScoreline(selectLoaded);
+  // The first data reaches the header and the tabs in the store's own (synchronous) render; the
+  // body under them (the follow card, the groups) follows as a deferred render, which React splits
+  // into pieces and the browser paints around, instead of riding in the task that brought the feed.
+  const loaded = useDeferredValue(useScoreline(selectLoaded));
   const liveCount = useScoreline(selectLiveMatchIds).length;
   const groups = useScoreline(selectGroups(groupsKey(list)));
   const followRef = useMemo(() => pref ?? followPref(defaultFollowed), [pref, defaultFollowed]);

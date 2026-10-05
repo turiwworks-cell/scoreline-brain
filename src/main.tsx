@@ -10,7 +10,12 @@ import { scorelineStore } from './store';
 // `?demo` / `?demo=fast`: a simulated matchday, no backend needed. The demo loads only then.
 const demo = demoMode(window.location.search);
 if (demo) {
-  void import('./data/demo').then(({ createDemoSource }) => connectSource(createDemoSource(demo), scorelineStore.getState().actions));
+  void import('./data/demo').then(({ createDemoSource }) => {
+    // The evening is built in this task and its first feed (written out, parsed, applied) is
+    // delivered in the next: together they were one long frame on a phone (Part 21, #5).
+    const source = createDemoSource(demo);
+    setTimeout(() => connectSource(source, scorelineStore.getState().actions), 0);
+  });
 }
 
 // Development only: the dev panel (Part 16). The condition is replaced at build time, so a
