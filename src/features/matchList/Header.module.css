@@ -70,17 +70,25 @@
   -webkit-tap-highlight-color: transparent;
 }
 /* the Rive button's hover light: the glass's spot and rim catch (materials .m-light) on the
-   capsule as wide as it is now. The capsule is right-aligned in the button and widens when Live
-   comes on; --cap-w is its width, played through the art's own timeline on each toggle
-   (LiveGraphic, liveLight.ts). The light is as small and dim as the round menu button's beside it
-   (Button.module.css .round). */
+   capsule as wide as it is now, and only on its pane: the Live circle (off) or pill (on) and the
+   calendar are left out, so the light is behind them, not over them. The capsule is right-aligned
+   in the button and widens when Live comes on; --open (0 off, 1 on) plays the art's own timeline on
+   each toggle (LiveGraphic, liveLight.ts). Positions are the art's, in its units (--u: the capsule
+   is 137.5 tall, 40 px here), measured from the export. The light is as small and dim as the round
+   menu button's beside it (Button.module.css .round). */
+@property --open {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
 @property --cap-w {
   syntax: '<length>';
   inherits: false;
   initial-value: 0px;
 }
 .liveLight {
-  --cap-w: var(--cap-off);
+  --open: 0;
+  --cap-w: calc(var(--cap-off) + (var(--cap-on) - var(--cap-off)) * var(--open));
   --light-reach: 0.7;
   --light-gain: 0.7;
   top: 0;
@@ -89,9 +97,34 @@
   width: var(--cap-w);
   border-radius: 20px;
   --light-dx: calc(var(--cap-on) - var(--cap-w));
+  --u: calc(40px / 137.5);
+  /* the circle (x 185.5–262.5) becomes the pill (59–238) as the capsule opens: a stadium 77 tall at y 37.25 */
+  --hole-r: calc(38.5 * var(--u));
+  --hole-w: calc((77 + 102 * var(--open)) * var(--u));
+  --hole-x: calc((148 + 24.5 * var(--open)) * var(--u));
+  --hole-y: calc(30 * var(--u));
+  /* the calendar: x 301–372, y 43–108.5 */
+  --cal: calc(71 * var(--u)) calc(65.5 * var(--u));
+  --cal-at: right calc(38.5 * var(--u)) top calc(35.75 * var(--u));
+  --disc-l: radial-gradient(circle var(--hole-r) at 100% 50%, #000 calc(var(--hole-r) - 0.75px), transparent var(--hole-r));
+  --disc-r: radial-gradient(circle var(--hole-r) at 0% 50%, #000 calc(var(--hole-r) - 0.75px), transparent var(--hole-r));
+  --fill: linear-gradient(#000 0 0);
+  -webkit-mask:
+    var(--disc-l) right calc(var(--hole-x) + var(--hole-w) - var(--hole-r)) top var(--hole-y) / var(--hole-r) calc(2 * var(--hole-r)) no-repeat,
+    var(--fill) right calc(var(--hole-x) + var(--hole-r)) top var(--hole-y) / max(0px, calc(var(--hole-w) - 2 * var(--hole-r))) calc(2 * var(--hole-r)) no-repeat,
+    var(--disc-r) right var(--hole-x) top var(--hole-y) / var(--hole-r) calc(2 * var(--hole-r)) no-repeat,
+    var(--fill) var(--cal-at) / var(--cal) no-repeat,
+    var(--fill);
+  -webkit-mask-composite: xor;
+  mask:
+    var(--disc-l) right calc(var(--hole-x) + var(--hole-w) - var(--hole-r)) top var(--hole-y) / var(--hole-r) calc(2 * var(--hole-r)) no-repeat exclude,
+    var(--fill) right calc(var(--hole-x) + var(--hole-r)) top var(--hole-y) / max(0px, calc(var(--hole-w) - 2 * var(--hole-r))) calc(2 * var(--hole-r)) no-repeat exclude,
+    var(--disc-r) right var(--hole-x) top var(--hole-y) / var(--hole-r) calc(2 * var(--hole-r)) no-repeat exclude,
+    var(--fill) var(--cal-at) / var(--cal) no-repeat exclude,
+    var(--fill);
 }
 .liveLight[data-on] {
-  --cap-w: var(--cap-on);
+  --open: 1;
 }
 
 .live:focus-visible {

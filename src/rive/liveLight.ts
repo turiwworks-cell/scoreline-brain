@@ -1,5 +1,3 @@
-import { LIVE_BUTTON_W, LIVE_OFF_W, livePx } from './liveGeometry';
-
 /*
  * How far the capsule is open (0 Live off, 1 on) through the art's two timelines, read from the
  * export's state machine every frame from the moment `islive` changes. Opening, the capsule first
@@ -21,10 +19,12 @@ export const LIVE_CLOSING: Track = [
   [500, -0.0263], [517, -0.0471], [533, -0.0592], [583, -0.0592], [633, -0.0449], [717, -0.011], [783, 0],
 ];
 
-/** The hover light's width (--cap-w) through one timeline: the capsule's, right-aligned in the button. */
+/** How long the art's timeline into `live` runs, in ms. */
+export const liveTimelineMs = (live: boolean) => (live ? LIVE_OPENING : LIVE_CLOSING).at(-1)![0];
+
+/** The hover light through one timeline: --open, how far the capsule is open (Header.module.css .liveLight). */
 export function liveLightMotion(live: boolean): { keyframes: Keyframe[]; duration: number } {
   const track = live ? LIVE_OPENING : LIVE_CLOSING;
-  const duration = track[track.length - 1]![0];
-  const keyframes = track.map(([ms, open]) => ({ offset: ms / duration, '--cap-w': livePx(LIVE_OFF_W + (LIVE_BUTTON_W - LIVE_OFF_W) * open) }));
-  return { keyframes, duration };
+  const duration = liveTimelineMs(live);
+  return { keyframes: track.map(([ms, open]) => ({ offset: ms / duration, '--open': String(open) })), duration };
 }

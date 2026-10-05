@@ -19,11 +19,12 @@ async function holdEntry(page: Page) {
 }
 
 /**
- * The Live button stays its DOM fallback: React's first frame is what the static frame stands in for.
- * (`/` has no data on its way, so Rive may start right after the first paint and swap its own capsule in,
- * as it did before the static frame; that swap is the list's, e2e/list.spec.ts.)
+ * The Live art stays on its way (its file never arrives): React's first frame is what the static frame
+ * stands in for, and both leave the Live button's place empty until the art is drawn. (`/` has no data
+ * on its way, so Rive may start right after the first paint; the art's arrival is the list's,
+ * e2e/list.spec.ts.)
  */
-const holdRive = (page: Page) => page.route('**/*.riv', (route) => route.abort());
+const holdRive = (page: Page) => page.route('**/*.riv', () => {});
 
 /** The face the page is set in has loaded, so the frame and the header are both measured in it. */
 const faceLoaded = (page: Page) => page.waitForFunction(() => document.fonts.check('500 15px "Hanken Grotesk"'));
@@ -45,7 +46,6 @@ function boxes() {
       wordmark: box(frame.querySelector('h1')),
       mark: box(frame.querySelector('.sf-mark')),
       live: box(frame.querySelector('.sf-live')),
-      count: box(frame.querySelector('.sf-count')),
       menu: box(frame.querySelector('.sf-round')),
       tabs: box(frame.querySelector('.sf-view')),
       days: [...frame.querySelectorAll('.sf-tab')].map(box),
@@ -62,8 +62,6 @@ function boxes() {
     wordmark: box(list.querySelector('h1')),
     mark: box(list.querySelector('h1')!.previousElementSibling),
     live: box(live),
-    // the number in the capsule (behind a display: contents wrapper once the gate lets the artwork start)
-    count: box([...live.querySelectorAll('span')].find((s) => s.children.length === 0 && /^\d+$/.test(s.textContent ?? ''))),
     menu: box(list.querySelector('button[aria-label="Menu"]')),
     tabs: box(tablist),
     days: [...list.querySelectorAll('[role="tab"]')].map(box),
@@ -116,13 +114,14 @@ test.describe('the first frame and the header that replaces it', () => {
     await page.screenshot({ path: `test-results/handoff-react-${info.project.name}.png` });
 
     // the same boxes: the header's, to a fraction of a pixel; the day words differ only by the
-    // whole-pixel rounding the strip's placement does (≤ 0.5 px)
-    for (const key of ['wordmark', 'mark', 'live', 'count', 'menu', 'tabs'] as const) close(before[key], after[key], 0.5, key);
+    // whole-pixel rounding the strip's placement does (≤ 0.5 px, and a hair over with the sub-pixel
+    // widths of "Ongoing", the word the app opens on)
+    for (const key of ['wordmark', 'mark', 'live', 'menu', 'tabs'] as const) close(before[key], after[key], 0.5, key);
     expect(before.panes.length).toBe(after.panes.length);
     before.panes.forEach((p, i) => close(p, after.panes[i]!, 0.5, `pane ${i}`));
     expect(before.days.length).toBe(after.days.length);
-    before.days.forEach((d, i) => close(d, after.days[i]!, 0.5, `day ${i}`));
-    close(before.indicator, after.indicator, 0.5, 'indicator');
+    before.days.forEach((d, i) => close(d, after.days[i]!, 0.6, `day ${i}`));
+    close(before.indicator, after.indicator, 0.6, 'indicator');
 
     // nothing moved when React took over
     expect(await page.evaluate(() => (window as unknown as { __shift: number }).__shift)).toBeLessThan(0.001);
@@ -209,7 +208,7 @@ const liveToggle = (page: Page) => page.locator('[data-screen="list"][data-prese
 test.describe('Rive starts after the first data', () => {
   test('nothing of it is asked for until the first rows are on screen, and the Live button works meanwhile', async ({ page }) => {
     await watchRows(page);
-    await page.goto('/?demo');
+    await page.goto('/?demo&live=0');
     await expect(page.locator('[data-focus-key^="match-"]').first()).toBeVisible();
     // the DOM button is the control, and it works, whether or not the artwork has come yet
     const live = liveToggle(page);
@@ -238,7 +237,7 @@ test.describe('Rive starts after the first data', () => {
       await gate;
       await route.continue();
     });
-    await page.goto('/?demo');
+    await page.goto('/?demo&live=0');
     await expect(page.getByText('Loading the demo…')).toBeVisible();
     // no data for a good while: Rive is not asked for in the first seconds ...
     await page.waitForTimeout(3000);
@@ -259,7 +258,7 @@ test.describe('Rive starts after the first data', () => {
 
   test('with no data on its way, it does not wait for any: it starts once the page has painted', async ({ page }) => {
     // `/` has no source (no ApiSource is wired yet, and no ?demo): nothing will arrive to wait for
-    await page.goto('/');
+    await page.goto('/?live=0');
     await expect(page.getByText('No matches yet.')).toBeVisible();
     await expect.poll(async () => (await riveTimes(page)).file.length, { timeout: 15_000 }).toBeGreaterThan(0);
     // well before the 4 s a late feed is given

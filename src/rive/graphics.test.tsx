@@ -26,24 +26,29 @@ function fixture() {
 }
 afterEach(() => { cleanup(); mock.canvas = null; mock.source = null; vi.restoreAllMocks(); });
 describe('Live icon binding and hit target', () => {
-  it('replaces the whole glass button and counter only after native artwork is ready', async () => {
+  it('shows no second Live design: nothing until the art has drawn and settled, the DOM button only if it fails', async () => {
     mock.source = '/rive/live-icon.riv';
     const view = render(<LiveIcon live count={8} onChange={vi.fn()} className="m-glass live" fallback={<span>Live</span>}><span>8</span></LiveIcon>);
-    await waitFor(() => expect(view.container.querySelector('canvas')).not.toBeNull());
     const button = view.getByRole('button', { name: 'Live, 8 in play' });
-    expect(button.classList.contains('m-glass')).toBe(true);
-    act(() => mock.canvas!.onReady?.());
+    // while the art is on its way: the art's box, no glass, no DOM pill
     expect(button.classList.contains('m-glass')).toBe(false);
-    expect(button.getAttribute('data-rive-live')).toBe('true');
     expect(view.queryByText('8')).toBeNull(); expect(view.queryByText('Live')).toBeNull();
     // the capsule, not the artboard, is the round button's 40 px (luau:8352)
     expect(parseFloat(button.style.height)).toBe(40);
     expect(parseFloat(button.style.width)).toBeCloseTo((410.5 - 32.5) * 40 / 137.5, 1);
+    await waitFor(() => expect(view.container.querySelector('canvas')).not.toBeNull());
+    act(() => mock.canvas!.onReady?.());
+    // Rive's first frame plays the opening timeline: the art stays hidden through it
+    expect(button.getAttribute('data-rive-live')).toBeNull();
+    expect(mock.canvas!.style?.opacity).toBe(0);
+    await waitFor(() => expect(button.getAttribute('data-rive-live')).toBe('true'), { timeout: 1500 });
+    expect(mock.canvas!.style?.opacity).toBe(1);
+    expect(view.queryByText('8')).toBeNull(); expect(view.queryByText('Live')).toBeNull();
     act(() => mock.canvas!.onError?.(new Error('renderer failed')));
     expect(button.classList.contains('m-glass')).toBe(true);
     expect(view.getByText('8')).toBeTruthy(); expect(view.getByText('Live')).toBeTruthy();
   });
-  it('is the DOM button alone until the shell lets Rive start, and the same button after', async () => {
+  it('is an empty button until the shell lets Rive start, and the same button after', async () => {
     mock.source = '/rive/live-icon.riv';
     const icon = (start: boolean) => (
       <RiveStartContext.Provider value={start}>
@@ -53,22 +58,20 @@ describe('Live icon binding and hit target', () => {
     const view = render(icon(false));
     const button = view.getByRole('button', { name: 'Live, 4 in play' });
     button.focus();
-    // nothing of Rive has been asked for: no graphic chunk, no canvas
+    // nothing of Rive has been asked for: no graphic chunk, no canvas; and no DOM pill either
     await new Promise((resolve) => setTimeout(resolve, 20));
     expect(view.container.querySelector('canvas')).toBeNull();
     expect(mock.canvas).toBeNull();
-    expect(view.getByText('Live')).toBeTruthy(); expect(view.getByText('4')).toBeTruthy();
+    expect(view.queryByText('Live')).toBeNull(); expect(view.queryByText('4')).toBeNull();
     view.rerender(icon(true));
     await waitFor(() => expect(view.container.querySelector('canvas')).not.toBeNull());
-    // the artwork starts behind the fallback: the button is the one that was there, still focused, the fallback still showing
+    // the artwork starts in the button that was there, still focused
     expect(view.getByRole('button', { name: 'Live, 4 in play' })).toBe(button);
     expect(document.activeElement).toBe(button);
-    expect(view.getByText('Live')).toBeTruthy(); expect(view.getByText('4')).toBeTruthy();
-    expect(button.getAttribute('data-rive-live')).toBeNull();
     act(() => mock.canvas!.onReady?.());
-    expect(button.getAttribute('data-rive-live')).toBe('true');
+    await waitFor(() => expect(button.getAttribute('data-rive-live')).toBe('true'), { timeout: 1500 });
   });
-  it('plays the art\'s own timeline on the hover light when the art first draws and on every toggle', async () => {
+  it('plays the art\'s own timeline on the hover light on every toggle, its clock on Rive\'s first frame', async () => {
     mock.source = '/rive/live-icon.riv';
     const motions: { keyframes: Keyframe[]; duration: number; cancel: ReturnType<typeof vi.fn>; startTime: number | null }[] = [];
     const animate = vi.fn(function (keyframes: Keyframe[], options: KeyframeAnimationOptions) {
@@ -82,22 +85,24 @@ describe('Live icon binding and hit target', () => {
       const icon = (live: boolean) => <LiveIcon live={live} count={2} onChange={vi.fn()} lightClassName="light" fallback={<span>Live</span>} />;
       const view = render(icon(false));
       await waitFor(() => expect(view.container.querySelector('canvas')).not.toBeNull());
-      expect(animate).not.toHaveBeenCalled();
       act(() => mock.canvas!.onReady?.());
+      await waitFor(() => expect(view.container.querySelector('.light')).not.toBeNull(), { timeout: 1500 });
       const light = view.container.querySelector<HTMLElement>('.light')!;
-      // Rive's first frame plays the closing timeline of the state it starts in: wide to the off
-      // capsule, its clock started on that frame
+      // the art appears settled: the light has nothing to play
+      await new Promise((resolve) => setTimeout(resolve, 40));
+      expect(animate).not.toHaveBeenCalled();
+      const open = (frame: Keyframe | undefined) => Number(frame?.['--open']);
+      view.rerender(icon(true));
       await waitFor(() => expect(motions).toHaveLength(1));
       expect(animate.mock.contexts[0]).toBe(light);
       expect(motions[0]!.startTime).toBe(1000);
-      const width = (frame: Keyframe | undefined) => parseFloat(String(frame?.['--cap-w']));
-      expect(width(motions[0]!.keyframes[0])).toBeCloseTo(parseFloat(light.style.getPropertyValue('--cap-on')), 1);
-      expect(width(motions[0]!.keyframes.at(-1))).toBeCloseTo(parseFloat(light.style.getPropertyValue('--cap-off')), 1);
-      view.rerender(icon(true));
+      expect(open(motions[0]!.keyframes[0])).toBe(0);
+      expect(open(motions[0]!.keyframes.at(-1))).toBe(1);
+      view.rerender(icon(false));
       await waitFor(() => expect(motions).toHaveLength(2));
       expect(motions[0]!.cancel).toHaveBeenCalled();
-      expect(width(motions[1]!.keyframes[0])).toBeCloseTo(parseFloat(light.style.getPropertyValue('--cap-off')), 1);
-      expect(width(motions[1]!.keyframes.at(-1))).toBeCloseTo(parseFloat(light.style.getPropertyValue('--cap-on')), 1);
+      expect(open(motions[1]!.keyframes[0])).toBe(1);
+      expect(open(motions[1]!.keyframes.at(-1))).toBe(0);
       // as small as the round button's light beside it: a 40 px control's, not the 110 px button's
       expect(light.style.getPropertyValue('--spot-r')).toBe('26px');
     } finally {

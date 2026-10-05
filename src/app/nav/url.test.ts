@@ -3,10 +3,13 @@ import { canonicalPath, hrefOf, listSearch, parseList, parseNav } from './url';
 
 describe('parseNav', () => {
   it('reads the list, a match and a player', () => {
-    expect(parseNav('/', '')).toEqual({ list: { day: 0, live: false } });
+    // the app opens on Live; live=0 is today
+    expect(parseNav('/', '')).toEqual({ list: { day: 0, live: true } });
+    expect(parseNav('/', '?demo')).toEqual({ list: { day: 0, live: true } });
+    expect(parseNav('/', '?live=0')).toEqual({ list: { day: 0, live: false } });
     expect(parseNav('/', '?day=-2')).toEqual({ list: { day: -2, live: false } });
     expect(parseNav('/match/7/lineup', '?day=1')).toEqual({ list: { day: 1, live: false }, match: { id: 7, tab: 'lineup' } });
-    expect(parseNav('/player/arg/10', '')).toEqual({ list: { day: 0, live: false }, player: { team: 'arg', n: 10 } });
+    expect(parseNav('/player/arg/10', '')).toEqual({ list: { day: 0, live: true }, player: { team: 'arg', n: 10 } });
   });
 
   it('takes the match a player was opened from out of history state', () => {
@@ -53,15 +56,16 @@ describe('canonicalPath', () => {
 
 describe('hrefOf and listSearch', () => {
   it('keep params the app does not own (demo, seed) as they were', () => {
-    expect(hrefOf({ list: { day: 0, live: false }, match: { id: 2, tab: 'facts' } }, '?demo')).toBe('/match/2/facts?demo');
+    expect(hrefOf({ list: { day: 0, live: true }, match: { id: 2, tab: 'facts' } }, '?demo')).toBe('/match/2/facts?demo');
     expect(hrefOf({ list: { day: 1, live: false }, player: { team: 'fra', n: 10 } }, '?demo=fast&seed=3&day=-1')).toBe('/player/fra/10?demo=fast&seed=3&day=1');
-    expect(hrefOf({ list: { day: 0, live: false } }, '?day=2&demo')).toBe('/?demo');
+    expect(hrefOf({ list: { day: 0, live: false } }, '?day=2&demo')).toBe('/?demo&live=0');
   });
 
-  it('write day only when it is not today and Live without day', () => {
-    expect(listSearch({ day: 0, live: false }, '')).toBe('');
+  it('write day only when it is not today, live=0 for today, and nothing for Live, the default', () => {
+    expect(listSearch({ day: 0, live: false }, '')).toBe('?live=0');
     expect(listSearch({ day: -2, live: false }, '')).toBe('?day=-2');
-    expect(listSearch({ day: 0, live: true }, '?day=1')).toBe('?live=1');
+    expect(listSearch({ day: 0, live: true }, '?day=1')).toBe('');
+    expect(listSearch({ day: 0, live: true }, '?live=1&demo')).toBe('?demo');
   });
 
   it('round-trips through parseNav', () => {

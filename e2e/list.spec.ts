@@ -27,7 +27,8 @@ function near(actual: Record<string, number>, want: Record<string, number>, tol 
   for (const [k, v] of Object.entries(want)) expect(Math.abs(actual[k]! - v), `${k}: ${actual[k]} against ${v}`).toBeLessThanOrEqual(tol);
 }
 
-async function open(page: Page, url = '/?demo') {
+/** Today unless `url` says otherwise (the app itself opens on Live). */
+async function open(page: Page, url = '/?demo&live=0') {
   await page.goto(url);
   await expect(page.getByTestId('app-shell')).toBeVisible();
   await expect(rows(page).first()).toBeVisible();
@@ -53,8 +54,8 @@ test.describe('Today', () => {
     // DOM pill is the Lua's 38 tall (luau:4617); once Rive draws it, the capsule is 40, as tall as
     // the menu button beside it (review of 2026-10-04, src/rive/liveGeometry.ts)
     const live = await box(page, liveToggle(page));
-    const rive = await liveToggle(page).evaluate((el) => el.hasAttribute('data-rive-live'));
-    near(live, rive ? { w: 110, h: 40 } : { w: 109.1, h: 38 }, 1);
+    // the art's box from the start: nothing else is drawn there while the art is on its way
+    near(live, { w: 110, h: 40 }, 1);
     expect(live.y + live.h / 2).toBeGreaterThan(75);
     expect(live.y + live.h / 2).toBeLessThan(90);
 

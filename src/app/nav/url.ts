@@ -1,8 +1,9 @@
 /*
  * Navigation state lives in the URL (ARCHITECTURE §4.5):
  *
- *   /?day=<n>&live=1     the list: the day tab as an offset from today (-2 … 2; today, 0, is left
- *                        out) and the Live filter (which shows today, so it drops `day`)
+ *   /?day=<n> | ?live=0  the list: the day tab as an offset from today (-2 … 2), or today. With
+ *                        neither it is the Live filter, which the app opens on (luau setupIcon);
+ *                        live=1 still reads as Live
  *   /match/:id/:tab      a match; tab is facts | stats | lineup | table (TABS, luau:1814)
  *   /player/:team/:n     a player
  *
@@ -63,10 +64,12 @@ const parseId = (s: string | undefined) => (s && /^[1-9]\d{0,8}$/.test(s) ? Numb
 const parseShirt = (s: string | undefined) => (s && /^[1-9]\d?$/.test(s) ? Number(s) : undefined);
 const parseTeam = (s: string | undefined) => (s && /^[a-z0-9][a-z0-9_-]{0,31}$/i.test(s) ? s : undefined);
 
+/** The app opens on Live, as the Lua does (setupIcon: "the app opens in Live mode"); `live=0` or a day opens that day. */
 export function parseList(search: string): ListState {
   const q = new URLSearchParams(search);
-  if (q.get('live') === '1') return { day: 0, live: true };
+  const live = q.get('live');
   const raw = q.get('day');
+  if (live === '1' || (live === null && raw === null)) return { day: 0, live: true };
   const d = raw === null || raw === '' ? 0 : Number(raw);
   return { day: Number.isInteger(d) && Math.abs(d) <= DAY_RANGE ? d : 0, live: false };
 }
@@ -117,8 +120,11 @@ export function listSearch(list: ListState, current: string): string {
   const q = new URLSearchParams(current);
   q.delete('day');
   q.delete('live');
-  if (list.live) q.set('live', '1');
-  else if (list.day !== 0) q.set('day', String(list.day));
+  // Live is the default (parseList); today is `live=0`
+  if (!list.live) {
+    if (list.day !== 0) q.set('day', String(list.day));
+    else q.set('live', '0');
+  }
   const parts: string[] = [];
   q.forEach((v, k) => parts.push(v === '' ? encodeURIComponent(k) : `${encodeURIComponent(k)}=${encodeURIComponent(v)}`));
   return parts.length ? `?${parts.join('&')}` : '';

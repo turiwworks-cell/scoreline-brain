@@ -7,11 +7,20 @@ export type CanvasOptions = {
   artboard?: string;
   /** start without waiting for an idle slot (the goal word, which a scene is waiting for) */
   eager?: boolean;
+  /**
+   * Draw this many times finer than the screen (up to MAX_RATIO). For a small canvas only: the
+   * surface then holds up wherever the browser reports fewer pixels than it draws (a phone emulated
+   * on a desktop), and a 2:1 downscale costs nothing in sharpness elsewhere.
+   */
+  oversample?: number;
   advance?(): void;
   bind(instance: RiveInstance, requestSync: () => void): CanvasBinding | void;
   ready(): void;
   error(error: unknown): void;
 };
+
+/** The finest an oversampled surface is drawn, in device pixels per CSS pixel. */
+export const MAX_RATIO = 8;
 
 /** Owns the instance, observers and binding. No async continuation may outlive dispose(). */
 export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
@@ -55,10 +64,10 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
    * canvas's client rect by it.
    */
   const pixelRatio = () => {
-    const ratio = window.devicePixelRatio || 1;
     const width = canvas.getBoundingClientRect().width;
     // a hair over, so the whole-pixel surface Rive truncates to is never a pixel short
-    return deviceWidth && width > 0 ? Math.max(ratio, (deviceWidth + 0.01) / width) : ratio;
+    const ratio = Math.max(window.devicePixelRatio || 1, deviceWidth && width > 0 ? (deviceWidth + 0.01) / width : 0);
+    return Math.max(ratio, Math.min(ratio * (options.oversample ?? 1), MAX_RATIO));
   };
   const sync = () => {
     if (!instance || !loaded) return;

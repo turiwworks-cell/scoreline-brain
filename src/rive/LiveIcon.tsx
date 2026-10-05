@@ -18,21 +18,26 @@ export type LiveIconProps = {
 };
 
 /**
- * DOM owns the hit target, URL, accessibility and hover light. Rive owns the animated artwork,
- * which replaces the fallback (same box) when it is ready.
+ * DOM owns the hit target, URL, accessibility and hover light. Rive owns the artwork. The DOM
+ * button (`fallback`, `children`) is drawn only without the artwork, when there is no asset or it
+ * failed: while the artwork is on its way the button keeps the art's box and shows nothing, so the
+ * page never shows a second Live design before Rive's (index.html's first frame does the same).
  */
 export function LiveIcon({ live, count, onChange, className, lightClassName, fallback, children }: LiveIconProps) {
-  const [ready, setReady] = useState(false);
+  const [art, setArt] = useState<'coming' | 'shown' | 'failed'>('coming');
   const lightRef = useRef<HTMLSpanElement>(null);
-  // the artwork is fetched and started only once the shell lets Rive start (startGate.ts); until then, and if it never does, the DOM button is the whole control
+  // the artwork is fetched and started only once the shell lets Rive start (startGate.ts)
   const start = useRiveStart();
-  const artworkReady = useCallback((value: boolean) => setReady(value), []);
+  const ready = art === 'shown';
+  const dom = !liveIconSource || art === 'failed';
+  const artworkReady = useCallback((value: boolean) => setArt((a) => (a === 'failed' ? a : value ? 'shown' : 'coming')), []);
+  const artworkFailed = useCallback(() => setArt('failed'), []);
   const staticButton = <>{fallback}{children}</>;
-  // Suppress the DOM glass pane only after the whole Rive button is bound: Rive draws its own.
-  const buttonClass = ready ? className?.split(/\s+/).filter((name) => name !== 'm-glass').join(' ') : className;
+  // Rive draws its own glass pane
+  const buttonClass = dom ? className : className?.split(/\s+/).filter((name) => name !== 'm-glass').join(' ');
   const style: CSSProperties = {
     position: 'relative',
-    ...(ready ? { width: px(LIVE_BUTTON_W), height: px(LIVE_CAPSULE_PX), padding: 0, background: 'transparent' } : {}),
+    ...(dom ? {} : { width: px(LIVE_BUTTON_W), height: px(LIVE_CAPSULE_PX), padding: 0, background: 'transparent' }),
   };
   // The light reaches as far as on the round menu button beside it: a control the capsule's height,
   // not the whole button (feel.ts sizes it from the button, which lit the capsule's rim end to end).
@@ -40,11 +45,11 @@ export function LiveIcon({ live, count, onChange, className, lightClassName, fal
   return (
     <button type="button" className={`m-feel ${buttonClass ?? ''}`} data-rive-live={ready || undefined}
       style={style} aria-pressed={live} aria-label={`Live, ${count} in play`} onClick={() => onChange(!live)} {...feel}>
-      {liveIconSource && start ? (
-        <Suspense fallback={staticButton}>
-          <Graphic source={liveIconSource} live={live} count={count} onReady={artworkReady} fallback={staticButton} light={lightClassName ? lightRef : undefined} />
+      {dom || !liveIconSource ? staticButton : start && (
+        <Suspense fallback={null}>
+          <Graphic source={liveIconSource} live={live} count={count} onReady={artworkReady} onFailed={artworkFailed} fallback={staticButton} light={lightClassName ? lightRef : undefined} />
         </Suspense>
-      ) : staticButton}
+      )}
       {ready && lightClassName && <span ref={lightRef} className={`m-light ${lightClassName}`} style={light} data-on={live || undefined} aria-hidden="true" />}
     </button>
   );

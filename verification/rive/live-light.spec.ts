@@ -12,8 +12,8 @@ import { expect, test, type Page } from '@playwright/test';
 
 type Frame = { t: number; art: number; light: number };
 
-const ready = async (page: Page) => {
-  await page.goto('/?demo');
+const ready = async (page: Page, search = '?demo&live=0') => {
+  await page.goto('/' + search);
   const button = page.getByRole('button', { name: /^Live, / });
   await expect(button).toHaveAttribute('data-rive-live', 'true', { timeout: 30000 });
   // the art's first timeline has played
@@ -92,7 +92,8 @@ test('the Live art is drawn at the screen\'s pixels when devicePixelRatio report
     return { width: canvas.width, height: canvas.height, css: canvas.getBoundingClientRect().width };
   });
   console.log('LIVE_SURFACE ' + JSON.stringify({ project: testInfo.project.name, ...surface }));
-  expect(Math.abs(surface.width - surface.css * 3)).toBeLessThanOrEqual(1);
+  // at least the screen's pixels (the Live art draws finer still: oversample, canvasLifecycle.ts)
+  expect(surface.width).toBeGreaterThanOrEqual(Math.floor(surface.css * 3));
   await button.screenshot({ path: `test-results/live-surface-${testInfo.project.name}.png` });
   await browser.close();
 });

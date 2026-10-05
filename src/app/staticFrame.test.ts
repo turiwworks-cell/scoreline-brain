@@ -62,9 +62,9 @@ describe('the first frame', () => {
     const fallback = /const FALLBACK_DAYS = \[([^\]]*)\]/.exec(list)?.[1] ?? '';
     const days = [...fallback.matchAll(/'([^']*)'/g)].map((m) => m[1]);
     expect(days.length).toBe(5);
-    expect([...frame.querySelectorAll('.sf-tab')].map((t) => t.textContent)).toEqual(days);
-    // Today is the chosen one, in the middle
-    expect(frame.querySelector('.sf-on')!.textContent).toBe('Today');
+    // the app opens on Live: the middle tab says Ongoing and is the chosen one
+    expect([...frame.querySelectorAll('.sf-tab')].map((t) => t.textContent)).toEqual(days.map((d) => (d === 'Today' ? 'Ongoing' : d)));
+    expect(frame.querySelector('.sf-on')!.textContent).toBe('Ongoing');
   });
 
   it('loads nothing: no image, no script, no request of its own', () => {

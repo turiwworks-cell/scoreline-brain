@@ -87,6 +87,17 @@ describe('Rive canvas ownership', () => {
     resize([{ target: s.canvas, devicePixelContentBoxSize: [{ inlineSize: 129, blockSize: 44 }] } as unknown as ResizeObserverEntry], {} as ResizeObserver);
     expect(inst.resizeDrawingSurfaceToCanvas).toHaveBeenLastCalledWith(3);
   });
+  it('draws an oversampled canvas finer than the screen, up to MAX_RATIO', async () => {
+    const canvas = document.createElement('canvas');
+    mounted.push(mountCanvas(canvas, { source: '/rive/live-icon.riv', oversample: 2, bind: () => undefined, ready: vi.fn(), error: vi.fn() }));
+    const inst = await load();
+    vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 128.8, 44));
+    for (const [screen, drawn] of [[1, 2], [3, 6], [5, 8]] as const) {
+      vi.spyOn(window, 'devicePixelRatio', 'get').mockReturnValue(screen);
+      resize([], {} as ResizeObserver);
+      expect(inst.resizeDrawingSurfaceToCanvas).toHaveBeenLastCalledWith(drawn);
+    }
+  });
   it('falls back to the content box where the device-pixel box is not supported', async () => {
     vi.stubGlobal('ResizeObserver', class {
       constructor(fn: ResizeObserverCallback) { resize = fn; }
