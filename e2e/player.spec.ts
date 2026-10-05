@@ -199,6 +199,8 @@ test('a direct link works for a player in a match that has not started, and for 
 
 test('a clock tick does not replay the entrance or rebuild the hero', async ({ page }) => {
   await open(page, '/player/fra/10?demo');
+  // the hero, not the screen's loading heading: the photo it shows is the one that must last
+  await expect(screenOf(page).locator('[data-pv="bust"] img')).toBeAttached();
   await page.evaluate(() => {
     const e = document.querySelector('[data-pv="bust"] img')!;
     (window as unknown as { __img: Element }).__img = e;

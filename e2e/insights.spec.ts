@@ -15,16 +15,21 @@ test('insights is desktop-only; smaller layouts keep the existing player route',
   page.on('request', (req) => {
     if (/\/assets\/Insights-.*\.js$/.test(req.url())) chunks.push(req.url());
   });
+  // The desktop preloads the Insights chunk once the page has painted (ThreePane), so whether that
+  // request goes out before the checks below is a race. Held there, the player page must render
+  // without it; on the smaller layouts it is never asked for.
+  const desktop = info.project.name.startsWith('desktop');
+  if (desktop) await page.route(/\/assets\/Insights-.*\.js$/, () => {});
   await page.goto('/player/fra/10?demo');
   await expect(page.getByRole('heading', { name: 'Kylian Mbappé', exact: true })).toBeVisible();
-  if (info.project.name.startsWith('desktop'))
+  if (desktop)
     await expect(tabs(page).getByRole('tab', { name: 'Player', exact: true })).toHaveAttribute('aria-selected', 'true');
   else {
     await expect(page.getByRole('tablist', { name: 'Insights' })).toHaveCount(0);
     await expect(pane(page)).toHaveCount(0);
   }
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
-  expect(chunks).toEqual([]);
+  if (!desktop) expect(chunks).toEqual([]);
 });
 
 test.describe('desktop insights', () => {

@@ -30,11 +30,18 @@ export function useScrollMemory(ref: RefObject<HTMLElement | null>, pane: Scroll
     const mounted = shown.current === null;
     shown.current = contentKey;
     // a screen that just mounted is at the top already
-    if (plan.kind === 'top' && !mounted && y.current !== 0) el.scrollTop = y.current = 0;
-    if (plan.kind !== 'restore') {
+    if (plan.kind === 'top' && !mounted) el.scrollTop = y.current = 0;
+    if (plan.kind === 'top') {
+      memory.set(location.key, pane, 0);
+      return;
+    }
+    if (plan.kind === 'keep') {
       // the new entry starts where the pane is now: a tab switch or a day change replaces the
-      // entry (a new key), and back/forward to it must find this position, not nothing
-      memory.set(location.key, pane, plan.kind === 'top' ? 0 : y.current);
+      // entry (a new key), and back/forward to it must find this position, not nothing. Read in
+      // the frame's callbacks: the scroll events are in by then (a scroll and a tap in one frame
+      // left the last one out) and the layout is the frame's own, not one forced in the commit.
+      const key = location.key;
+      requestAnimationFrame(() => memory.set(key, pane, el.scrollTop));
       return;
     }
     // content may still be growing: keep at it for a few frames, until the user scrolls
