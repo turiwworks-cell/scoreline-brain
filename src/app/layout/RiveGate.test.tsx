@@ -90,8 +90,8 @@ describe('RiveGate', () => {
     expect(vi.getTimerCount()).toBe(0);
   });
 
-  it('a page without ?demo has no data on its way', () => {
-    expect(window.location.search).toBe('');
+  it('a page with ?demo=off has no data on its way (with no source named, the demo plays)', () => {
+    window.history.replaceState(null, '', '/?demo=off');
     const view = render(
       <RiveGate>
         <Reader />
@@ -100,5 +100,6 @@ describe('RiveGate', () => {
     advance(100);
     expect(gate()).toBe('true');
     view.unmount();
+    window.history.replaceState(null, '', '/');
   });
 });

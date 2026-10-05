@@ -225,3 +225,26 @@ counter, numbers every event it emits, and stamps snapshots with the counter's c
 | player number | `player` (shirt number), with `name` if your squads are incomplete |
 | statistics | `stats` pairs |
 | player rating | `players.home["7"].rating` |
+
+---
+
+## 8. The stand-in backend (`npm run api`)
+
+`scripts/mock-api.mjs` serves this contract from the demo's evening (`src/data/demo/sim.ts`, the
+same simulation `?demo` plays in the page), so the app's real sync path can be watched end to end:
+
+```
+npm run api                      # http://127.0.0.1:8787/api  (--speed 10 for ?demo=fast's pace)
+npm run dev   →  /?api           # or npm run build && npm run preview; both proxy /api to it
+```
+
+- `GET /api/feed`: the whole feed, with `ETag`; `If-None-Match` on an unchanged one is a `304`.
+  The ETag moves with every event and snapshot; the clocks run on without it, as §2 allows.
+- `GET /api/events`: SSE, one §3 event per message. The SSE `id` counts the stream's messages
+  (one resume point for every match); each message still carries its match's `seq`.
+  `Last-Event-ID` or `?lastEventId=` replays the messages after it (the last 500 are kept).
+- `POST /api/trigger?name=goalHome`: the dev panel's triggers, for tests and live demos.
+
+In the page, `?api` uses `ApiSource` (poll, ETag, stream, resync) against `/api`, or against the
+build's `VITE_API_BASE`. With no source in the URL the page plays the demo; `?demo=off` is the page
+with no source. `e2e/api.spec.ts` drives the app through it.

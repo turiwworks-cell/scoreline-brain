@@ -1,5 +1,5 @@
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
-import { demoMode } from '../../data';
+import { apiMode, demoMode } from '../../data';
 import type { PhotoOf } from './FollowCard';
 import { selectDays, selectLiveMatchIds, selectLoaded, useScoreline } from '../../store';
 import { DayTabs, type DayTab } from './DayTabs';
@@ -144,8 +144,10 @@ function Groups({ groups, start, listKey, collapsed, onToggle, openId, onOpen }:
 }
 
 function NoData() {
-  // no ApiSource is wired yet (Part 22): without ?demo nothing will arrive
-  if (typeof window !== 'undefined' && demoMode(window.location.search)) return <p className={styles.nodata}>Loading the demo…</p>;
+  const search = typeof window === 'undefined' ? '' : window.location.search;
+  if (demoMode(search)) return <p className={styles.nodata}>Loading the demo…</p>;
+  if (apiMode(search)) return <p className={styles.nodata}>Connecting…</p>;
+  // `?demo=off`: no source, nothing will arrive
   return (
     <p className={styles.nodata}>
       No matches yet.

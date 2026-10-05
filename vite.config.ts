@@ -26,7 +26,7 @@ function bootAfterFirstPaint(): Plugin {
         if (ctx.path !== '/index.html') return;
         const entry = /<script type="module" crossorigin src="([^"]+)"><\/script>/.exec(html);
         if (!entry) throw new Error('bootAfterFirstPaint: no entry script in index.html');
-        // ?demo: the demo's chunk and what it imports (the parser) are asked for when the app is
+        // the demo: its chunk and what it imports (the parser) are asked for when the app is
         // started, not once it has run; nothing changes for other pages
         const demo: string[] = [];
         const bundle = ctx.bundle ?? {};
@@ -47,8 +47,10 @@ function bootAfterFirstPaint(): Plugin {
           if (started) return;
           started = true;
           document.removeEventListener('visibilitychange', start);
-          var demo = new URLSearchParams(location.search).get('demo');
-          if (demo !== null && demo !== '0' && demo !== 'false' && demo !== 'off') {
+          // the demo plays unless ?api or ?demo=off (src/data/demo/mode.ts)
+          var q = new URLSearchParams(location.search);
+          var demo = q.get('demo');
+          if (demo === null ? !q.has('api') : demo !== '0' && demo !== 'false' && demo !== 'off') {
             ${JSON.stringify(demo)}.forEach(function (href) {
               var l = document.createElement('link');
               l.rel = 'modulepreload';
@@ -90,8 +92,13 @@ function bootAfterFirstPaint(): Plugin {
   };
 }
 
+// `?api` talks to /api; locally that is the mock backend (npm run api, scripts/mock-api.mjs)
+const apiProxy = { '/api': { target: `http://127.0.0.1:${process.env.MOCK_API_PORT ?? 8787}`, changeOrigin: true } };
+
 export default defineConfig({
   plugins: [react(), bootAfterFirstPaint()],
+  server: { proxy: apiProxy },
+  preview: { proxy: apiProxy },
   define: {
     __RIVE_ASSETS__: JSON.stringify({
       liveIcon: existsSync(new URL('./public/rive/live-icon.riv', import.meta.url)),

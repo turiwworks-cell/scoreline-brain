@@ -8,6 +8,7 @@
     "build": "tsc --noEmit && vite build",
     "check:size": "node scripts/size-budget.mjs",
     "preview": "vite preview",
+    "api": "node scripts/mock-api.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",

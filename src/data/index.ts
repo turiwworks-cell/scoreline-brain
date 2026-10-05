@@ -7,4 +7,4 @@ export { browserEnvironment, realScheduler, type EnvironmentChange, type Schedul
 export { httpTransport, type FeedRequest, type FeedResponse, type HttpTransportOptions, type StreamCallbacks, type StreamHandle, type Transport } from './transport';
 export { connectSource, type Connection, type SyncTarget } from './sync';
 // The demo itself is imported from './demo' (on demand, it is large); reading the URL is cheap.
-export { demoMode, FAST_SPEED, type DemoMode } from './demo/mode';
+export { apiMode, demoMode, FAST_SPEED, sourceExpected, type DemoMode } from './demo/mode';

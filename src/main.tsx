@@ -4,12 +4,20 @@ import './styles/tokens.css';
 import './styles/materials.css';
 import './styles/global.css';
 import { App } from './app/App';
-import { connectSource, demoMode } from './data';
+import { apiMode, connectSource, demoMode } from './data';
 import { scorelineStore } from './store';
 
-// `?demo` / `?demo=fast`: a simulated matchday, no backend needed. The demo loads only then.
+// The demo (`/`, `?demo`, `?demo=fast`): a simulated matchday, no backend needed. `?api`: the
+// real HTTP source, polling `/feed` and following `/events` (npm run api serves them). Each loads
+// only when asked for.
 const demo = demoMode(window.location.search);
-if (demo) {
+const api = apiMode(window.location.search);
+if (api) {
+  void Promise.all([import('./data/apiSource'), import('./data/transport')]).then(([{ createApiSource }, { httpTransport }]) => {
+    const source = createApiSource({ transport: httpTransport({ feedUrl: `${api}/feed`, eventsUrl: `${api}/events` }) });
+    connectSource(source, scorelineStore.getState().actions);
+  });
+} else if (demo) {
   void import('./data/demo').then(({ createDemoSource }) => {
     // The evening is built in this task and its first feed (written out, parsed, applied) is
     // delivered in the next: together they were one long frame on a phone (Part 21, #5).

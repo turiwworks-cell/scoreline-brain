@@ -1,11 +1,11 @@
 import { useEffect, type ReactNode } from 'react';
-import { demoMode } from '../../data';
+import { sourceExpected } from '../../data';
 import { preloadRive } from '../../rive/preload';
 import { RiveStartContext, useRiveStartAfter } from '../../rive/startGate';
 import { selectLiveMatchIds, selectLoaded, useScoreline } from '../../store';
 
-/** Whether any data is on its way: no ApiSource is wired yet (Part 22), so without ?demo nothing will arrive. */
-const dataExpected = () => typeof window !== 'undefined' && demoMode(window.location.search) !== null;
+/** Whether any data is on its way: the demo (the default) or `?api`; with `?demo=off` nothing will arrive. */
+const dataExpected = () => typeof window !== 'undefined' && sourceExpected(window.location.search);
 
 /**
  * Holds Rive back until the first data is drawn and painted (rive/startGate.ts), then warms it. A

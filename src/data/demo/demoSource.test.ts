@@ -5,7 +5,7 @@ import type { SyncStatus } from '../source';
 import { connectSource } from '../sync';
 import { FakeScheduler } from '../testing/fakes';
 import { createDemoSource, TICK_MS, type DemoSourceOptions } from './demoSource';
-import { demoMode, FAST_SPEED } from './mode';
+import { apiMode, demoMode, FAST_SPEED } from './mode';
 import { LEAGUE_BASES } from './wire';
 
 function recorded(options: DemoSourceOptions = {}) {
@@ -100,8 +100,14 @@ describe('DemoSource', () => {
   });
 
   it('reads the mode from the URL', () => {
-    expect(demoMode('')).toBeNull();
-    expect(demoMode('?day=2')).toBeNull();
+    // no source named: the demo plays (the site opens on the matchday)
+    expect(demoMode('')).toEqual({ speed: 1 });
+    expect(demoMode('?day=2')).toEqual({ speed: 1 });
+    // ?api is the HTTP source; ?demo=off is no source at all
+    expect(demoMode('?api')).toBeNull();
+    expect(apiMode('?api')).toBe('/api');
+    expect(apiMode('?demo')).toBeNull();
+    expect(demoMode('?demo=off')).toBeNull();
     expect(demoMode('?demo=0')).toBeNull();
     expect(demoMode('?demo')).toEqual({ speed: 1 });
     expect(demoMode('?demo=1&seed=42')).toEqual({ speed: 1, seed: 42 });

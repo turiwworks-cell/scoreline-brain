@@ -20,7 +20,7 @@ async function holdEntry(page: Page) {
 
 /**
  * The Live button stays its DOM fallback: React's first frame is what the static frame stands in for.
- * (`/` has no data on its way, so Rive may start right after the first paint and swap its own capsule in,
+ * (`/?demo=off` has no data on its way, so Rive may start right after the first paint and swap its own capsule in,
  * as it did before the static frame; that swap is the list's, e2e/list.spec.ts.)
  */
 const holdRive = (page: Page) => page.route('**/*.riv', (route) => route.abort());
@@ -85,7 +85,9 @@ test.describe('the first frame and the header that replaces it', () => {
     });
     await holdRive(page);
     const release = await holdEntry(page);
-    await page.goto('/', { waitUntil: 'commit' });
+    // no data: the header React draws from nothing is what the frame stands in for (with the demo,
+    // `/`, the day words then change with the evening's days, as they are meant to)
+    await page.goto('/?demo=off', { waitUntil: 'commit' });
     const frame = page.locator('[data-static-frame]');
     await expect(frame).toBeVisible();
     await expect(frame.getByText('scoreline')).toBeVisible();
@@ -258,8 +260,8 @@ test.describe('Rive starts after the first data', () => {
   });
 
   test('with no data on its way, it does not wait for any: it starts once the page has painted', async ({ page }) => {
-    // `/` has no source (no ApiSource is wired yet, and no ?demo): nothing will arrive to wait for
-    await page.goto('/');
+    // `?demo=off` names no source (`/` plays the demo): nothing will arrive to wait for
+    await page.goto('/?demo=off');
     await expect(page.getByText('No matches yet.')).toBeVisible();
     await expect.poll(async () => (await riveTimes(page)).file.length, { timeout: 15_000 }).toBeGreaterThan(0);
     // well before the 4 s a late feed is given

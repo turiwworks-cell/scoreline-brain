@@ -189,10 +189,17 @@ describe('before there is any data', () => {
     scorelineStore.setState((s) => ({ domain: { ...s.domain, loaded: true } }));
   });
 
-  it('offers the demo instead of an empty list', () => {
+  it('offers the demo instead of an empty list (?demo=off: the page with no source)', () => {
+    window.history.replaceState(null, '', '/?demo=off');
     setup();
     expect(screen.getByRole('link', { name: 'Play the demo matchday' }).getAttribute('href')).toBe('/?demo');
     expect(screen.queryByRole('region', { name: 'Following' })).toBeNull();
+    window.history.replaceState(null, '', '/');
+  });
+
+  it('with no source named, the demo is on its way', () => {
+    setup();
+    expect(screen.getByText('Loading the demo…')).toBeTruthy();
   });
 });
 
