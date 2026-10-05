@@ -163,7 +163,10 @@ export const EventsFeed = memo(function EventsFeed({ match, home, away, onReplay
               <m.div
                 variants={rowIn}
                 custom={row.index > LIMIT && evAll ? row.index - LIMIT - 1 : Math.min(ri, 12)}
-                initial={(startOf.get(row.key) ?? OLD) !== OLD ? false : row.index > LIMIT && evAll ? 'faded' : 'hidden'}
+                // a row that arrived while the feed was open has its own motion (written below); the rest
+                // cascade in when the tab opens, or fade in after "Show all". Its birth, not its start:
+                // startsOf staggers rows born together, so only the first old row's start is OLD.
+                initial={(born.get(row.key) ?? OLD) !== OLD ? false : row.index > LIMIT && evAll ? 'faded' : 'hidden'}
                 animate={row.index > LIMIT && evAll ? 'all' : 'shown'}
               >
                 <EventRow
