@@ -74,7 +74,7 @@ try {
       const slices = after.filter(f => f.scripts.some(s => /setTimeout|Timer/.test(s.inv)));
       // when the last row arrived, counted from the first feed
       const fill = data.fill.find(f => f.rows >= data.rows)?.t;
-      results.push({ run, tasks, callback: data.firstData.callback, frame: frame ? { start: frame.start, duration: frame.duration, forced: frame.forced } : null, parts, later: after.map(f => ({ start: f.start, duration: f.duration, timer: f.scripts.some(s => /setTimeout|Timer/.test(s.inv)), scripts: f.scripts })), laterTimer: slices.length, fillMs: fill === undefined ? null : fill - data.firstData.start, rows: data.rows, groups: data.groups, pending: data.pending, unique: data.unique, filled, errors });
+      results.push({ run, tasks, callback: data.firstData.callback, frame: frame ? { start: frame.start, duration: frame.duration, forced: frame.forced } : null, parts, later: after.map(f => ({ start: f.start, duration: f.duration, timer: f.scripts.some(s => /setTimeout|Timer/.test(s.inv)), scripts: f.scripts })), laterTimer: slices.length, fillMs: fill === undefined ? null : fill - data.firstData.start, fill: data.fill.map(f => ({ t: Math.round(f.t - data.firstData.start), rows: f.rows })), rows: data.rows, groups: data.groups, pending: data.pending, unique: data.unique, filled, errors });
       await page.close();
     }
     // What decoding and validating the first feed costs on its own, cold, on pages that never mount the app.

@@ -10,8 +10,10 @@ import { followPref, type FollowPref } from './follow/pref';
 import type { Followed } from './follow/model';
 import { watchAppGoals } from './goalFeed';
 import { Header } from './Header';
-import { LeagueGroup } from './LeagueGroup';
+import { GroupShell, LeagueGroup } from './LeagueGroup';
 import { LiveSection } from './LiveSection';
+import { blocksIn, blockStarts, firstBlocks, mountedIn, useProgressiveBlocks } from './progressive';
+import type { Group } from './groups';
 import { groupsKey, selectGroups } from './selectors';
 import { timing } from '../../motion';
 import styles from './MatchList.module.css';
@@ -84,7 +86,6 @@ export function MatchList({ list, openId, onDay, onLive, onOpenMatch, onOpenPlay
   };
 
   const showFollow = loaded && (list.live || list.day === 0);
-  let at = showFollow ? 1 : 0;
 
   return (
     <FeedContext.Provider value={feed}>
@@ -106,16 +107,37 @@ export function MatchList({ list, openId, onDay, onLive, onOpenMatch, onOpenPlay
               <p className={styles.emptyHint}>{list.live ? 'Check back soon' : 'Pick another date'}</p>
             </div>
           ) : (
-            groups.map((g) => {
-              const index = at;
-              at += 1 + g.ids.length;
-              return <LeagueGroup key={g.key} groupKey={g.key} ids={g.ids} index={index} collapsed={collapsed.has(g.key)} onToggle={toggle} openId={openId} onOpen={onOpenMatch} />;
-            })
+            <Groups groups={groups} start={showFollow ? 1 : 0} listKey={groupsKey(list)} collapsed={collapsed} onToggle={toggle} openId={openId} onOpen={onOpenMatch} />
           )}
         </div>
       </div>
     </FeedContext.Provider>
   );
+}
+
+type GroupsProps = {
+  groups: readonly Group[];
+  /** the cascade index of the first group's header: the follow card, when shown, is block 0 */
+  start: number;
+  /** the day, or Live: a different one mounts the whole new list at once (progressive.ts) */
+  listKey: string;
+  collapsed: ReadonlySet<string>;
+  onToggle: (key: string) => void;
+  openId?: number;
+  onOpen: (id: number, from: Element) => void;
+};
+
+/** The league groups. Owns the slicing (progressive.ts), so a slice renders these and nothing around them. */
+function Groups({ groups, start, listKey, collapsed, onToggle, openId, onOpen }: GroupsProps) {
+  const first = useMemo(() => firstBlocks(groups, typeof window === 'undefined' ? 800 : window.innerHeight), [groups]);
+  const budget = useProgressiveBlocks(blocksIn(groups), first, listKey);
+  const mounted = mountedIn(groups, budget);
+  const starts = blockStarts(groups, start);
+  return groups.map((g, i) => {
+    const blocks = mounted[i]!;
+    if (blocks === 0) return <GroupShell key={g.key} groupKey={g.key} count={g.ids.length} />;
+    return <LeagueGroup key={g.key} groupKey={g.key} ids={g.ids} index={starts[i]!} collapsed={collapsed.has(g.key)} onToggle={onToggle} openId={openId} onOpen={onOpen} rows={blocks - 1 < g.ids.length ? blocks - 1 : undefined} />;
+  });
 }
 
 function NoData() {

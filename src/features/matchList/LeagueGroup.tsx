@@ -12,6 +12,10 @@ import styles from './Groups.module.css';
  * A collapsible group of matches (drawGroup, luau:3987–4044): "Favourites" with the spectrum star,
  * or a league (its country in grey, its name in white), the number of matches, a chevron, and under
  * a rule the matches. Each header and each row is a block of the day-change cascade.
+ *
+ * While the first feed's list is being mounted in slices (progressive.ts) a group may show only its
+ * first `rows` rows, or, before the slices reach it, be a `GroupShell`. Both keep the group's full
+ * height, so nothing below them moves when the rest arrives, and every block keeps its cascade index.
  */
 
 export type LeagueGroupProps = {
@@ -24,13 +28,16 @@ export type LeagueGroupProps = {
   openId?: number;
   onOpen: (id: number, from: Element) => void;
   feed?: GoalFeed;
+  /** mount only the first this many rows; absent, all of them (the rest of the box is still there) */
+  rows?: number;
 };
 
-export const LeagueGroup = memo(function LeagueGroup({ groupKey, ids, index, collapsed, onToggle, openId, onOpen, feed }: LeagueGroupProps) {
+export const LeagueGroup = memo(function LeagueGroup({ groupKey, ids, index, collapsed, onToggle, openId, onOpen, feed, rows: limit }: LeagueGroupProps) {
   const league = useScoreline(selectLeague(groupKey));
   const fav = groupKey === FAV;
   const rows = useId();
   const style = { '--full': ids.length * 76 } as CSSProperties;
+  const shown = limit === undefined || limit >= ids.length ? ids : ids.slice(0, limit);
   return (
     <div className={styles.group} data-collapsed={collapsed ? '' : undefined} data-group={groupKey} style={style}>
       <Block index={index} className={styles.head}>
@@ -49,7 +56,7 @@ export const LeagueGroup = memo(function LeagueGroup({ groupKey, ids, index, col
         <span className={styles.rule} aria-hidden="true" />
       </Block>
       <div id={rows} className={styles.rows} role="list" inert={collapsed}>
-        {ids.map((id, i) => (
+        {shown.map((id, i) => (
           <Block key={id} index={index + 1 + i} className={styles.place} style={{ '--top': i * 76 } as CSSProperties}>
             <div className={styles.slot} role="listitem">
               <Row id={id} current={id === openId} onOpen={onOpen} feed={feed} />
@@ -57,6 +64,16 @@ export const LeagueGroup = memo(function LeagueGroup({ groupKey, ids, index, col
           </Block>
         ))}
       </div>
+    </div>
+  );
+});
+
+/** A group the slices have not reached: the same box, empty, so the page is as long as it will be. */
+export const GroupShell = memo(function GroupShell({ groupKey, count }: { groupKey: string; count: number }) {
+  return (
+    <div className={styles.group} data-group={groupKey} data-pending="" style={{ '--full': count * 76 } as CSSProperties}>
+      <div className={styles.head} />
+      <div className={styles.rows} />
     </div>
   );
 });
