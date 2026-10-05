@@ -1,4 +1,4 @@
-import { expect, test, type Page, type TestInfo } from '@playwright/test';
+import { expect, test, type Locator, type Page, type TestInfo } from '@playwright/test';
 
 /*
  * Part 9: routes, layouts, scroll and focus (nothing flies between screens), at every width the
@@ -14,6 +14,19 @@ const chip = (page: Page, key: string) => page.locator(`[data-focus-key="chip-${
 const screenOf = (page: Page, name: string) => page.locator(`[data-screen="${name}"][data-present="true"]`);
 const scrollTop = (page: Page, name: string) => screenOf(page, name).evaluate((el) => el.scrollTop);
 const titled = (page: Page, name: string, title: string) => screenOf(page, name).getByRole('heading', { level: 1, name: title });
+// no ancestor up to the scroller is still fading or moving: the entrance cascade has landed on this element
+const landed = (target: Locator) =>
+  expect
+    .poll(() =>
+      target.evaluate((el) => {
+        for (let n: Element | null = el; n && !n.hasAttribute('data-scroller'); n = n.parentElement) {
+          const s = getComputedStyle(n);
+          if (s.opacity !== '1' || (s.transform !== 'none' && s.transform !== 'matrix(1, 0, 0, 1, 0, 0)')) return false;
+        }
+        return true;
+      }),
+    )
+    .toBe(true);
 // a tab click that doesn't scroll the pane first (a Playwright click may scroll the target into view)
 const pressTab = (page: Page, screen: string, name: string) => screenOf(page, screen).getByRole('tab', { name }).evaluate((el: HTMLElement) => el.click());
 
@@ -159,6 +172,11 @@ test('each pane keeps its own scroll', async ({ page }, info) => {
     // sticky header, and a click there makes Playwright scroll the pane to reach it. The list's
     // blocks are still arriving when the page first shows a card, so wait until it can scroll that far.
     await expect.poll(() => screenOf(page, 'list').evaluate((el) => el.scrollHeight - el.clientHeight)).toBeGreaterThan(300);
+    // Playwright retries a click on an element that is still moving, and each retry scrolls the pane to
+    // align it ('end', then 'center', then 'start'). The cards' entrance spring is long in its tail, and
+    // a click that waits for it moved the list to 0, 272 or 510 in about one run in six: let it land, so
+    // that the click is the only thing that acts.
+    await landed(card(page, 2));
     const listBefore = await screenOf(page, 'list').evaluate((el) => {
       el.scrollTo(0, 300);
       return el.scrollTop;
