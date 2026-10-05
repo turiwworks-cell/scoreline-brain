@@ -28,6 +28,8 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
   let starting = false;
   let paused = true;
   let dirtySize = true;
+  /** the canvas's width in real device pixels, when the browser reports it (the ResizeObserver below) */
+  let deviceWidth: number | undefined;
   let machine: string | undefined;
 
   const active = () => !disposed && !failed && visible && !document.hidden;
@@ -46,6 +48,17 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
     cancelLoad?.();
     releaseInstance();
     options.error(error);
+  };
+  /**
+   * Device pixels per CSS pixel for the drawing surface: window.devicePixelRatio, or more where the
+   * canvas's own device-pixel box says the page is drawn finer than that. Rive multiplies the
+   * canvas's client rect by it.
+   */
+  const pixelRatio = () => {
+    const ratio = window.devicePixelRatio || 1;
+    const width = canvas.getBoundingClientRect().width;
+    // a hair over, so the whole-pixel surface Rive truncates to is never a pixel short
+    return deviceWidth && width > 0 ? Math.max(ratio, (deviceWidth + 0.01) / width) : ratio;
   };
   const sync = () => {
     if (!instance || !loaded) return;
@@ -67,7 +80,7 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
       } catch (error) { fail(error); return; }
     }
     if (dirtySize) {
-      instance.resizeDrawingSurfaceToCanvas();
+      instance.resizeDrawingSurfaceToCanvas(pixelRatio());
       dirtySize = false;
     }
     binding?.resume?.();
@@ -137,12 +150,29 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
   });
   io?.observe(canvas);
   const resize = () => { dirtySize = true; sync(); };
-  const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(resize);
-  ro?.observe(canvas);
+  // The drawing surface is at least the canvas's device pixels where the browser reports them
+  // (device-pixel-content-box). window.devicePixelRatio alone is not always the ratio the page is
+  // drawn at: a phone emulated on a desktop (Firefox's responsive design mode) reports the phone's
+  // ratio while the page is drawn at the desktop's, zoom included, so a surface sized by it was
+  // stretched and the artwork came out soft. Chrome's device mode errs the other way (its
+  // device-pixel box ignores the emulated ratio), hence the larger of the two. The device-pixel box
+  // also changes with zoom and with the ratio.
+  const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver((entries) => {
+    const box = entries.find((e) => e.target === canvas)?.devicePixelContentBoxSize?.[0];
+    if (box) deviceWidth = box.inlineSize > 0 ? box.inlineSize : undefined;
+    resize();
+  });
+  try {
+    ro?.observe(canvas, { box: 'device-pixel-content-box' });
+  } catch {
+    // a browser without the device-pixel box sizes by window.devicePixelRatio
+    ro?.observe(canvas);
+  }
   window.addEventListener('resize', resize);
-  // A change of device pixel ratio alone (browser zoom, a device toolbar, a second screen) leaves
-  // the canvas's CSS size as it was, so neither observer above fires and the drawing surface stays
-  // at the old resolution: the artwork turns soft. Re-arm the query for each new ratio.
+  // Without the device-pixel box, a change of device pixel ratio alone (browser zoom, a device
+  // toolbar, a second screen) leaves the canvas's CSS size as it was, so the observer above does not
+  // fire and the drawing surface stays at the old resolution: the artwork turns soft. Re-arm the
+  // query for each new ratio.
   let dpr: MediaQueryList | null = null;
   const watchRatio = () => {
     dpr?.removeEventListener('change', onRatio);

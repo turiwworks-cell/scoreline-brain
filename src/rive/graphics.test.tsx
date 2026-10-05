@@ -68,6 +68,43 @@ describe('Live icon binding and hit target', () => {
     act(() => mock.canvas!.onReady?.());
     expect(button.getAttribute('data-rive-live')).toBe('true');
   });
+  it('plays the art\'s own timeline on the hover light when the art first draws and on every toggle', async () => {
+    mock.source = '/rive/live-icon.riv';
+    const motions: { keyframes: Keyframe[]; duration: number; cancel: ReturnType<typeof vi.fn>; startTime: number | null }[] = [];
+    const animate = vi.fn(function (keyframes: Keyframe[], options: KeyframeAnimationOptions) {
+      const motion = { keyframes, duration: Number(options.duration), cancel: vi.fn(), startTime: null as number | null };
+      motions.push(motion);
+      return motion as unknown as Animation;
+    });
+    Object.defineProperty(HTMLElement.prototype, 'animate', { value: animate, configurable: true, writable: true });
+    Object.defineProperty(document, 'timeline', { value: { currentTime: 1000 }, configurable: true });
+    try {
+      const icon = (live: boolean) => <LiveIcon live={live} count={2} onChange={vi.fn()} lightClassName="light" fallback={<span>Live</span>} />;
+      const view = render(icon(false));
+      await waitFor(() => expect(view.container.querySelector('canvas')).not.toBeNull());
+      expect(animate).not.toHaveBeenCalled();
+      act(() => mock.canvas!.onReady?.());
+      const light = view.container.querySelector<HTMLElement>('.light')!;
+      // Rive's first frame plays the closing timeline of the state it starts in: wide to the off
+      // capsule, its clock started on that frame
+      await waitFor(() => expect(motions).toHaveLength(1));
+      expect(animate.mock.contexts[0]).toBe(light);
+      expect(motions[0]!.startTime).toBe(1000);
+      const width = (frame: Keyframe | undefined) => parseFloat(String(frame?.['--cap-w']));
+      expect(width(motions[0]!.keyframes[0])).toBeCloseTo(parseFloat(light.style.getPropertyValue('--cap-on')), 1);
+      expect(width(motions[0]!.keyframes.at(-1))).toBeCloseTo(parseFloat(light.style.getPropertyValue('--cap-off')), 1);
+      view.rerender(icon(true));
+      await waitFor(() => expect(motions).toHaveLength(2));
+      expect(motions[0]!.cancel).toHaveBeenCalled();
+      expect(width(motions[1]!.keyframes[0])).toBeCloseTo(parseFloat(light.style.getPropertyValue('--cap-off')), 1);
+      expect(width(motions[1]!.keyframes.at(-1))).toBeCloseTo(parseFloat(light.style.getPropertyValue('--cap-on')), 1);
+      // as small as the round button's light beside it: a 40 px control's, not the 110 px button's
+      expect(light.style.getPropertyValue('--spot-r')).toBe('26px');
+    } finally {
+      delete (HTMLElement.prototype as Partial<HTMLElement>).animate;
+      Reflect.deleteProperty(document, 'timeline');
+    }
+  });
   it('keeps a DOM button, static fallback and controlled pressed state', () => {
     const change = vi.fn();
     const view = render(<LiveIcon live={false} count={3} onChange={change} fallback={<svg aria-hidden="true" />} />);

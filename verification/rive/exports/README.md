@@ -2,10 +2,11 @@
 
 Production assets are separate files in `public/rive/`:
 - `moments.riv`: accepted signed Node-script export, 18,100 bytes.
-- `live-icon.riv`: accepted compact full-button export, 26,800 bytes.
+- `live-icon.riv`: full-button export of 2026-10-05, 24,925 bytes: the `aniamtion` artboard only
+  (no `font` helper), timelines `live to idle` and `idle to live`.
 
-`live-icon.candidate.riv` is a byte-identical diagnostic copy of the accepted compact Live
-export. It contains helper `font` plus full-button `aniamtion`; the host selects
+`live-icon.candidate.riv` is a diagnostic copy of the previous accepted Live export (26,800
+bytes). It contains helper `font` plus full-button `aniamtion`; the host selects
 `aniamtion` explicitly and binds Boolean `islive` and String `count`.
 Production acceptance tests load `/rive/live-icon.riv`, not this copy.
 

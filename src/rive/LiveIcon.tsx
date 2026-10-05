@@ -1,5 +1,5 @@
-import { lazy, Suspense, useCallback, useState, type CSSProperties, type ReactNode } from 'react';
-import { feel } from '../ui/feel';
+import { lazy, Suspense, useCallback, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { feel, spotRadius } from '../ui/feel';
 import { liveIconSource } from './assets';
 import { useRiveStart } from './startGate';
 import { LIVE_BUTTON_W, LIVE_CAPSULE_PX, LIVE_OFF_W, livePx as px } from './liveGeometry';
@@ -23,6 +23,7 @@ export type LiveIconProps = {
  */
 export function LiveIcon({ live, count, onChange, className, lightClassName, fallback, children }: LiveIconProps) {
   const [ready, setReady] = useState(false);
+  const lightRef = useRef<HTMLSpanElement>(null);
   // the artwork is fetched and started only once the shell lets Rive start (startGate.ts); until then, and if it never does, the DOM button is the whole control
   const start = useRiveStart();
   const artworkReady = useCallback((value: boolean) => setReady(value), []);
@@ -33,16 +34,18 @@ export function LiveIcon({ live, count, onChange, className, lightClassName, fal
     position: 'relative',
     ...(ready ? { width: px(LIVE_BUTTON_W), height: px(LIVE_CAPSULE_PX), padding: 0, background: 'transparent' } : {}),
   };
-  const light = { '--cap-on': px(LIVE_BUTTON_W), '--cap-off': px(LIVE_OFF_W) } as CSSProperties;
+  // The light reaches as far as on the round menu button beside it: a control the capsule's height,
+  // not the whole button (feel.ts sizes it from the button, which lit the capsule's rim end to end).
+  const light = { '--cap-on': px(LIVE_BUTTON_W), '--cap-off': px(LIVE_OFF_W), '--spot-r': px(spotRadius(LIVE_CAPSULE_PX, LIVE_CAPSULE_PX)) } as CSSProperties;
   return (
     <button type="button" className={`m-feel ${buttonClass ?? ''}`} data-rive-live={ready || undefined}
       style={style} aria-pressed={live} aria-label={`Live, ${count} in play`} onClick={() => onChange(!live)} {...feel}>
       {liveIconSource && start ? (
         <Suspense fallback={staticButton}>
-          <Graphic source={liveIconSource} live={live} count={count} onReady={artworkReady} fallback={staticButton} />
+          <Graphic source={liveIconSource} live={live} count={count} onReady={artworkReady} fallback={staticButton} light={lightClassName ? lightRef : undefined} />
         </Suspense>
       ) : staticButton}
-      {ready && lightClassName && <span className={`m-light ${lightClassName}`} style={light} data-on={live || undefined} aria-hidden="true" />}
+      {ready && lightClassName && <span ref={lightRef} className={`m-light ${lightClassName}`} style={light} data-on={live || undefined} aria-hidden="true" />}
     </button>
   );
 }

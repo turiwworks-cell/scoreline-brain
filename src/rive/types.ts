@@ -21,7 +21,8 @@ export interface RiveInstance {
   pause(): void;
   stopRendering(): void;
   startRendering(): void;
-  resizeDrawingSurfaceToCanvas(): void;
+  /** sizes the drawing surface to the canvas's client rect times the ratio (window.devicePixelRatio by default) */
+  resizeDrawingSurfaceToCanvas(customDevicePixelRatio?: number): void;
   cleanup(): void;
 }
 

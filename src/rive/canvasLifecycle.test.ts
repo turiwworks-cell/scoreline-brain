@@ -10,6 +10,7 @@ vi.mock('./loader', async (original) => { const actual = await original<typeof i
 let hidden = false;
 let intersect: IntersectionObserverCallback;
 let resize: ResizeObserverCallback;
+let observeBox: ResizeObserverOptions['box'] | undefined;
 const disconnectIO = vi.fn();
 const disconnectRO = vi.fn();
 const instances: Fake[] = [];
@@ -39,7 +40,8 @@ beforeEach(() => {
   mock.runtime.mockResolvedValue({ Rive: Fake });
   mock.file.mockResolvedValue(new Uint8Array([82, 73, 86, 69]).buffer);
   vi.stubGlobal('IntersectionObserver', class { constructor(fn: IntersectionObserverCallback) { intersect = fn; } observe() {} disconnect = disconnectIO; });
-  vi.stubGlobal('ResizeObserver', class { constructor(fn: ResizeObserverCallback) { resize = fn; } observe() {} disconnect = disconnectRO; });
+  observeBox = undefined;
+  vi.stubGlobal('ResizeObserver', class { constructor(fn: ResizeObserverCallback) { resize = fn; } observe(_target: Element, options?: ResizeObserverOptions) { observeBox = options?.box; } disconnect = disconnectRO; });
 });
 afterEach(() => { mounted.splice(0).forEach((life) => life.dispose()); vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 describe('Rive canvas ownership', () => {
@@ -68,6 +70,33 @@ describe('Rive canvas ownership', () => {
     expect(inst.startRendering).not.toHaveBeenCalled();
     hidden = false; document.dispatchEvent(new Event('visibilitychange'));
     expect(inst.startRendering).toHaveBeenCalledTimes(1); expect(inst.resizeDrawingSurfaceToCanvas).toHaveBeenCalledTimes(1);
+  });
+  it('sizes the drawing surface to the canvas\'s device pixels, not to window.devicePixelRatio', async () => {
+    const s = setup(); const inst = await load();
+    expect(observeBox).toBe('device-pixel-content-box');
+    // a phone emulated on a desktop: the page reports ratio 1 while the canvas is drawn at 5
+    vi.spyOn(window, 'devicePixelRatio', 'get').mockReturnValue(1);
+    vi.spyOn(s.canvas, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 128.8, 44));
+    const size = { inlineSize: 644, blockSize: 220 };
+    resize([{ target: s.canvas, devicePixelContentBoxSize: [size] } as unknown as ResizeObserverEntry], {} as ResizeObserver);
+    const ratio = inst.resizeDrawingSurfaceToCanvas.mock.calls.at(-1)![0] as number;
+    // Rive sets the surface to ratio × the client rect and truncates it
+    expect(Math.trunc(ratio * 128.8)).toBe(644);
+    // Chrome's device mode: the device-pixel box ignores the emulated ratio 3, which the page is drawn at
+    vi.spyOn(window, 'devicePixelRatio', 'get').mockReturnValue(3);
+    resize([{ target: s.canvas, devicePixelContentBoxSize: [{ inlineSize: 129, blockSize: 44 }] } as unknown as ResizeObserverEntry], {} as ResizeObserver);
+    expect(inst.resizeDrawingSurfaceToCanvas).toHaveBeenLastCalledWith(3);
+  });
+  it('falls back to the content box where the device-pixel box is not supported', async () => {
+    vi.stubGlobal('ResizeObserver', class {
+      constructor(fn: ResizeObserverCallback) { resize = fn; }
+      observe(_target: Element, options?: ResizeObserverOptions) { if (options?.box === 'device-pixel-content-box') throw new TypeError('box'); observeBox = options?.box ?? 'content-box'; }
+      disconnect = disconnectRO;
+    });
+    setup(); const inst = await load();
+    expect(observeBox).toBe('content-box');
+    resize([], {} as ResizeObserver);
+    expect(inst.resizeDrawingSurfaceToCanvas).toHaveBeenLastCalledWith(window.devicePixelRatio);
   });
   it('a word-clock request cannot restart an offscreen canvas', async () => {
     const s = setup();
