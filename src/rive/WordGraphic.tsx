@@ -3,6 +3,7 @@ import { RiveCanvas } from './RiveCanvas';
 import type { GoalWordProps } from './GoalWord';
 import type { RiveInstance } from './types';
 import { argb } from './color';
+import { borrowWord } from './wordStage';
 
 export default function WordGraphic(props: GoalWordProps & { source: string }) {
   // Reference advances include textPath's trailing tracking and the caller's second subtraction.
@@ -77,7 +78,7 @@ export default function WordGraphic(props: GoalWordProps & { source: string }) {
   return (
     <span aria-hidden="true" style={{ display: 'inline-grid', position: 'relative', height: '100%', alignItems: 'center' }}>
       <span style={{ gridArea: '1 / 1', visibility: ready && !failed ? 'hidden' : undefined }}>{props.fallback}</span>
-      {!failed && <RiveCanvas source={props.source} eager bind={bind} onReady={() => setReady(true)} onError={fail} style={{ position: 'absolute', left: '50%', top: '50%', width: 390 * scale, height: 340 * scale, transform: 'translate(-50%, -50%)', opacity: ready ? 1 : 0 }} />}
+      {!failed && <RiveCanvas source={props.source} eager borrow={() => borrowWord(props.source)} bind={bind} onReady={() => setReady(true)} onError={fail} style={{ position: 'absolute', left: '50%', top: '50%', width: 390 * scale, height: 340 * scale, transform: 'translate(-50%, -50%)', opacity: ready ? 1 : 0 }} />}
     </span>
   );
 }

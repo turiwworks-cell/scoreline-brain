@@ -102,6 +102,11 @@ simulation, JSON parsing, text, layout, scrolling, hit testing and tweens.
   no data on its way opens the gate after its first paint. Until then, and while it loads, the
   Live icon is its DOM fallback, swapped for the canvas without a visible change. `moments.riv`
   preloads once the gate is open and any match is live.
+- **The goal word is one instance for the session** (`src/rive/wordStage.ts`). Made at idle once a
+  match is live, on a canvas parked off-screen; each scene borrows it (its canvas moves into the
+  scene's word box and mirrors the scene canvas's styles, `reset` rebinds a fresh state machine and
+  view model, no parse) and gives it back paused and not rendering. Freed when no match is live.
+  A scene that finds none, or finds it lent, makes its own as before.
 - `useOffscreenRenderer: true` makes the instances share one WebGL context. Never more than 2
   instances at once. Pause when off-screen or the tab is hidden, and call `cleanup()` on unmount.
 - Size budget: `live-icon.riv` ≤ 60 KB, `moments.riv` ≤ 150 KB.

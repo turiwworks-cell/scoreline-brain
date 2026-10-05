@@ -2,6 +2,15 @@ import { afterPaint } from './afterPaint';
 import { riveLoader, riveSlots } from './loader';
 import type { CanvasBinding, RiveInstance } from './types';
 
+/** An instance lent by an owner that keeps it between mounts (the warm goal word, wordStage.ts). */
+export type Borrowed = {
+  readonly instance: RiveInstance;
+  /** the canvas the instance draws into; it stands in for the mount's own while lent */
+  readonly canvas: HTMLCanvasElement;
+  /** hands it back, paused and not rendering */
+  give(): void;
+};
+
 export type CanvasOptions = {
   source: string;
   artboard?: string;
@@ -11,6 +20,11 @@ export type CanvasOptions = {
   bind(instance: RiveInstance, requestSync: () => void): CanvasBinding | void;
   ready(): void;
   error(error: unknown): void;
+  /**
+   * A loaded instance to borrow instead of creating one (no `new Rive`, no parse in this mount);
+   * null: create one as usual.
+   */
+  borrow?(): Promise<Borrowed> | null;
 };
 
 /** Owns the instance, observers and binding. No async continuation may outlive dispose(). */
@@ -29,6 +43,10 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
   let paused = true;
   let dirtySize = true;
   let machine: string | undefined;
+  // the borrowed instance, while this mount holds it, and the canvas it draws into
+  let lent: Borrowed | undefined;
+  let target = canvas;
+  const lending = options.borrow?.() ?? null;
 
   const active = () => !disposed && !failed && visible && !document.hidden;
   const releaseInstance = () => {
@@ -37,7 +55,11 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
     loaded = false;
     try { binding?.cleanup?.(); } finally {
       binding = undefined;
-      try { current?.cleanup(); } finally { release?.(); release = undefined; }
+      try { if (!lent) current?.cleanup(); } finally {
+        if (lent) unlend();
+        release?.();
+        release = undefined;
+      }
     }
   };
   const fail = (error: unknown) => {
@@ -81,7 +103,55 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
     }
     if (!announced && !failed) { announced = true; options.ready(); }
   };
+  const watch = (el: HTMLCanvasElement) => {
+    io?.unobserve(target);
+    ro?.unobserve(target);
+    target = el;
+    io?.observe(el);
+    ro?.observe(el);
+  };
+  // the lent canvas takes the place of this mount's own, with its styles as they change (the
+  // owner's opacity, its size)
+  let mirror: MutationObserver | undefined;
+  const lend = (b: Borrowed) => {
+    lent = b;
+    const copy = () => {
+      b.canvas.className = canvas.className;
+      b.canvas.style.cssText = canvas.style.cssText;
+      b.canvas.style.removeProperty('display');
+    };
+    copy();
+    canvas.style.display = 'none';
+    mirror = new MutationObserver(copy);
+    mirror.observe(canvas, { attributes: true, attributeFilter: ['class', 'style'] });
+    canvas.after(b.canvas);
+    watch(b.canvas);
+    release = b.give;
+    instance = b.instance;
+    loaded = true;
+    paused = true;
+    dirtySize = true;
+    sync();
+  };
+  function unlend() {
+    lent = undefined;
+    mirror?.disconnect();
+    mirror = undefined;
+    canvas.style.display = '';
+    watch(canvas);
+  }
+  let borrowing = false;
   const start = () => {
+    if (lending) {
+      // borrowed once, when it is ready: not after an idle slot, not again after a hide
+      if (borrowing || instance || failed) return;
+      borrowing = true;
+      lending.then((b) => {
+        if (disposed || failed) { b.give(); return; }
+        try { lend(b); } catch (error) { fail(error); }
+      }, fail);
+      return;
+    }
     if (!active() || starting || instance) return;
     starting = true;
     cancelLoad = afterPaint(() => {
@@ -130,7 +200,7 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
     else start();
   };
   const io = typeof IntersectionObserver === 'undefined' ? null : new IntersectionObserver((entries) => {
-    const entry = entries.find((e) => e.target === canvas);
+    const entry = entries.find((e) => e.target === target);
     if (!entry) return;
     visible = entry.isIntersecting;
     visibility();

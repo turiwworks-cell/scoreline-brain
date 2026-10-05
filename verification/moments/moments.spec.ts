@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 /*
  * Part 18, done when: the dev panel's triggers play both scenes and the toast. Run with
@@ -41,6 +41,12 @@ async function open(page: Page, path: string, follow?: 'none') {
     }, name);
 }
 
+/**
+ * The Rive word drawing in a scene: the warm instance's canvas, lent to the scene (rive/wordStage.ts;
+ * the scene's own canvas stands aside, display none, while it is lent).
+ */
+const word = (scene: Locator) => scene.locator('canvas:not([style*="display: none"])');
+
 const layout = (page: Page) => page.getByTestId('app-shell').getAttribute('data-layout');
 
 test('goalHome plays the goal scene; a first tap shows it all, the next closes it', async ({ page }) => {
@@ -56,9 +62,11 @@ test('goalHome plays the goal scene; a first tap shows it all, the next closes i
   // the story lands: scorer, minute, commentary
   await expect(scene.getByText('Commentary')).toBeVisible({ timeout: 6000 });
   if (hasSignedMoments) {
-    await expect(scene.locator('canvas')).toHaveCSS('opacity', '1');
+    await expect(word(scene)).toHaveCSS('opacity', '1');
+    // the session's one word instance, lent from where it waits (rive/wordStage.ts)
+    await expect(page.locator('#rive-word-parking canvas')).toHaveCount(0);
     await page.waitForTimeout(2000);
-    await expect(scene.locator('canvas')).toHaveCSS('opacity', '1');
+    await expect(word(scene)).toHaveCSS('opacity', '1');
   }
   await page.screenshot({ path: `test-results/moments-goal-${page.viewportSize()!.width}.png` });
   await scene.click({ position: { x: 40, y: box.height / 2 } });
@@ -74,13 +82,33 @@ test('redHome plays the red card scene; Escape closes it', async ({ page }) => {
   await expect(scene.getByText(/^Down to ten · /)).toBeVisible({ timeout: 6000 });
   await expect(scene.getByText('Sent off', { exact: true })).toBeVisible();
   if (hasSignedMoments) {
-    await expect(scene.locator('canvas')).toHaveCSS('opacity', '1');
+    await expect(word(scene)).toHaveCSS('opacity', '1');
     await page.waitForTimeout(2000);
-    await expect(scene.locator('canvas')).toHaveCSS('opacity', '1');
+    await expect(word(scene)).toHaveCSS('opacity', '1');
   }
   await page.screenshot({ path: 'test-results/app-red-' + page.viewportSize()!.width + '.png' });
   await page.keyboard.press('Escape');
   await expect(scene).toHaveCount(0, { timeout: 2000 });
+});
+
+test('two goals in a row and a red card after them each play the Rive word, from the one instance', async ({ page }) => {
+  test.skip(!hasSignedMoments, 'needs the Moments asset');
+  const fire = await open(page, '/?demo');
+  const scene = page.getByTestId('moment-scene');
+  for (const [trigger, landed] of [['goalHome', scene.getByText('Commentary')], ['goalHome', scene.getByText('Commentary')], ['redHome', scene.getByText('Sent off', { exact: true })]] as const) {
+    await fire(trigger);
+    await expect(scene).toBeVisible();
+    await expect(landed).toBeVisible({ timeout: 6000 });
+    // the word bound, played its phases and stays drawn (a stalled or failed word gives way to the DOM word)
+    await expect(word(scene)).toHaveCSS('opacity', '1');
+    await expect(page.locator('#rive-word-parking canvas')).toHaveCount(0);
+    await page.waitForTimeout(1500);
+    await expect(word(scene)).toHaveCSS('opacity', '1');
+    await page.keyboard.press('Escape');
+    await expect(scene).toHaveCount(0, { timeout: 2000 });
+    // given back, paused, to wait for the next
+    await expect(page.locator('#rive-word-parking canvas')).toHaveCount(1);
+  }
 });
 
 test('a goal in another match is a toast; a tap opens that match', async ({ page }) => {

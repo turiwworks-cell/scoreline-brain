@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, type CSSProperties } from 'react';
-import { mountCanvas } from './canvasLifecycle';
+import { mountCanvas, type Borrowed } from './canvasLifecycle';
 import type { CanvasBinding, RiveInstance } from './types';
 
 export type RiveCanvasProps = {
@@ -13,6 +13,8 @@ export type RiveCanvasProps = {
   bind(instance: RiveInstance, requestSync: () => void): CanvasBinding | void;
   onReady?(): void;
   onError?(error: unknown): void;
+  /** borrow a kept instance instead of creating one (canvasLifecycle); read once, at mount */
+  borrow?(): Promise<Borrowed> | null;
 };
 
 export function RiveCanvas(props: RiveCanvasProps) {
@@ -29,6 +31,7 @@ export function RiveCanvas(props: RiveCanvasProps) {
       bind: (instance, requestSync) => latest.current.bind(instance, requestSync),
       ready: () => latest.current.onReady?.(),
       error: (error) => latest.current.onError?.(error),
+      borrow: latest.current.borrow,
     });
     return () => life.dispose();
   }, [props.source, props.artboard, props.eager]);
