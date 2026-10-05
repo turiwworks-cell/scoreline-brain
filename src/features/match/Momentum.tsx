@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { animate, m, useMotionValue, useReducedMotion, useTransform } from 'motion/react';
 import type { MatchEvent, MatchStatus, Team } from '../../domain';
 import { timing } from '../../motion/tokens';
@@ -7,7 +7,7 @@ import { Crest } from '../../ui/Crest';
 import { Glass } from '../../ui/Glass';
 import { tagId } from '../../ui/icons';
 import { useSvgId } from '../../ui/svgId';
-import { derivedMomentum, minuteX, momentumColors, momentumGoals, momentumPaths, pressure } from './momentumGeometry';
+import { derivedMomentum, minuteX, MOMENTUM_WIDTH, momentumColors, momentumGoals, momentumPaths, pressure } from './momentumGeometry';
 import styles from './Momentum.module.css';
 
 export interface MomentumProps {
@@ -42,6 +42,22 @@ function MomentumContent({ matchId, minute, status, momentum, events, home, away
   const clipX = useTransform(reveal, (p) => -323 + p * endX);
   const markerOpacity = useTransform(reveal, (p) => p > 0.98 ? 1 : 0);
   const nowY = wave.ys[Math.min(Math.max(0, Math.floor(minute)), wave.ys.length - 1)]!;
+  // The chart is drawn at its real width. The wave is computed on the Lua's 322 units and only it
+  // is stretched to fit (its lines keep their width); crests, labels, balls and the live dot stand
+  // at their own size. A 322 × 156 viewBox squeezed into a wider desktop pane stretched them all
+  // sideways (review of 2026-10-04: "on desktop it looks crushed").
+  const svg = useRef<SVGSVGElement>(null);
+  const [w, setW] = useState(MOMENTUM_WIDTH);
+  useLayoutEffect(() => {
+    const el = svg.current;
+    if (!el) return;
+    const read = () => setW(el.clientWidth || MOMENTUM_WIDTH);
+    read();
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(read);
+    ro?.observe(el);
+    return () => ro?.disconnect();
+  }, []);
+  const sx = w / MOMENTUM_WIDTH;
 
   useEffect(() => {
     if (reduced) { reveal.set(1); return; }
@@ -62,7 +78,7 @@ function MomentumContent({ matchId, minute, status, momentum, events, home, away
         </div>
       </header>
       <Glass radius={20} className={styles.glass}>
-        <svg className={styles.chart} viewBox="0 0 322 156" preserveAspectRatio="none" role="img" aria-labelledby={`${id}-title ${id}-description`}>
+        <svg ref={svg} className={styles.chart} viewBox={`0 0 ${w} 156`} role="img" aria-labelledby={`${id}-title ${id}-description`}>
           <title id={`${id}-title`}>Match momentum</title>
           <desc id={`${id}-description`}>{description}</desc>
           <defs>
@@ -80,19 +96,21 @@ function MomentumContent({ matchId, minute, status, momentum, events, home, away
           <g aria-hidden="true">
             <Crest team={home} size={13} x={0} y={2} /><text x="18" y="12" className={styles.teamLabel}>{home.short}</text>
             <Crest team={away} size={13} x={0} y={141} /><text x="18" y="151" className={styles.teamLabel}>{away.short}</text>
-            <path d="M 161 22 V 134" stroke="white" strokeOpacity="0.14" strokeWidth="1" strokeDasharray="3 4" />
-            {status !== 'finished' && endX + 6 < 322 && <path d={`M ${endX + 6} 78 H 322`} stroke="white" strokeOpacity="0.22" strokeWidth="1" strokeDasharray="3 4" data-future-minutes="" />}
-            <g clipPath={`url(#${id}-reveal)`}>
-              <path d={`M 0 78 H ${endX}`} stroke="white" strokeOpacity="0.3" strokeWidth="1" />
-              <path d={wave.home} fill={`url(#${id}-home)`} data-wave="home" />
-              <path d={wave.away} fill={`url(#${id}-away)`} data-wave="away" />
-              {colors.map((color, i) => <g key={i} clipPath={`url(#${id}-${i === 0 ? 'top' : 'bottom'})`} fill="none" stroke={color}>
-                <path d={wave.line} strokeWidth="3" strokeOpacity="0.45" filter={`url(#${id}-glow)`} />
-                <path d={wave.line} strokeWidth="1.4" strokeOpacity="0.95" data-wave="line" />
-              </g>)}
+            <path d={`M ${161 * sx} 22 V 134`} stroke="white" strokeOpacity="0.14" strokeWidth="1" strokeDasharray="3 4" />
+            {status !== 'finished' && endX + 6 < 322 && <path d={`M ${endX * sx + 6} 78 H ${w}`} stroke="white" strokeOpacity="0.22" strokeWidth="1" strokeDasharray="3 4" data-future-minutes="" />}
+            <g transform={`scale(${sx} 1)`}>
+              <g clipPath={`url(#${id}-reveal)`}>
+                <path d={`M 0 78 H ${endX}`} stroke="white" strokeOpacity="0.3" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+                <path d={wave.home} fill={`url(#${id}-home)`} data-wave="home" />
+                <path d={wave.away} fill={`url(#${id}-away)`} data-wave="away" />
+                {colors.map((color, i) => <g key={i} clipPath={`url(#${id}-${i === 0 ? 'top' : 'bottom'})`} fill="none" stroke={color}>
+                  <path d={wave.line} strokeWidth="3" strokeOpacity="0.45" filter={`url(#${id}-glow)`} vectorEffect="non-scaling-stroke" />
+                  <path d={wave.line} strokeWidth="1.4" strokeOpacity="0.95" vectorEffect="non-scaling-stroke" data-wave="line" />
+                </g>)}
+              </g>
             </g>
             {goals.map((goal, i) => {
-              const x = minuteX(goal.minute), homeGoal = goal.side === 'home', y = homeGoal ? 10 : 146;
+              const x = minuteX(goal.minute) * sx, homeGoal = goal.side === 'home', y = homeGoal ? 10 : 146;
               return <g key={goal.id} data-momentum-goal={goal.id}>
                 <title>{`${homeGoal ? home.name : away.name} goal, ${goal.minute}'${goal.name ? `, ${goal.name}` : ''}`}</title>
                 <m.g initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={transition('momentum', { index: i + 1 })}>
@@ -103,7 +121,7 @@ function MomentumContent({ matchId, minute, status, momentum, events, home, away
                 </m.g>
               </g>;
             })}
-            {status === 'live' && <m.g style={{ opacity: markerOpacity }}><LiveMarker x={endX} y={nowY} reduced={!!reduced} /></m.g>}
+            {status === 'live' && <m.g style={{ opacity: markerOpacity }}><LiveMarker x={endX * sx} y={nowY} reduced={!!reduced} /></m.g>}
           </g>
         </svg>
       </Glass>

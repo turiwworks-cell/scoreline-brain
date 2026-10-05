@@ -1,4 +1,4 @@
-import { useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useLocation } from 'react-router';
 import { AnimatePresence, m } from 'motion/react';
 import { paneSwap } from '../../motion';
@@ -9,6 +9,8 @@ import { scrollMemory } from '../nav/scrollMemory';
 import { playerRevealVersion, subscribePlayerReveal } from '../nav/playerReveal';
 import { playerKeyOf } from '../nav/url';
 import { InsightsScreen } from '../screens/InsightsScreen';
+import { preloadInsights } from '../screens/insightsChunk';
+import { afterPaint } from '../../rive/afterPaint';
 import { PlayerScreen } from '../screens/PlayerScreen';
 import { MatchPane } from './MatchPane';
 import type { Resolved } from './resolve';
@@ -32,6 +34,8 @@ export function ThreePane({ r }: { r: Resolved }) {
   const nav = useNav();
   const location = useLocation();
   const paneRef = useRef<HTMLDivElement>(null);
+  // Tables and Leaders are a chunk of their own: fetch it once the desktop has painted
+  useEffect(() => afterPaint(preloadInsights), []);
   const reveal = useSyncExternalStore(subscribePlayerReveal, playerRevealVersion, playerRevealVersion);
   const playerKey = r.player ? playerKeyOf(r.player) : null;
   const [view, setView] = useState<{ playerKey: string | null; tab: DeskTab; returnTab: DeskTab; reveal: number }>({
@@ -40,8 +44,8 @@ export function ThreePane({ r }: { r: Resolved }) {
     returnTab: 'player',
     reveal,
   });
-  // Adjust before child layout effects: a newly routed player's bust must be visible when
-  // Shell measures its flight. A passive effect would reveal it one frame too late.
+  // Adjust during render, before child layout effects: a newly routed player shows in the same
+  // frame as his route, not one frame later.
   const changedTab = r.player ? 'player' : view.tab === 'player' ? view.returnTab : view.tab;
   const revealChanged = reveal !== view.reveal && !!r.player;
   if (view.playerKey !== playerKey || reveal !== view.reveal) setView({ ...view, playerKey, reveal, tab: revealChanged ? 'player' : changedTab });

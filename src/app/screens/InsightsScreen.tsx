@@ -3,8 +3,9 @@ import { followPref, useFollowed } from '../../features/matchList';
 import { demoFollowed } from '../followed';
 import { useNav } from '../nav/useNav';
 import type { MatchRef } from '../nav/url';
+import { loadInsights } from './insightsChunk';
 
-const Insights = lazy(() => import('../../features/insights/Insights'));
+const Insights = lazy(loadInsights);
 
 /** Lazy desktop-only content; routing stays in the app, not in the feature. */
 export function InsightsScreen({

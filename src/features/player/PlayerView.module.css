@@ -437,7 +437,9 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: calc(24px - 0.9485em);
+  /* centred on y 24: baseline bc(24, 24) = 24 + 0.3485 em (luau:6062); the baseline sits 0.9485 em
+     into this 1.2 line box. It had the baseline on 24 itself, 8.4 px high in the box. */
+  top: calc(24px + 0.3485em - 0.9485em);
   font: var(--fw-b) 24px / 1.2 var(--font-sans);
   text-align: center;
 }
