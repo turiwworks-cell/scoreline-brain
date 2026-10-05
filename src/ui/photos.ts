@@ -49,3 +49,28 @@ export function photoSources(path: string, kind: PhotoKind = 'bust', face?: Face
   const set = (format: 'avif' | 'webp') => `${url(1, format)} ${PHOTO_SIZES[kind][1][0]}w, ${url(2, format)} ${PHOTO_SIZES[kind][2][0]}w`;
   return { src: url(1, 'webp'), srcSet: set('webp'), sources: [{ type: 'image/avif', srcSet: set('avif') }], ...(face ? { face } : {}) };
 }
+
+/**
+ * Starts loading the file a `<picture>` of `photo` shown at `sizes` would choose (the AVIF where the
+ * browser takes it, the WebP otherwise, at the screen's density) before that picture is on the page,
+ * by building the same picture off the page. The request is the picture's own, so it is not repeated.
+ */
+export function warmPhoto(photo: PhotoSources, sizes: string): void {
+  if (typeof document === 'undefined') return;
+  const picture = document.createElement('picture');
+  for (const s of photo.sources) {
+    const source = document.createElement('source');
+    source.type = s.type;
+    source.sizes = sizes;
+    source.srcset = s.srcSet;
+    picture.append(source);
+  }
+  const img = document.createElement('img');
+  img.decoding = 'async';
+  img.alt = '';
+  img.sizes = sizes;
+  img.srcset = photo.srcSet;
+  picture.append(img);
+  img.src = photo.src;
+}
+

@@ -270,3 +270,20 @@ test.describe('Rive starts after the first data', () => {
   });
 });
 
+test.describe('the followed player’s photo', () => {
+  test('is asked for once, before the card that shows it, and it is the file the card shows', async ({ page }) => {
+    await watchRows(page);
+    await page.goto('/?demo');
+    const chest = page.locator('[data-screen="list"][data-present="true"] img[width="144"]');
+    await expect(chest).toBeVisible();
+    await expect.poll(() => chest.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+    const t = await page.evaluate(() => {
+      const shown = (document.querySelector('[data-screen="list"][data-present="true"] img[width="144"]') as HTMLImageElement).currentSrc;
+      const busts = performance.getEntriesByType('resource').filter((e) => /\/img\/players\/.+-bust@/.test(e.name));
+      return { shown, busts: busts.map((e) => ({ name: e.name, start: e.startTime })), rows: (window as unknown as { __rows?: number }).__rows };
+    });
+    // one request, for the very file the card's picture chose (format and density)
+    expect(t.busts.map((b) => b.name)).toEqual([t.shown]);
+  });
+});
+

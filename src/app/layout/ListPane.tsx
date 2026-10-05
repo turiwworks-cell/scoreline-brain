@@ -1,9 +1,9 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { m } from 'motion/react';
-import { AccountSheet, MatchList } from '../../features/matchList';
+import { AccountSheet, CHEST_SIZES, followPref, MatchList, useFollowed } from '../../features/matchList';
 import type { Team } from '../../domain';
 import { pushBase } from '../../motion';
-import { playerPhoto, usePhotoManifest } from '../../ui';
+import { playerPhoto, usePhotoManifest, warmPhoto } from '../../ui';
 import { demoFollowed } from '../followed';
 import { useNav } from '../nav/useNav';
 import type { ListState } from '../nav/url';
@@ -21,6 +21,13 @@ export function ListPane({ layout, shifted, covered, list, openId }: { layout: L
   // the follow card shows the followed player's bust when the manifest has one (Part 8's files)
   const manifest = usePhotoManifest().manifest;
   const photoOf = useCallback((team: Team, n: number) => playerPhoto(manifest, team.id, n), [manifest]);
+  // That bust is the largest thing the first screen draws, and the card waits for the first data;
+  // its file starts with the manifest instead, so it is there when the card is (Part 21, #4).
+  const followed = useFollowed(followPref(demoFollowed()));
+  const chest = followed ? playerPhoto(manifest, followed.team, followed.n) : undefined;
+  useEffect(() => {
+    if (chest) warmPhoto(chest, CHEST_SIZES);
+  }, [chest]);
   // the account sheet rises over the list: the whole phone screen, the list pane on desktop (luau:7055)
   const [sheet, setSheet] = useState(false);
   const openSheet = useCallback(() => setSheet(true), []);

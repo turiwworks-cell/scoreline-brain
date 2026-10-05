@@ -39,6 +39,9 @@ export type FollowCardProps = {
 
 export type PhotoOf = (team: Team, n: number) => PhotoSources | undefined;
 
+/** The chest-up photo's width on the open card, as its `<picture>` asks for it. */
+export const CHEST_SIZES = '144px';
+
 
 export function FollowCard({ followed, live, open, hidden, onToggle, onOpenPlayer, photoOf }: FollowCardProps) {
   const { team: teamId, n } = followed;
@@ -124,13 +127,13 @@ export function FollowCard({ followed, live, open, hidden, onToggle, onOpenPlaye
               <span className={styles.chest}>
                 <picture>
                   {photo.sources.map((s) => (
-                    <source key={s.type} type={s.type} srcSet={s.srcSet} sizes="144px" />
+                    <source key={s.type} type={s.type} srcSet={s.srcSet} sizes={CHEST_SIZES} />
                   ))}
                   <img
                     className={styles.chestImg}
                     src={photo.src}
                     srcSet={photo.srcSet}
-                    sizes="144px"
+                    sizes={CHEST_SIZES}
                     alt=""
                     width={144}
                     height={180}

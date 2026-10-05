@@ -26,6 +26,19 @@ function bootAfterFirstPaint(): Plugin {
         if (ctx.path !== '/index.html') return;
         const entry = /<script type="module" crossorigin src="([^"]+)"><\/script>/.exec(html);
         if (!entry) throw new Error('bootAfterFirstPaint: no entry script in index.html');
+        // ?demo: the demo's chunk and what it imports (the parser) are asked for when the app is
+        // started, not once it has run; nothing changes for other pages
+        const demo: string[] = [];
+        const bundle = ctx.bundle ?? {};
+        const walk = (file: string) => {
+          const chunk = bundle[file];
+          if (chunk?.type !== 'chunk' || demo.includes(`/${file}`) || html.includes(`"/${file}"`)) return;
+          demo.push(`/${file}`);
+          chunk.imports.forEach(walk);
+        };
+        const demoChunk = Object.values(bundle).find((c) => c.type === 'chunk' && c.facadeModuleId?.replace(/\\/g, '/').endsWith('/src/data/demo/index.ts'));
+        if (!demoChunk) throw new Error('bootAfterFirstPaint: no chunk for src/data/demo');
+        walk(demoChunk.fileName);
 
         const boot = `<script>
       (function () {
@@ -34,6 +47,16 @@ function bootAfterFirstPaint(): Plugin {
           if (started) return;
           started = true;
           document.removeEventListener('visibilitychange', start);
+          var demo = new URLSearchParams(location.search).get('demo');
+          if (demo !== null && demo !== '0' && demo !== 'false' && demo !== 'off') {
+            ${JSON.stringify(demo)}.forEach(function (href) {
+              var l = document.createElement('link');
+              l.rel = 'modulepreload';
+              l.crossOrigin = '';
+              l.href = href;
+              document.head.appendChild(l);
+            });
+          }
           var s = document.createElement('script');
           s.type = 'module';
           s.crossOrigin = '';

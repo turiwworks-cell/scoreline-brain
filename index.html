@@ -9,6 +9,8 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
     <link rel="preload" href="/fonts/hanken-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- which players have photos (src/ui/photoManifest.ts): the list asks for it as soon as it runs -->
+    <link rel="preload" href="/img/players/manifest.json" as="fetch" crossorigin fetchpriority="low" />
     <!--
       The first frame, before any script has run (Part 21, issue #4). It is the list's header and day
       tabs as the app draws them with no data (Header.module.css, DayTabs.module.css, Shell.module.css,

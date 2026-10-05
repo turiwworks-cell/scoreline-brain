@@ -10,7 +10,7 @@ export { IconSprite } from './IconSprite';
 export { MatchClock, type ClockMatch, type MatchClockProps } from './MatchClock';
 export { LiveDot, Pill, type PillProps } from './Pill';
 export { KitDisc, PhotoTile, PlayerPhoto, type KitDiscProps, type PhotoTileProps, type PlayerPhotoProps } from './PlayerPhoto';
-export { PHOTO_ROOT, PHOTO_SIZES, photoSources, type FaceFrame, type PhotoKind, type PhotoSources } from './photos';
+export { PHOTO_ROOT, PHOTO_SIZES, photoSources, warmPhoto, type FaceFrame, type PhotoKind, type PhotoSources } from './photos';
 export { coachPhoto, frostPhoto, loadPhotoManifest, parsePhotoManifest, photoProps, playerPhoto, setPhotoManifest, usePhotoManifest, type PhotoManifest, type PhotoManifestState } from './photoManifest';
 export { ratingTone, type RatingTone } from './rating';
 export { RatingBadge, type RatingBadgeProps } from './RatingBadge';
