@@ -6,10 +6,13 @@ import { appMoments } from '../motion';
 import { scorelineStore } from '../store';
 import { App } from './App';
 import { appRoutes } from './router';
+import { loadMatchScreen, loadPlayerScreen } from './screens/screenChunks';
 
 afterEach(cleanup);
 
-beforeAll(() => {
+beforeAll(async () => {
+  // These test routing/state; the browser suite covers cold screen imports and first-open motion.
+  await Promise.all([loadMatchScreen(), loadPlayerScreen()]);
   scorelineStore.getState().actions.applyFeed(
     parseFeed({
       version: 2,

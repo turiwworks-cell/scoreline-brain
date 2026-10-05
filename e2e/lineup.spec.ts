@@ -137,10 +137,11 @@ test('markers rise line by line, forwards first', async ({ page }) => {
       new Promise<Record<string, number>>((done) => {
         const at: Record<string, number> = {};
         const t0 = performance.now();
-        const tick = () => {
+        const tick = (frame: number) => {
           for (const b of document.querySelectorAll<HTMLElement>('[data-screen="match"][data-present="true"] [data-pitch] [data-player]')) {
             const op = Number(getComputedStyle(b.parentElement!).opacity);
-            if (op > 0.05 && at[b.dataset.player!] === undefined) at[b.dataset.player!] = performance.now() - t0;
+            // One timestamp per frame: DOM iteration order cannot invent a 0.1 ms lead.
+            if (op > 0.05 && at[b.dataset.player!] === undefined) at[b.dataset.player!] = frame - t0;
           }
           if (Object.keys(at).length === 11 || performance.now() - t0 > 6000) done(at);
           else requestAnimationFrame(tick);

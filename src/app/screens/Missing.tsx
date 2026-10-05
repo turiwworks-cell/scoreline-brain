@@ -1,12 +1,13 @@
+import type { Ref } from 'react';
 import { Icon, RoundButton } from '../../ui';
 import { useNav } from '../nav/useNav';
 import styles from './placeholder.module.css';
 
 /** A screen whose match or player isn't in the feed (yet). */
-export function Missing({ back, loaded, what }: { back: boolean; loaded: boolean; what: string }) {
+export function Missing({ back, loaded, what, ref }: { back: boolean; loaded: boolean; what: string; ref?: Ref<HTMLDivElement> }) {
   const nav = useNav();
   return (
-    <div className={styles.page}>
+    <div ref={ref} className={styles.page}>
       <div className={styles.bar}>
         {back && (
           <RoundButton aria-label="Back" onClick={nav.back}>

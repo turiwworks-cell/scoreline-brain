@@ -11,7 +11,7 @@ import { playerKeyOf } from '../nav/url';
 import { InsightsScreen } from '../screens/InsightsScreen';
 import { preloadInsights } from '../screens/insightsChunk';
 import { afterPaint } from '../../rive/afterPaint';
-import { PlayerScreen } from '../screens/PlayerScreen';
+import { LazyPlayerScreen as PlayerScreen } from '../screens/LazyScreens';
 import { MatchPane } from './MatchPane';
 import type { Resolved } from './resolve';
 import { Screen } from './Screen';

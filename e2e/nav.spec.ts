@@ -32,6 +32,10 @@ async function open(page: Page, url: string) {
   await page.goto(url);
   await expect(page.getByTestId('app-shell')).toBeVisible();
   await expect(card(page, 1)).toBeVisible();
+  // Detail screens are chunks now: a cold direct URL may briefly show its loading chrome.
+  // Wait for its actual content before sampling a player chip or its first animation frame.
+  if (url.startsWith('/match/')) await expect(screenOf(page, 'match').getByRole('tablist', { name: 'Match' })).toBeVisible();
+  if (url.startsWith('/player/')) await expect(screenOf(page, 'player').locator('[data-pv="page"]')).toBeVisible();
   await settled(page);
 }
 
@@ -224,6 +228,9 @@ test('nothing flies between screens: the match pushes in, the player grows in at
   await expect(page.locator('[data-shared], [data-shared-end], [data-shared-copy]')).toHaveCount(0);
 
   await open(page, '/match/1/lineup?demo');
+  // Measure the warmed first reveal; chunks.spec separately holds a cold download open.
+  await expect.poll(() => page.evaluate(() => performance.getEntriesByType('resource').some((e) => /\/PlayerScreen-[^/]+\.js$/.test(e.name)))).toBe(true);
+  await page.evaluate(() => new Promise<void>((done) => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
   // the bust starts at 0.9 about its middle and grows to 1 (luau:5965), whatever opened it
   const first = await page.evaluate(
     () =>

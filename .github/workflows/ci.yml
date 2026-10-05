@@ -20,3 +20,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run ${{ matrix.task }}
+      - if: matrix.task == 'build'
+        run: npm run check:size

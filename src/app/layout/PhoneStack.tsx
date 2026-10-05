@@ -1,8 +1,8 @@
 import { AnimatePresence, m } from 'motion/react';
 import { LAYER, playerPage, pushLayer, scrim } from '../../motion';
 import { playerKeyOf } from '../nav/url';
-import { MatchScreen } from '../screens/MatchScreen';
-import { PlayerScreen } from '../screens/PlayerScreen';
+import { LazyMatchScreen as MatchScreen } from '../screens/LazyScreens';
+import { LazyPlayerScreen as PlayerScreen } from '../screens/LazyScreens';
 import type { Resolved } from './resolve';
 import { Screen } from './Screen';
 import styles from './Shell.module.css';

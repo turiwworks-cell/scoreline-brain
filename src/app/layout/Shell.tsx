@@ -2,6 +2,8 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { useLocation, useNavigate, useNavigationType } from 'react-router';
 import { selectFeaturedMatchId, selectLiveMatchIds, selectMatchIdOfTeam, useScoreline } from '../../store';
 import { preloadRive } from '../../rive/preload';
+import { afterPaint } from '../../rive/afterPaint';
+import { prepareScreen, preloadScreens } from '../screens/screenChunks';
 import { canonicalPath, parseNav } from '../nav/url';
 import { useLayoutMode } from './layoutMode';
 import { ListPane } from './ListPane';
@@ -22,6 +24,7 @@ import styles from './Shell.module.css';
  * each pane shows. The list always renders first under the same key, so it never unmounts.
  */
 export function Shell() {
+  useEffect(() => afterPaint(preloadScreens), []);
   const location = useLocation();
   const navType = useNavigationType();
   const layout = useLayoutMode();
@@ -55,7 +58,7 @@ export function Shell() {
 
   const phone = layout === 'phone';
   return (
-    <main ref={root} className={styles.shell} data-layout={layout} data-testid="app-shell" aria-label="Scoreline">
+    <main ref={root} className={styles.shell} data-layout={layout} data-testid="app-shell" aria-label="Scoreline" onPointerDownCapture={(e) => prepareScreen(e.target)} onFocusCapture={(e) => prepareScreen(e.target)}>
       <ListPane key="list" layout={layout} shifted={phone && !!r.match} covered={phone && !!(r.match || r.player)} list={r.list} openId={r.match?.id} />
       {phone ? <PhoneStack key="phone" r={r} /> : layout === 'two' ? <TwoPane key="two" r={r} /> : <ThreePane key="three" r={r} />}
       {/* the phone plays toasts and scenes over everything; the panes play them inside (Part 18) */}
