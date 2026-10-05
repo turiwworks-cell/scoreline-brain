@@ -56,6 +56,49 @@ Lighthouse is not a dependency of the project. To run it:
 npx lighthouse@13 http://127.0.0.1:4173/?demo --only-categories=performance,accessibility --chrome-flags="--headless=new"
 ```
 
+## Start-up: first paint and first data (Part 21, #4 and #5)
+
+Four scripts, all against a production build (`vite preview`), and all run on their own, one after
+another, with nothing else using the CPU.
+
+```sh
+# The page load: first paint, every LCP candidate and its element, when the header and rows reached
+# the DOM, each Long Animation Frame over 50 ms, layout shifts. --no-rive blocks the .riv files.
+node verification/perf/startup.mjs --path /?demo --rate 3.6 --no-rive --runs 5 --out /tmp/startup.json
+# Lighthouse's mobile network on top of the CPU throttle, and each request's start and end:
+node verification/perf/startup.mjs --path /?demo --rate 4 --network slow4g --resources
+# A Chrome trace; every main-thread task over 50 ms is split into script / style / layout / paint / GC:
+node verification/perf/startup.mjs --path /?demo --rate 3.6 --no-rive --trace /tmp/trace.json
+# The first feed on its own (300 matches), through the real parser, store and list; the frame is taken apart:
+node verification/perf/poll-replay.mjs --first-data --matches 300 --runs 5 --rate 3.6 --out /tmp/first-data.json
+# Lighthouse mobile, N runs of / and /?demo against a built directory (it starts its own preview);
+# LH_EXTRA adds flags, e.g. applied throttling:
+bash verification/perf/lighthouse.sh dist /tmp/lh 3
+LH_EXTRA="--throttling-method=devtools" bash verification/perf/lighthouse.sh dist /tmp/lh-applied 3
+# One-line summaries of Lighthouse JSON reports (score, FCP, LCP and its element and phases, TBT, CLS):
+node verification/perf/lh-summary.mjs /tmp/lh/*.json
+# Is the host compressing, and is the WASM served as application/wasm? Point --base at the real host:
+node verification/perf/compression.mjs --base https://example.org
+```
+
+`startup.mjs` takes timings from runs without `--trace` and anatomy from runs with it: tracing
+slows the page. Keep every run's file, outliers included. **`poll-replay.mjs` and `profile.mjs`
+answer different questions.** `poll-replay.mjs` replays recorded wire JSON through the real
+`ApiSource`, parser, store and UI, so it measures the app's work for one feed with no demo
+generation; `--first-data` is the first feed of a page, one fresh page per run. `profile.mjs` plays
+the whole demo, whose timer also builds the feed (simulation, JSON) and delivers events. A
+"time until paint" is never a task's duration: it adds the wait for the next frame.
+
+**Lighthouse, simulated and applied.** The default (lantern) computes FCP and LCP from a model of the
+page: it counts script requests that finished before the observed paint, so a page that paints
+a static frame at 0.3 s is still modelled as waiting for its bundle. To see what a browser under
+that throttle does, add `--throttling-method=devtools` (applied: CPU 4× and the slow-4G network
+happen in the browser). Report both and say which is which; the container's benchmark index is
+about 1480, so every number is on a slower machine than a typical laptop. Whether a run's window catches
+the Rive requests depends on timing (on `/?demo` it usually does, after the first rows; read the
+report's network requests); the container draws Rive's WebGL in software either way, so none of
+this says how Rive performs on a phone.
+
 ## Reading the numbers
 
 **Calibrate.** "6× slowdown" means 6× slower than the machine it runs on. The Part 21 audit
