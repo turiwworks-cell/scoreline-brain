@@ -235,15 +235,16 @@
   pointer-events: none;
 }
 
+/* on the top line (TOP.mid, choreo.ts): 40 px, centred on y 72 */
 .sceneClose {
   position: absolute;
   z-index: 2;
-  top: 44px;
+  top: 52px;
   right: 20px;
 }
 
 :global([data-layout='phone']) > .scene .sceneClose {
-  top: calc(44px + env(safe-area-inset-top));
+  top: calc(52px + env(safe-area-inset-top));
 }
 
 .clip {
@@ -428,7 +429,7 @@
 
 .topName {
   position: absolute;
-  top: 56px;
+  top: 55px;
   color: var(--c-text);
   font-weight: var(--fw-s);
   font-size: var(--fs-17);
@@ -439,7 +440,7 @@
 
 .topSub {
   position: absolute;
-  top: 80px;
+  top: 79px;
   color: var(--c-muted);
   font: var(--type-label);
   letter-spacing: var(--track-label);
@@ -448,10 +449,12 @@
   white-space: nowrap;
 }
 
+/* the crest's box is the crest alone, centred on the line; the name's cap top (57) and the label's
+   baseline (87.6) sit either side of it */
 .topCrest {
   position: absolute;
-  left: 60px;
   top: 61px;
+  display: flex;
 }
 
 /* the score strip, top right (luau:6497) */

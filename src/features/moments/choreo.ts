@@ -47,6 +47,15 @@ export const BUST_LIFT = 60;
 /** The four cards of the wall behind him, as fractions of 320 px (luau:6553). */
 export const WALL = { heights: [0.74, 0.94, 1, 0.84], tall: 320, gap: 6, side: 12, lead: 0.2, step: 0.11, rise: 0.75, flash: 0.16 } as const;
 
+/**
+ * The scene's top line, once the headline has risen: the flag (or the red card and crest), the
+ * name over its label, the score strip and the close button, all centred on y 72 (the Lua's
+ * strip, luau:6512). The Lua put the close button at 70 and landed the card 47 px tall and tilted,
+ * taller than the text beside it; the review of 2026-10-04 asked for one clean line, so the card
+ * lands level, as tall as the name and its label, with the crest and text 10 px after it.
+ */
+export const TOP = { mid: 72, card: { cx: 29, h: 32 }, crest: 50, text: 82, goalText: 68 } as const;
+
 /** The goal word lands on LAND (luau:6319). */
 export const LAND: Bezier = [0.12, 1, 0.3, 1];
 

@@ -1,5 +1,9 @@
-/** After two paints and an idle slot; hidden tabs wait. Every scheduled callback is cancellable. */
-export function afterPaint(run: () => void): () => void {
+/**
+ * After two paints and an idle slot; hidden tabs wait. Every scheduled callback is cancellable.
+ * `idle: false` skips the idle slot, for work that is needed now: while a scene animates there
+ * may be no idle slot for a second.
+ */
+export function afterPaint(run: () => void, { idle: waitIdle = true }: { idle?: boolean } = {}): () => void {
   let disposed = false;
   let frame = 0;
   let idle = 0;
@@ -25,7 +29,8 @@ export function afterPaint(run: () => void): () => void {
     frame = requestAnimationFrame(() => {
       frame = requestAnimationFrame(() => {
         frame = 0;
-        if (typeof window.requestIdleCallback === 'function') idle = window.requestIdleCallback(finish);
+        if (!waitIdle) finish();
+        else if (typeof window.requestIdleCallback === 'function') idle = window.requestIdleCallback(finish);
         else timer = setTimeout(finish, 0);
       });
     });

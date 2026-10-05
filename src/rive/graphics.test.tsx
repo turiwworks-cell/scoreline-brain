@@ -83,18 +83,26 @@ describe('Live icon binding and hit target', () => {
   });
 });
 describe('goal word View Model contract', () => {
+  const props = (time: ReturnType<typeof motionValue<number>>, elapsed: ReturnType<typeof motionValue<number>>, fns: { onPhase: () => void; onBound: () => void; onFallback: () => void }, skipped = false) => (
+    <WordGraphic source="/rive/moments.riv" kind="goal" colors={['#123456', '#654321']} time={time} elapsed={elapsed} start={0.1} late={(e) => e >= 0.3} full={4} skipped={skipped} {...fns} fallback={<span>GOAAAL</span>} />
+  );
+  const mount = () => {
+    const f = fixture(); const time = motionValue(0); const elapsed = motionValue(0); const fns = { onPhase: vi.fn(), onBound: vi.fn(), onFallback: vi.fn() };
+    const view = render(props(time, elapsed, fns));
+    return { ...f, ...fns, time, elapsed, view, rerender: (skipped: boolean) => view.rerender(props(time, elapsed, fns, skipped)) };
+  };
   const setup = () => {
-    const f = fixture(); const time = motionValue(0); const onPhase = vi.fn(); const onWaiting = vi.fn(); const onFallback = vi.fn();
-    const view = render(<WordGraphic source="/rive/moments.riv" kind="goal" colors={['#123456', '#654321']} time={time} start={0.1} full={4} skipped={false} onWaiting={onWaiting} onPhase={onPhase} onFallback={onFallback} fallback={<span>GOAAAL</span>} />);
-    const binding = mock.canvas!.bind(f.instance, () => { if (!document.hidden) binding.resume?.(); })!;
-    return { ...f, time, onPhase, onWaiting, onFallback, view, binding };
+    const m = mount();
+    const binding = mock.canvas!.bind(m.instance, () => { if (!document.hidden) binding.resume?.(); })!;
+    return { ...m, binding };
   };
   it('sets kind and ARGB colors before firing play once on the stage beat', () => {
     const s = setup();
     expect(s.kind.value).toBe('goal'); expect(s.c1.value).toBe(0xff123456); expect(s.c2.value).toBe(0xff654321);
+    expect(s.onBound).toHaveBeenCalledTimes(1);
     expect(s.trigger).not.toHaveBeenCalled(); expect(s.binding.shouldPlay?.()).toBe(false);
     act(() => s.time.set(0.1)); expect(s.trigger).toHaveBeenCalledTimes(1);
-    act(() => s.time.set(0.2)); expect(s.trigger).toHaveBeenCalledTimes(1); expect(s.onWaiting).toHaveBeenCalledTimes(1);
+    act(() => s.time.set(0.2)); expect(s.trigger).toHaveBeenCalledTimes(1);
     s.binding.cleanup?.();
   });
   it('reports phases, freezes the landed word on done, and removes listeners', () => {
@@ -105,9 +113,33 @@ describe('goal word View Model contract', () => {
     s.binding.cleanup?.(); expect(s.phase.listeners.size).toBe(0); expect(s.onFallback).toHaveBeenCalled();
   });
   it('falls back at the scene deadline if the phase handshake never arrives', () => {
-    const s = setup(); act(() => s.time.set(4));
+    const s = setup(); act(() => s.elapsed.set(4));
     expect(s.onFallback).toHaveBeenCalled(); expect(s.view.container.querySelector('canvas')).toBeNull();
     expect(s.trigger).not.toHaveBeenCalled(); s.binding.cleanup?.();
+  });
+  it('leaves the headline to the DOM word when it is not bound by the deadline', () => {
+    const m = mount();
+    act(() => m.elapsed.set(0.3));
+    expect(m.onFallback).toHaveBeenCalled(); expect(m.view.container.querySelector('canvas')).toBeNull();
+    expect(m.view.getByText('GOAAAL')).toBeTruthy(); expect(m.onBound).not.toHaveBeenCalled();
+  });
+  it('refuses a late binding, so the two words never swap mid-flight', () => {
+    const m = mount();
+    const canvas = mock.canvas!;
+    m.elapsed.set(0.35);
+    expect(() => canvas.bind(m.instance, () => {})).toThrow('before the Rive word was ready');
+    expect(m.onBound).not.toHaveBeenCalled();
+  });
+  it('a first tap before it lands shows the DOM word; once landed it stays', () => {
+    const a = setup(); act(() => a.time.set(0.1));
+    act(() => a.rerender(true));
+    expect(a.onFallback).toHaveBeenCalled(); expect(a.view.container.querySelector('canvas')).toBeNull();
+    a.binding.cleanup?.(); cleanup();
+    const b = setup(); act(() => b.time.set(0.1));
+    b.phase.value = 1; b.phase.emit();
+    act(() => b.rerender(true));
+    expect(b.onFallback).not.toHaveBeenCalled(); expect(b.view.container.querySelector('canvas')).not.toBeNull();
+    b.binding.cleanup?.();
   });
   it('does not fire play while hidden and resumes from the current stage time', () => {
     let hidden = true; vi.spyOn(document, 'hidden', 'get').mockImplementation(() => hidden);

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import { m, useMotionValue, useMotionValueEvent, useTransform, type MotionValue } from 'motion/react';
 import { GoalWord, type GoalWordProps } from '../../rive/GoalWord';
+import { momentsSource } from '../../rive/assets';
 import { createWordClock } from '../../rive/wordClock';
 import { minText } from '../../domain';
 import { bez, clamp, CURVES, ease, goalLetters, lerp, prog, timing, type MomentDirector, type Presentation, type Timing } from '../../motion';
@@ -21,6 +22,7 @@ import {
   SLAM,
   SLAM_WORD,
   SLASHES,
+  TOP,
   WALL,
   WORDS,
   wordWidth,
@@ -41,7 +43,8 @@ import styles from './Moments.module.css';
  * Red card: the hit (shake, strobes, slashes), the card slamming in, RED CARD, then the same
  * story; the card flies to the top corner.
  *
- * The word is a plain DOM stand-in (Word.tsx) until Rive's GoalWord (Parts 19-20).
+ * The word is Rive's GoalWord (Parts 19-20) when its file is ready by the first beat, else the DOM
+ * stand-in (Word.tsx); one plays the whole headline, they never swap in mid-flight (wordClock.ts).
  */
 
 export type SceneProps = {
@@ -91,27 +94,32 @@ export function Scene({ p, info, d, photo, followed }: SceneProps) {
   const g = useBox(root);
   const { t, out } = useStageTime(p, d.clock);
   const [firstStart] = useState(p.startedAt);
-  const skipped = p.startedAt !== firstStart || p.phase === 'out';
-  const [wordClock] = useState(() => createWordClock(p.beats!.up, p.beats!.full));
+  // a first tap moves the start back: everything lands at once
+  const skipped = p.startedAt !== firstStart;
+  const [wordClock] = useState(() => createWordClock({ up: p.beats!.up, full: p.beats!.full, rive: momentsSource !== null }));
   const wordSignal = useMotionValue(0);
   // Updating a derived MotionValue during render notifies Story's React text
   // subscribers inside Scene's render. Sync the handoff clock after commit and
-  // on clock/phase events instead, including a first-tap jump or director exit.
+  // on clock/phase events instead, including a first-tap jump.
   const storyTime = useMotionValue(wordClock.time(t.get(), skipped));
   const storySkipped = useRef(skipped);
   const syncStory = useCallback(() => {
     storyTime.set(wordClock.time(t.get(), storySkipped.current));
   }, [storyTime, wordClock, t]);
+  // the story starts on the scene's first frame, however long React took to get it on screen
+  useLayoutEffect(() => {
+    wordClock.begin(t.get());
+  }, [wordClock, t]);
   useLayoutEffect(() => {
     storySkipped.current = skipped;
     syncStory();
   }, [skipped, syncStory]);
   useMotionValueEvent(t, 'change', syncStory);
   useMotionValueEvent(wordSignal, 'change', syncStory);
-  const waiting = useCallback(() => { wordClock.waiting(); wordSignal.set(wordSignal.get() + 1); }, [wordClock, wordSignal]);
+  const bound = useCallback(() => { wordClock.bound(t.get()); wordSignal.set(wordSignal.get() + 1); }, [wordClock, wordSignal, t]);
   const phase = useCallback((n: number) => { wordClock.phase(n, t.get()); wordSignal.set(wordSignal.get() + 1); }, [wordClock, wordSignal, t]);
-  const fallback = useCallback(() => { wordClock.fallback(); wordSignal.set(wordSignal.get() + 1); }, [wordClock, wordSignal]);
-  const word: WordBridge = { time: t, full: p.beats!.full, skipped, onWaiting: waiting, onPhase: phase, onFallback: fallback };
+  const fallback = useCallback(() => { wordClock.fallback(t.get()); wordSignal.set(wordSignal.get() + 1); }, [wordClock, wordSignal, t]);
+  const word: WordBridge = { time: storyTime, elapsed: t, late: wordClock.late, full: p.beats!.full, skipped, onBound: bound, onPhase: phase, onFallback: fallback };
   const [T] = useState(() => timing('goal'));
   const red = p.variant === 'red';
 
@@ -159,7 +167,7 @@ export function Scene({ p, info, d, photo, followed }: SceneProps) {
   );
 }
 
-type WordBridge = Pick<GoalWordProps, 'time' | 'full' | 'skipped' | 'onWaiting' | 'onPhase' | 'onFallback'>;
+type WordBridge = Pick<GoalWordProps, 'time' | 'elapsed' | 'late' | 'full' | 'skipped' | 'onBound' | 'onPhase' | 'onFallback'>;
 type ArtProps = { t: MotionValue<number>; T: Timing; p: Presentation; info: MomentInfo; g: Geo; photo: PhotoSources | undefined; followed: boolean; word: WordBridge };
 
 /** bez(T.c, prog(t, at, T.dur)) as a motion value. */
@@ -171,8 +179,8 @@ const WARM = '#F7F2EA';
 
 function GoalArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
   const [riveActive, setRiveActive] = useState(false);
-  const { onWaiting, onFallback } = word;
-  const waiting = useCallback(() => { setRiveActive(true); onWaiting(); }, [onWaiting]);
+  const { onBound, onFallback } = word;
+  const bound = useCallback(() => { setRiveActive(true); onBound(); }, [onBound]);
   const fallback = useCallback(() => { setRiveActive(false); onFallback(); }, [onFallback]);
   const B = p.beats!;
   const c1 = info.team.colors[0];
@@ -205,7 +213,7 @@ function GoalArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
   const flareY = useTransform(() => wordMid.get() - 170);
 
   const flagX = useTransform(() => lerp(g.cx, 38, u.get()) - 32);
-  const flagY = useTransform(() => lerp(318 * g.ky, 72, u.get()) - 32);
+  const flagY = useTransform(() => lerp(318 * g.ky, TOP.mid, u.get()) - 32);
   const flagS = useTransform(() => (lerp(64, 40, u.get()) / 64) * lerp(0.6, 1, pS.get()));
 
   const flash = useTransform(() => FLASH.alpha * (1 - ease(CURVES.ease, t.get(), 0, FLASH.dur)));
@@ -238,10 +246,10 @@ function GoalArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
         <SoftLight color={pastel(c1)} alpha={0.55} cx="50%" cy={170} rx={115} ry={65} />
       </m.div>
       <m.div className={styles.word} style={{ y: wordY, height: size0, scale: wordScale }}>
-        <GoalWord {...word} size={size0} onWaiting={waiting} onFallback={fallback} kind="goal" colors={info.team.colors} start={B.delay} fallback={<Word word="GOAAAL" size={size0} t={t} t0={B.delay} gap={gap} land={land} curve={LAND} mode="shout" stops={gs} glow={pastel(c1)} />} />
+        <GoalWord {...word} size={size0} onBound={bound} onFallback={fallback} kind="goal" colors={info.team.colors} start={B.delay} fallback={<Word word="GOAAAL" size={size0} t={t} t0={B.delay} gap={gap} land={land} curve={LAND} mode="shout" stops={gs} glow={pastel(c1)} />} />
       </m.div>
       {/* once at the top: who scored, and the score */}
-      <m.div className={styles.topLine} style={{ left: 68, opacity: pTop }}>
+      <m.div className={styles.topLine} style={{ left: TOP.goalText, opacity: pTop }}>
         <span className={styles.topName}>{info.team.name}</span>
         <span className={styles.topSub}>Scores · {minText(info.minute)}</span>
       </m.div>
@@ -266,12 +274,12 @@ function RedArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
   const jy = useTransform(() => shake(SHAKE.fy, Math.cos));
   const lightA = useTransform(() => 1 - 0.35 * u.get());
 
-  // the card: slams in huge and spinning, lands, then flies to the top corner
+  // the card: slams in huge and spinning, lands, then flies to the top line and comes to rest level
   const pIn = useTransform(() => bez(SLAM, prog(t.get(), 0.02, HIT)));
-  const cardS = useTransform(() => lerp(lerp(2.8, 1, pIn.get()), 0.22, u.get()));
-  const cardR = useTransform(() => `${lerp(lerp(-0.9, -0.16, pIn.get()), -0.08, u.get())}rad`);
-  const cardX = useTransform(() => lerp(g.cx, 30, u.get()) - 75);
-  const cardY = useTransform(() => lerp(316 * g.ky, 72, u.get()) - 107);
+  const cardS = useTransform(() => lerp(lerp(2.8, 1, pIn.get()), TOP.card.h / 214, u.get()));
+  const cardR = useTransform(() => `${lerp(lerp(-0.9, -0.16, pIn.get()), 0, u.get())}rad`);
+  const cardX = useTransform(() => lerp(g.cx, TOP.card.cx, u.get()) - 75);
+  const cardY = useTransform(() => lerp(316 * g.ky, TOP.mid, u.get()) - 107);
   const cardO = useTransform(() => clamp(pIn.get() * 2, 0, 1));
 
   // RED CARD: letters slam in after the hit, then rise to the top with the card
@@ -308,10 +316,10 @@ function RedArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
         <m.div className={styles.word} style={{ y: wordY, height: size0, scale: wordScale }}>
           <GoalWord {...word} size={size0} kind="red" colors={['#FF2D2D', '#8E0A10']} start={HIT + SLAM_WORD.after} fallback={<Word word="RED CARD" size={size0} t={t} t0={HIT + SLAM_WORD.after} gap={SLAM_WORD.gap} land={T.duration} curve={T.ease} mode="slam" stops="#FF6A5E 0%, #FF2D2D 50%, #C2101A 100%" />} />
         </m.div>
-        <m.div className={styles.topCrest} style={{ opacity: pTop }}>
+        <m.div className={styles.topCrest} style={{ left: TOP.crest, opacity: pTop }}>
           <Crest team={info.team} size={22} />
         </m.div>
-        <m.div className={styles.topLine} style={{ left: 90, opacity: pTop }}>
+        <m.div className={styles.topLine} style={{ left: TOP.text, opacity: pTop }}>
           <span className={styles.topName}>{info.team.name}</span>
           <span className={styles.topSub}>Down to ten · {minText(info.minute)}</span>
         </m.div>

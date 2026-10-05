@@ -5,6 +5,8 @@ import type { CanvasBinding, RiveInstance } from './types';
 export type CanvasOptions = {
   source: string;
   artboard?: string;
+  /** start without waiting for an idle slot (the goal word, which a scene is waiting for) */
+  eager?: boolean;
   advance?(): void;
   bind(instance: RiveInstance, requestSync: () => void): CanvasBinding | void;
   ready(): void;
@@ -115,7 +117,7 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
         // Also prevents a load which completes in a hidden tab from starting its frame loop.
         instance.stopRendering();
       }).catch(fail);
-    });
+    }, { idle: !options.eager });
   };
   const visibility = () => {
     if (!active()) {
