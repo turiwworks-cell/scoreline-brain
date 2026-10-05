@@ -62,7 +62,12 @@ Rejected (don't revisit):
   Part 20 preserves its outer capsule and calendar motion. Its default View Model exposes
   Boolean `islive` and String `count` bound to the calendar text. The DOM supplies the button's
   hit target/accessibility and a complete fallback; after Rive is ready it suppresses its own
-  glass rim and counter. The 443 x 152 artboard is displayed proportionally at 38 px high.
+  glass rim and counter. The artboard's **capsule** (not the 443 x 152 artboard) is 40 px high,
+  as tall as the round menu button beside it (`src/rive/liveGeometry.ts`); the artboard overflows
+  the button. `islive` is written one way, from the URL: Rive's own toggle never writes back
+  (an echo of an older value switched Live off again). The hover light is the DOM's `.m-light`
+  over the capsule, sized to its on/off width. The canvas re-sizes when `devicePixelRatio`
+  changes (zoom, device emulation).
 - `public/rive/moments.riv`: one artboard with a state machine for the goal word (letters slam
   in, flare, glint) and the red-card hit.
 
@@ -77,6 +82,12 @@ simulation, JSON parsing, text, layout, scrolling, hit testing and tweens.
 - Rive draws the word in place. The **DOM** moves it: a container holding the Rive canvas and
   the SVG flag does the rise to the top, then brings in the scorer and the commentary. This keeps
   flag images out of Rive and leaves one handoff point (`phase = 1`) between the two.
+- **One word plays the headline, never two.** The scene's story time (`src/rive/wordClock.ts`)
+  stays at 0 for at most 0.3 s from the scene's first frame, until it is known which word plays:
+  the Rive word if it binds in time, else the DOM stand-in (`Word.tsx`), which then plays the
+  whole headline. A late binding is refused. Swapping in mid-flight (the DOM letters hidden and
+  Rive starting them again) was the "shake" of the 2026-10-04 review. The rise waits at `up` only
+  for a late Rive word; an early landing keeps the Lua's hold.
 - First version of `moments.riv`: lift the existing `shoutWord` / `slamWord` drawing code
   (`luau:6314–6422`, called from `goalScene` / `redScene` at `luau:6536–6656`) into a small
   Node Script so the approved look carries over. A designer can later replace it with a timeline
@@ -142,7 +153,7 @@ provider API → adapter server ─┬─ GET /feed        (snapshot, ETag)
 | Tier | Used for | Tool |
 | --- | --- | --- |
 | Micro | Hover light, press dip, letter roll on buttons, focus rings | CSS transitions + custom properties (no JS) |
-| Choreography | Screen push, staggered cascades, tab indicator and content slide, live section open/close, card→hero and face→bust shared elements, toast swipe | Motion: `AnimatePresence`, variants, `layoutId` |
+| Choreography | Screen push, staggered cascades, tab indicator and content slide, live section open/close, toast swipe | Motion: `AnimatePresence`, variants; WAAPI (`src/motion/play.ts`) for time-pure entrances that must replay, such as the live cards |
 | Moments | Goal word, red-card hit, Live icon | Rive |
 
 - `src/motion/tokens.ts` copies `TIMING_DEF` from `luau:366–381` verbatim (14 sections: dur,
@@ -150,11 +161,24 @@ provider API → adapter server ─┬─ GET /feed        (snapshot, ETag)
   and `goalMark`. Every animation reads from it. No inline durations anywhere.
 - The Lua's design rule stays: curves settle and nothing bounces. Gestures (toast swipe, sheet)
   use springs with `bounce: 0`.
-- Animate only `transform` and `opacity`, plus `filter` on at most 6 live cards. Motion `layout`
-  goes on the few shared elements only, never on every list row.
+- Animate only `transform` and `opacity`, plus `filter` on at most 6 live cards. No Motion
+  `layout` and no `layoutId`.
+- **No shared elements.** Nothing flies between screens, as in the Lua. (Card→hero and
+  face→bust flights were built in Part 9 and removed after the 2026-10-04 review: logos flew from
+  the middle of the page, and ghosts showed under the lineup plates.)
+  - Opening a match is the Lua's **push** (`pushLayer` / `pushBase`, `src/motion/variants.ts`).
+  - Opening a player is the **same from every origin** (list, follow card, lineup, Leaders): his
+    bust grows at the centre of its window from 0.9 to 1 on the `player` timing's ease-out while
+    the page fades in, and closing plays it backwards and scales him down
+    (`src/features/player/motion.ts`). The bust's cut edge stays below its window.
+  - The goal and red card scenes keep their own choreography.
 - **Navigation model.** The list never unmounts. On phone, the match and player screens stack
-  above it; on desktop they sit in panes beside it. Both ends of every shared element are
-  therefore always mounted, and the list keeps its scroll position for free.
+  above it; on desktop they sit in panes beside it. The list keeps its scroll position for free.
+  Navigations render at once (`flushSync` in `src/app/nav/actions.ts`): under a transition a
+  second Live tap saw stale state and the cascade started late.
+- **Presence.** Under `AnimatePresence initial={false}` Motion skips `initial` for everything
+  mounted later in the same child, so `Screen` lifts that after its first frame
+  (`LaterMountsAnimate`, `src/app/layout/Screen.tsx`): a tab's content still animates in.
 - `<MotionConfig reducedMotion="user">`. With reduced motion on, a moment becomes a static toast.
 - A dev-only tuning panel edits the tokens live and copies them out as JSON. It replaces the 98
   timing inputs on the Rive script.
@@ -170,8 +194,12 @@ One app, one component set, one URL scheme. Layout is a function of route and wi
 | ≥ 1200 px | Three panes: list · match · insights (Player / Tables / Leaders). This is today's desktop. |
 
 - Panes are fluid (min 360, max 440 px) and each is its own native scroll container with
-  `overscroll-behavior: contain`. Wheel, trackpad, keyboard and touch scrolling all come from the
-  browser, so the wheel-to-drag shim is gone.
+  `overscroll-behavior: contain` and no visible scrollbar. Wheel, trackpad, keyboard and touch
+  scrolling all come from the browser, so the wheel-to-drag shim is gone.
+- **Elastic edges.** A touch drag that starts at a pane's top or bottom and pulls outward
+  follows the finger at 0.4 and springs back at 14/s, as the Lua's scroll does (`luau:8559`,
+  `8803`); it works on a page shorter than the screen too. Sticky bars stay put
+  (`src/app/layout/useElasticEdges.ts`).
 - Hover effects only under `@media (hover: hover) and (pointer: fine)`. Safe-area insets on phone.
 - On load, desktop opens the featured match in pane 2, as it does today.
 
@@ -187,7 +215,7 @@ One app, one component set, one URL scheme. Layout is a function of route and wi
 | Image weight | Per-player AVIF/WebP at 1× and 2×, explicit `width`/`height`, lazy below the fold. No 4032×3556 atlases |
 | Long lists (300+ matches on a real matchday) | League sections with `content-visibility: auto`. Virtualize only if profiling shows it's needed |
 | Several moments at once (one poll reveals 4 goals) | MomentDirector queue: only the open or followed match gets a full scene, others get toasts; collapse when more than 2 are queued; hold while the tab is hidden, then summarize |
-| Motion `layout` thrash | Shared elements only (§5) |
+| Motion `layout` thrash | No `layout` and no `layoutId` anywhere (§5) |
 | Font loading | One self-hosted Hanken Grotesk variable woff2, preloaded, latin + latin-ext subset; `tabular-nums` on scores and clocks |
 | Service worker serving a stale feed | The SW caches the app shell only and never `/feed` or `/events` |
 

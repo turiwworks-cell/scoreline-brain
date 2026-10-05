@@ -151,10 +151,11 @@ Milestones:
   - The PhoneStack, TwoPane and ThreePane layouts with the list always mounted (§5, §6).
   - Per-pane native scroll with scroll restoration, and focus management on navigation.
   - `motion/tokens.ts`, the variant helpers (`cascade(key)`) and `MotionConfig`.
-  - Card→hero and face→bust shared elements, proven on placeholder screens. Parts 10–15 build on
-    this pattern.
-- **Done when:** navigation works at 390, 900 and 1280 px, back and forward behave, and both
-  shared elements animate in both directions and hold up under rapid taps.
+  - The match push and the player's centre scale (ARCHITECTURE §5). The card→hero and
+    face→bust shared elements first built here were removed after the 2026-10-04 review: the Lua
+    has none, and nothing flies between screens.
+- **Done when:** navigation works at 390, 900 and 1280 px, back and forward behave, and the push
+  and the player's open and close play in both directions and hold up under rapid taps.
 
 ### 10 · Match list (Sonnet)
 - **Build:**
@@ -191,7 +192,8 @@ Milestones:
 
 ### 14 · Player view (Sonnet)
 - **Build:** The hero bust, the giant shirt number, the line of light and the sheet blocks
-  (`luau:5845–6179`). The face→bust transition uses Part 9's shared element.
+  (`luau:5845–6179`). It opens the same way from every origin: the bust grows at the centre
+  from 0.9 to 1 (ARCHITECTURE §5).
 - **Done when:** the view opens from the line-up, the list and the follow card on phone and in
   pane 3.
 
@@ -231,8 +233,8 @@ Milestones:
 - **Build:**
   - A lazy loader and a single shared offscreen renderer.
   - `RiveCanvas`: pause off-screen and while hidden, `cleanup()` on unmount.
-  - `LiveIcon`: a button wrapper syncing `islive` ↔ URL `live`, with a static SVG until the
-    runtime loads.
+  - `LiveIcon`: a button wrapper writing URL `live` → `islive` (one way; Rive never writes back),
+    with a static SVG until the runtime loads.
   - `GoalWord`: sets the View Model inputs and listens to `phase` to drive the scene.
 - **Ref:** the runtime setup in `Scoreline_Fixed.html:10060–10253`, and the icon wiring at
   `luau:8293–8378`.

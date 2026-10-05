@@ -49,9 +49,12 @@ test.describe('Today', () => {
   test.beforeEach(async ({ page }) => open(page));
 
   test('the header, the day tabs and the followed card sit where the Lua puts them', async ({ page }) => {
-    // header: the Live pill 38 tall, centred on y=82 (62 down on a phone, 24 below the pane's top on a desktop pane)
+    // header: centred on y=82 (62 down on a phone, 24 below the pane's top on a desktop pane). The
+    // DOM pill is the Lua's 38 tall (luau:4617); once Rive draws it, the capsule is 40, as tall as
+    // the menu button beside it (review of 2026-10-04, src/rive/liveGeometry.ts)
     const live = await box(page, liveToggle(page));
-    near(live, { w: 109.1, h: 38 }, 1);
+    const rive = await liveToggle(page).evaluate((el) => el.hasAttribute('data-rive-live'));
+    near(live, rive ? { w: 110, h: 40 } : { w: 109.1, h: 38 }, 1);
     expect(live.y + live.h / 2).toBeGreaterThan(75);
     expect(live.y + live.h / 2).toBeLessThan(90);
 

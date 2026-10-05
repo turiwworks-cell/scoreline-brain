@@ -57,7 +57,8 @@ test('the hero and Facts sit where the Lua puts them', async ({ page }, info) =>
   near(await box(page, s.getByRole('heading', { name: 'Momentum' })), { x: 18, y: top });
   const momentum = s.locator('[data-momentum="1"]');
   near(await box(page, momentum.locator(':scope > .m-glass')), { y: top + 27.7 + 61.8, h: 184, x: 18, r: 18 });
-  const plot = momentum.locator('svg[viewBox="0 0 322 156"]');
+  // drawn at the pane's width, 156 tall (Momentum.tsx): 322 on a phone
+  const plot = momentum.locator('svg[viewBox$=" 156"]');
   near(await box(page, plot), { x: 34, r: 34, y: top + 27.7 + 61.8 + 14, h: 156 });
   await expect(plot).toHaveAttribute('role', 'img');
   await expect(momentum.locator('[data-wave="home"]')).toHaveCount(1);
@@ -98,7 +99,10 @@ test('the Facts chart unmounts on tab change and returns once', async ({ page })
   const revealX = () => clip.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m41);
   // Wait beyond the wave's entrance, then verify a leaf clock tick leaves the chart in place.
   await expect(chart.locator('[data-momentum-now]')).toBeVisible();
-  const endX = await chart.locator('[data-momentum-now]').evaluate((el) => (el as SVGGElement).transform.baseVal.consolidate()!.matrix.e);
+  // the chart is drawn at the pane's width: the marker sits at endX × sx, the reveal clip in the
+  // 322-wide design units (Momentum.tsx)
+  const sx = await chart.locator('svg[viewBox$=" 156"]').evaluate((el) => (el as SVGSVGElement).viewBox.baseVal.width / 322);
+  const endX = (await chart.locator('[data-momentum-now]').evaluate((el) => (el as SVGGElement).transform.baseVal.consolidate()!.matrix.e)) / sx;
   await expect.poll(revealX).toBeCloseTo(-323 + endX, 2);
   const paths = await chart.locator('[data-wave="home"]').getAttribute('d');
   const clock = screen(page).getByText(/^\d{2}:\d{2}$/).first();
