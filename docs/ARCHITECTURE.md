@@ -209,6 +209,16 @@ One app, one component set, one URL scheme. Layout is a function of route and wi
   (`src/app/layout/useElasticEdges.ts`).
 - Hover effects only under `@media (hover: hover) and (pointer: fine)`. Safe-area insets on phone.
 - On load, desktop opens the featured match in pane 2, as it does today.
+- **Text on the Lua's baselines.** The Lua's `txt(…, x, y, size)` takes the baseline, and
+  `bc(cy, size) = cy + 0.3485 × size` is the baseline of text centred on cy (`luau:1630`). Hanken
+  Grotesk's ascent is 1000 and descent 303, so `line-height: normal` is 1.303: a line box centred on
+  cy puts the baseline on `bc` at any line height; a box with `line-height: 1.2` whose top is
+  `y − 0.9485em` puts it on y; a `line-height: 1` box starts 0.8485 em above it. Chromium rounds the
+  ascent and descent to whole pixels, so a line box shorter than 1.303 em can sit up to 1 px higher
+  than this arithmetic. Badges and tags beside text centre on what the Lua centres them on (cy or the
+  cap height), not on the line box. `e2e/baselines.spec.ts` and `verification/moments/baselines.spec.ts`
+  hold the ported text to the Lua's numbers within 1.1 px (`e2e/support/baseline.ts` measures the
+  baseline the browser drew); add a row there when porting a new text block.
 
 ## 7. Performance risks to design out
 
