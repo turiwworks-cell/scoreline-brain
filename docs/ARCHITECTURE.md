@@ -132,6 +132,9 @@ provider API → adapter server ─┬─ GET /feed        (snapshot, ETag)
    id. Components never derive them.
 3. **Structural sharing.** An unchanged match keeps its object identity across polls. A 15 s poll
    re-renders only what changed and never replays an entrance animation.
+   Each Source session owns a feed parser cache. A v2 match is reused only when both its `seq`
+   and its wire data are unchanged: equal-seq clocks, late details and late events must still be
+   read. v1 matches are always validated in full. Stopping or restarting a Source clears its cache.
 4. **Normalized store**: `teams`, `leagues`, `players`, `matches` keyed by id; each match's events
    ordered by `seq`.
 5. **The URL holds navigation state**: `/?day=<n>&live=1`, `/match/:id/:tab`,
@@ -221,6 +224,13 @@ One app, one component set, one URL scheme. Layout is a function of route and wi
 
 Budgets: initial JS ≤ 180 KB gzip, Rive excluded. LCP ≤ 2.0 s on a mid-range Android over 4G.
 INP ≤ 200 ms. No task longer than 50 ms while a poll is applied.
+
+`npm run check:size` counts the entry and every modulepreload once, in decimal KB, and runs after
+the CI build. Match and player screens are lazy, warmed after paint and on pointer/focus intent;
+their ready thenables preserve the first warmed push/reveal. A cold load keeps loading chrome
+and transfers any focus it holds to the resolved heading. Rive stays outside the initial graph.
+Motion's `domAnimation` stays synchronous: deferring it prevented some initial screens from
+completing their exits in browser tests.
 
 ## 8. Project structure
 

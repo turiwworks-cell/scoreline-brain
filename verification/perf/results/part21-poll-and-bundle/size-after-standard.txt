@@ -1,0 +1,9 @@
+
+> scoreline@0.0.0 check:size
+> node scripts/size-budget.mjs
+
+assets/index-9I8RqK8J.js                                  45.23 KB gzip
+assets/rolldown-runtime-CbXtAM7H.js                        0.37 KB gzip
+assets/app-vendor-CA1omR8B.js                            128.48 KB gzip
+assets/colorOf-ClTxFktT.js                                 3.52 KB gzip
+Initial JavaScript: 177.60 KB gzip / 180 KB

@@ -16,10 +16,36 @@ node verification/perf/inp.mjs --rate 6                              # worst eve
 `PW_CHROMIUM_PATH` points the scripts at another Chromium, as in `playwright.moments.config.ts`.
 `profile.mjs` plays `?demo=fast` (match time at 10×, so goals come every minute or so) and
 records every Long Animation Frame with the scripts in it, and when a scene or toast is on
-stage. A frame is counted as a **poll** when the demo source's timer ran in it: one demo tick
-builds the feed, parses it with the contract's schemas, applies it to the store and renders,
-which is what an `ApiSource` poll does apart from building the feed. **goal scene** / **toast**
-frames are those within 2.5 s of one appearing.
+stage. A frame is labelled **poll** when the demo source's timer ran in it. That timer can deliver
+live events (including followed-player actions), and/or build, parse and apply a snapshot. Its
+cost therefore includes simulation, SSE-like event delivery and demo feed generation, in addition
+to a poll's work. **goal scene** / **toast** frames are those within 2.5 s of one appearing.
+
+Long Animation Frames record only frames over 50 ms. Their reported median therefore describes
+the **long frames**, not all polls; the demo timer also includes `feedJson`, which a real API poll
+does not run. Do not treat that median as a complete poll-task distribution.
+
+For a poll measurement that includes the fast samples and excludes demo feed construction:
+
+```sh
+node verification/perf/poll-replay.mjs --rate 3.6 --samples 40 --out /tmp/poll-3.6.json
+node verification/perf/poll-replay.mjs --rate 6 --samples 40 --out /tmp/poll-6.json
+# Optional adversarial scale check: 300 visible matches, changing together.
+node verification/perf/poll-replay.mjs --rate 3.6 --matches 300 --out /tmp/poll-300.json
+```
+
+The runner builds a separate production diagnostic entry and starts its own preview server.
+It prepares wire JSON before timing, then replays it through the real `ApiSource`, parser, store
+and UI, with the demo's followed player. `callback` includes JSON decoding and a synchronous
+React commit; `untilPaint` includes two animation frames. It also records actual long tasks and
+page errors. Fixture match time advances every replay, faster than wall time, so clock corrections
+are deliberately frequent. It is a deterministic stress replay, not a measurement of network
+latency or a real phone. Run before/after sequentially on the same machine without other tests.
+`--root` can build another checkout containing the same diagnostic files. It never rewrites the
+app's `dist/` or imports this harness into the application.
+
+Run `npm run build && npm run check:size` for the initial JS budget. Detailed results of the
+poll and bundle changes are in `reports/part21-poll-and-bundle.md`.
 
 `inp.mjs` taps through the main screens and reports, per interaction, the longest Event Timing
 entry: input delay + handlers + the wait for the next paint, which is what INP counts.

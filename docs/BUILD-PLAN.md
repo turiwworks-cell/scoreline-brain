@@ -253,6 +253,9 @@ Milestones:
 - **Opus:** profile a poll tick and a goal moment at 6× CPU throttle; run Lighthouse mobile;
   check the §7 budgets; do a keyboard and VoiceOver pass. Write the findings up as issues.
 - **Sonnet:** fix them, one issue per session.
+- **Follow-up #1/#2:** the shared parser/bundle work is grouped: session-scoped feed reuse,
+  lazy match/player screens, and the CI initial-JS budget. Decisions and measured limits are in
+  `reports/part21-poll-and-bundle.md`; the remaining audit issues keep their own scope.
 
 ### 22 · Adapter server (Opus designs, Sonnet maps)
 - **Opus:** design the service. It polls the provider and keeps a per-match `seq`, serves
