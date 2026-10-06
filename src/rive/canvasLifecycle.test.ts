@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mountCanvas } from './canvasLifecycle';
 import { createSlots } from './loader';
-import type { RiveInstance, RiveOptions, RiveRuntime } from './types';
+import type { RiveInstance, RiveLayout, RiveOptions, RiveRuntime } from './types';
 
 const mock = vi.hoisted(() => ({ paints: [] as (() => void)[], runtime: vi.fn<() => Promise<RiveRuntime>>(), file: vi.fn<(source: string) => Promise<ArrayBuffer>>(), slots: null as ReturnType<typeof createSlots> | null }));
 vi.mock('./afterPaint', () => ({ afterPaint: (fn: () => void) => { mock.paints.push(fn); return () => { mock.paints = mock.paints.filter((x) => x !== fn); }; } }));
@@ -14,9 +14,11 @@ let observeBox: ResizeObserverOptions['box'] | undefined;
 const disconnectIO = vi.fn();
 const disconnectRO = vi.fn();
 const instances: Fake[] = [];
+const layoutOf = (b: { minX: number; minY: number; maxX: number; maxY: number }): RiveLayout => ({ ...b, copyWith: layoutOf });
 class Fake implements RiveInstance {
   stateMachineNames = ['Moments'];
   viewModelInstance = null;
+  layout = layoutOf({ minX: 0, minY: 0, maxX: 0, maxY: 0 });
   reset = vi.fn(); play = vi.fn(); pause = vi.fn(); stopRendering = vi.fn(); startRendering = vi.fn(); resizeDrawingSurfaceToCanvas = vi.fn(); cleanup = vi.fn();
   constructor(public options: RiveOptions) { instances.push(this); }
 }
@@ -86,6 +88,27 @@ describe('Rive canvas ownership', () => {
     vi.spyOn(window, 'devicePixelRatio', 'get').mockReturnValue(3);
     resize([{ target: s.canvas, devicePixelContentBoxSize: [{ inlineSize: 129, blockSize: 44 }] } as unknown as ResizeObserverEntry], {} as ResizeObserver);
     expect(inst.resizeDrawingSurfaceToCanvas).toHaveBeenLastCalledWith(3);
+  });
+  it('sizes the surface for the canvas\'s own box, not as an ancestor\'s transform shows it', async () => {
+    const s = setup(); const inst = await load();
+    vi.spyOn(window, 'devicePixelRatio', 'get').mockReturnValue(2);
+    // the word's box still scaled 1.08 when it binds: 427 px on screen for its own 395.5
+    vi.spyOn(s.canvas, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 395.5 * 1.08, 344));
+    resize([{ target: s.canvas, devicePixelContentBoxSize: [{ inlineSize: 791, blockSize: 688 }], contentBoxSize: [{ inlineSize: 395.5, blockSize: 344 }] } as unknown as ResizeObserverEntry], {} as ResizeObserver);
+    const ratio = inst.resizeDrawingSurfaceToCanvas.mock.calls.at(-1)![0] as number;
+    expect(Math.trunc(ratio * 395.5 * 1.08)).toBe(791);
+  });
+  it('tells the binding of each resize, after it, and asks Rive to draw every frame only when told to', async () => {
+    const s = setup(); const resized = vi.fn(); s.options.bind.mockImplementation(() => ({ ...s.binding, resized }));
+    const inst = await load();
+    expect(inst.options.drawingOptions).toBeUndefined();
+    s.canvas.width = 640; s.canvas.height = 480;
+    resize([], {} as ResizeObserver);
+    expect(resized).toHaveBeenLastCalledWith(640, 480);
+    expect(resized.mock.invocationCallOrder.at(-1)!).toBeGreaterThan(inst.resizeDrawingSurfaceToCanvas.mock.invocationCallOrder.at(-1)!);
+    const canvas = document.createElement('canvas');
+    mounted.push(mountCanvas(canvas, { source: '/rive/moments.riv', alwaysDraw: true, bind: () => undefined, ready: vi.fn(), error: vi.fn() }));
+    expect((await load()).options.drawingOptions).toBe('alwaysDraw');
   });
   it('draws an oversampled canvas finer than the screen, up to MAX_RATIO', async () => {
     const canvas = document.createElement('canvas');

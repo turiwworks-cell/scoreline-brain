@@ -9,6 +9,8 @@ export type RiveCanvasProps = {
   eager?: boolean;
   /** draw this many times finer than the screen (canvasLifecycle) */
   oversample?: number;
+  /** draw every frame, also one where only the layout moved (canvasLifecycle) */
+  alwaysDraw?: boolean;
   onAdvance?(): void;
   className?: string;
   style?: CSSProperties;
@@ -28,6 +30,7 @@ export function RiveCanvas(props: RiveCanvasProps) {
       artboard: props.artboard,
       eager: props.eager,
       oversample: props.oversample,
+      alwaysDraw: props.alwaysDraw,
       advance: () => latest.current.onAdvance?.(),
       bind: (instance, requestSync) => latest.current.bind(instance, requestSync),
       ready: () => latest.current.onReady?.(),

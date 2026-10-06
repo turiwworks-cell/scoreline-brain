@@ -1,7 +1,7 @@
 # Editor exports received for Part 20
 
 Production assets are separate files in `public/rive/`:
-- `moments.riv`: accepted signed Node-script export, 18,100 bytes.
+- `moments.riv`: signed Node-script export updated 2026-10-06, 22,455 bytes (previously 18,100).
 - `live-icon.riv`: full-button export of 2026-10-05, 24,925 bytes: the `aniamtion` artboard only
   (no `font` helper), timelines `live to idle` and `idle to live`.
 

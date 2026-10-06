@@ -1,5 +1,6 @@
 import { afterPaint } from './afterPaint';
 import { riveLoader, riveSlots } from './loader';
+import type { DrawOptimizationOptions } from '@rive-app/webgl2';
 import type { CanvasBinding, RiveInstance } from './types';
 
 export type CanvasOptions = {
@@ -13,6 +14,8 @@ export type CanvasOptions = {
    * on a desktop), and a 2:1 downscale costs nothing in sharpness elsewhere.
    */
   oversample?: number;
+  /** draw every frame Rive is asked for, also one where only the binding's layout moved (the goal word's rise) */
+  alwaysDraw?: boolean;
   advance?(): void;
   bind(instance: RiveInstance, requestSync: () => void): CanvasBinding | void;
   ready(): void;
@@ -39,6 +42,8 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
   let dirtySize = true;
   /** the canvas's width in real device pixels, when the browser reports it (the ResizeObserver below) */
   let deviceWidth: number | undefined;
+  /** the canvas's own width in CSS pixels, before any transform (the ResizeObserver below) */
+  let boxWidth: number | undefined;
   let machine: string | undefined;
 
   const active = () => !disposed && !failed && visible && !document.hidden;
@@ -61,13 +66,17 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
   /**
    * Device pixels per CSS pixel for the drawing surface: window.devicePixelRatio, or more where the
    * canvas's own device-pixel box says the page is drawn finer than that. Rive multiplies the
-   * canvas's client rect by it.
+   * canvas's client rect by it, and that rect includes an ancestor's transform: a word sized while
+   * its box was scaled 1.08 got a surface 1.08 too large, never drawn pixel for pixel. The ratio
+   * takes the transform back out, so the surface is for the canvas's own box.
    */
   const pixelRatio = () => {
-    const width = canvas.getBoundingClientRect().width;
+    const shown = canvas.getBoundingClientRect().width;
+    const width = boxWidth || shown;
     // a hair over, so the whole-pixel surface Rive truncates to is never a pixel short
     const ratio = Math.max(window.devicePixelRatio || 1, deviceWidth && width > 0 ? (deviceWidth + 0.01) / width : 0);
-    return Math.max(ratio, Math.min(ratio * (options.oversample ?? 1), MAX_RATIO));
+    const fine = Math.max(ratio, Math.min(ratio * (options.oversample ?? 1), MAX_RATIO));
+    return shown > 0 && width > 0 ? (fine * width) / shown : fine;
   };
   const sync = () => {
     if (!instance || !loaded) return;
@@ -91,6 +100,7 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
     if (dirtySize) {
       instance.resizeDrawingSurfaceToCanvas(pixelRatio());
       dirtySize = false;
+      binding?.resized?.(canvas.width, canvas.height);
     }
     binding?.resume?.();
     if (binding?.shouldPlay?.() === false) {
@@ -124,6 +134,8 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
           onAdvance: options.advance,
           autoplay: false,
           autoBind: true,
+          // the runtime's DrawOptimizationOptions.AlwaysDraw, without importing the runtime here
+          ...(options.alwaysDraw ? { drawingOptions: 'alwaysDraw' as DrawOptimizationOptions.AlwaysDraw } : {}),
           useOffscreenRenderer: true,
           enableRiveAssetCDN: false,
           onLoad: () => {
@@ -167,8 +179,11 @@ export function mountCanvas(canvas: HTMLCanvasElement, options: CanvasOptions) {
   // device-pixel box ignores the emulated ratio), hence the larger of the two. The device-pixel box
   // also changes with zoom and with the ratio.
   const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver((entries) => {
-    const box = entries.find((e) => e.target === canvas)?.devicePixelContentBoxSize?.[0];
+    const entry = entries.find((e) => e.target === canvas);
+    const box = entry?.devicePixelContentBoxSize?.[0];
     if (box) deviceWidth = box.inlineSize > 0 ? box.inlineSize : undefined;
+    const own = entry?.contentBoxSize?.[0]?.inlineSize ?? entry?.contentRect?.width;
+    if (own !== undefined) boxWidth = own > 0 ? own : undefined;
     resize();
   });
   try {

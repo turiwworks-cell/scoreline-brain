@@ -202,11 +202,13 @@ function GoalArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
   const base0 = 436 * g.ky;
   const landed = B.delay + 5 * gap + land * 0.55;
   const settle = land + 5 * gap + T.duration;
+  const mid0 = base0 - size0 * 0.35;
   const wordMid = useTransform(() => {
     const size = lerp(size0, size1, u.get());
     return lerp(base0, 196, u.get()) - size * 0.35;
   });
-  const wordScale = useTransform(() => (lerp(size0, size1, u.get()) / size0) * (riveActive ? 1 : lerp(1.08, 1, bez(LAND, prog(t.get(), B.delay, settle)))));
+  const rise = { y: useTransform(() => wordMid.get() - mid0), scale: useTransform(() => lerp(size0, size1, u.get()) / size0), top: 196 - size1 * 0.35 - mid0 };
+  const wordScale = useTransform(() => rise.scale.get() * (riveActive ? 1 : lerp(1.08, 1, bez(LAND, prog(t.get(), B.delay, settle)))));
   const wordY = useTransform(() => wordMid.get() - size0 / 2);
   const flare = useTransform(() => prog(t.get(), landed - 0.1, 0.25) * (1 - 0.55 * ease(CURVES.inout, t.get(), landed + 0.15, 0.9)));
   const flareScale = useTransform(() => 0.8 + 0.2 * flare.get());
@@ -245,8 +247,9 @@ function GoalArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
       <m.div className={styles.flare} style={{ y: flareY, opacity: riveActive ? 0 : flare, scale: flareScale }}>
         <SoftLight color={pastel(c1)} alpha={0.55} cx="50%" cy={170} rx={115} ry={65} />
       </m.div>
-      <m.div className={styles.word} style={{ y: wordY, height: size0, scale: wordScale }}>
-        <GoalWord {...word} size={size0} onBound={bound} onFallback={fallback} kind="goal" colors={info.team.colors} start={B.delay} fallback={<Word word="GOAAAL" size={size0} t={t} t0={B.delay} gap={gap} land={land} curve={LAND} mode="shout" stops={gs} glow={pastel(c1)} />} />
+      {/* the Rive word draws its rise itself (GoalWord's rise): its box stays where it starts, untransformed */}
+      <m.div className={styles.word} style={riveActive ? { top: mid0 - size0 / 2, height: size0 } : { y: wordY, height: size0, scale: wordScale }}>
+        <GoalWord {...word} size={size0} rise={rise} onBound={bound} onFallback={fallback} kind="goal" colors={info.team.colors} start={B.delay} fallback={<Word word="GOAAAL" size={size0} t={t} t0={B.delay} gap={gap} land={land} curve={LAND} mode="shout" stops={gs} glow={pastel(c1)} />} />
       </m.div>
       {/* once at the top: who scored, and the score */}
       <m.div className={styles.topLine} style={{ left: TOP.goalText, opacity: pTop }}>
@@ -262,6 +265,10 @@ function GoalArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
 }
 
 function RedArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
+  const [riveActive, setRiveActive] = useState(false);
+  const { onBound, onFallback } = word;
+  const bound = useCallback(() => { setRiveActive(true); onBound(); }, [onBound]);
+  const fallback = useCallback(() => { setRiveActive(false); onFallback(); }, [onFallback]);
   const B = p.beats!;
   const u = useBeat(t, T, B.up);
   // shake: hard on the hit, then gone
@@ -288,8 +295,11 @@ function RedArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
   const size0 = fitTo(70);
   const size1 = fitTo(56);
   const base0 = 500 * g.ky;
-  const wordY = useTransform(() => lerp(base0, 196, u.get()) - lerp(size0, size1, u.get()) * 0.35 - size0 / 2);
+  const mid0 = base0 - size0 * 0.35;
+  const wordMid = useTransform(() => lerp(base0, 196, u.get()) - lerp(size0, size1, u.get()) * 0.35);
+  const wordY = useTransform(() => wordMid.get() - size0 / 2);
   const wordScale = useTransform(() => lerp(size0, size1, u.get()) / size0);
+  const rise = { y: useTransform(() => wordMid.get() - mid0), scale: wordScale, top: 196 - size1 * 0.35 - mid0 };
 
   const pTop = useBeat(t, T, B.up + T.duration * 0.3);
   // red strobes: the hit, and twice more
@@ -313,8 +323,8 @@ function RedArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
         </div>
         <Story t={t} T={T} p={p} info={info} g={g} followed={followed} red line="linear-gradient(90deg, #FF2D2D, #8E0A10)" />
         <m.div className={styles.bigCard} style={{ x: cardX, y: cardY, scale: cardS, rotate: cardR, opacity: cardO }} />
-        <m.div className={styles.word} style={{ y: wordY, height: size0, scale: wordScale }}>
-          <GoalWord {...word} size={size0} kind="red" colors={['#FF2D2D', '#8E0A10']} start={HIT + SLAM_WORD.after} fallback={<Word word="RED CARD" size={size0} t={t} t0={HIT + SLAM_WORD.after} gap={SLAM_WORD.gap} land={T.duration} curve={T.ease} mode="slam" stops="#FF6A5E 0%, #FF2D2D 50%, #C2101A 100%" />} />
+        <m.div className={styles.word} style={riveActive ? { top: mid0 - size0 / 2, height: size0 } : { y: wordY, height: size0, scale: wordScale }}>
+          <GoalWord {...word} size={size0} rise={rise} onBound={bound} onFallback={fallback} kind="red" colors={['#FF2D2D', '#8E0A10']} start={HIT + SLAM_WORD.after} fallback={<Word word="RED CARD" size={size0} t={t} t0={HIT + SLAM_WORD.after} gap={SLAM_WORD.gap} land={T.duration} curve={T.ease} mode="slam" stops="#FF6A5E 0%, #FF2D2D 50%, #C2101A 100%" />} />
         </m.div>
         <m.div className={styles.topCrest} style={{ left: TOP.crest, opacity: pTop }}>
           <Crest team={info.team} size={22} />
