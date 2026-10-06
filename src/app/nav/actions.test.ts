@@ -53,7 +53,7 @@ describe('nav actions', () => {
     expect(href(loc())).toBe('/match/2/lineup?demo&day=-1');
     nav.setLive(true);
     await tick();
-    expect(href(loc())).toBe('/match/2/lineup?demo&live=1');
+    expect(href(loc())).toBe('/match/2/lineup?demo');
     expect(router.state.historyAction).toBe('REPLACE');
   });
 

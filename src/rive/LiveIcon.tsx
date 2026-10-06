@@ -1,8 +1,9 @@
-import { lazy, Suspense, useCallback, useState, type CSSProperties, type ReactNode } from 'react';
-import { feel } from '../ui/feel';
+import { lazy, Suspense, useCallback, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { feel, spotRadius } from '../ui/feel';
 import { liveIconSource } from './assets';
 import { useRiveStart } from './startGate';
-import { LIVE_BUTTON_W, LIVE_CAPSULE_PX, LIVE_OFF_W, livePx as px } from './liveGeometry';
+import { LIVE_BUTTON_W, LIVE_CANVAS_STYLE, LIVE_CAPSULE_PX, LIVE_OFF_W, livePx as px } from './liveGeometry';
+import { LIVE_DIGITS, LIVE_STILL_VIEWBOX, liveDigits } from './liveStill';
 
 const Graphic = lazy(() => import('./LiveGraphic'));
 
@@ -17,32 +18,56 @@ export type LiveIconProps = {
   children?: ReactNode;
 };
 
+/** The art as it stands with Live on, `count` in the calendar: Rive's own drawing until Rive draws (liveStill.ts). */
+function LiveStill({ count }: { count: number }) {
+  return (
+    <svg viewBox={LIVE_STILL_VIEWBOX} style={LIVE_CANVAS_STYLE} aria-hidden="true" data-live-still="">
+      <use href="#live-still" />
+      {liveDigits(count).map(({ digit, x }, i) => <use key={i} href={`#ld${digit}`} x={x} y={LIVE_DIGITS.baseline} />)}
+    </svg>
+  );
+}
+
 /**
- * DOM owns the hit target, URL, accessibility and hover light. Rive owns the animated artwork,
- * which replaces the fallback (same box) when it is ready.
+ * DOM owns the hit target, URL, accessibility and hover light. Rive owns the artwork. The DOM
+ * button (`fallback`, `children`) is drawn only without the artwork, when there is no asset or it
+ * failed. While the artwork is on its way the button keeps the art's box and shows the art's still
+ * with Live on, nothing with it off, so the page never shows another Live design before Rive's
+ * (index.html's first frame shows the same still). Rive takes its place in the same frame.
  */
 export function LiveIcon({ live, count, onChange, className, lightClassName, fallback, children }: LiveIconProps) {
-  const [ready, setReady] = useState(false);
-  // the artwork is fetched and started only once the shell lets Rive start (startGate.ts); until then, and if it never does, the DOM button is the whole control
+  const [art, setArt] = useState<'coming' | 'shown' | 'failed'>('coming');
+  const lightRef = useRef<HTMLSpanElement>(null);
+  // the artwork is fetched and started only once the shell lets Rive start (startGate.ts)
   const start = useRiveStart();
-  const artworkReady = useCallback((value: boolean) => setReady(value), []);
+  const ready = art === 'shown';
+  const dom = !liveIconSource || art === 'failed';
+  const artworkReady = useCallback((value: boolean) => setArt((a) => (a === 'failed' ? a : value ? 'shown' : 'coming')), []);
+  const artworkFailed = useCallback(() => setArt('failed'), []);
   const staticButton = <>{fallback}{children}</>;
-  // Suppress the DOM glass pane only after the whole Rive button is bound: Rive draws its own.
-  const buttonClass = ready ? className?.split(/\s+/).filter((name) => name !== 'm-glass').join(' ') : className;
+  // Rive draws its own glass pane
+  const buttonClass = dom ? className : className?.split(/\s+/).filter((name) => name !== 'm-glass').join(' ');
   const style: CSSProperties = {
     position: 'relative',
-    ...(ready ? { width: px(LIVE_BUTTON_W), height: px(LIVE_CAPSULE_PX), padding: 0, background: 'transparent' } : {}),
+    ...(dom ? {} : { width: px(LIVE_BUTTON_W), height: px(LIVE_CAPSULE_PX), padding: 0, background: 'transparent' }),
   };
-  const light = { '--cap-on': px(LIVE_BUTTON_W), '--cap-off': px(LIVE_OFF_W) } as CSSProperties;
+  // The light reaches as far as on the round menu button beside it: a control the capsule's height,
+  // not the whole button (feel.ts sizes it from the button, which lit the capsule's rim end to end).
+  const light = { '--cap-on': px(LIVE_BUTTON_W), '--cap-off': px(LIVE_OFF_W), '--spot-r': px(spotRadius(LIVE_CAPSULE_PX, LIVE_CAPSULE_PX)) } as CSSProperties;
   return (
     <button type="button" className={`m-feel ${buttonClass ?? ''}`} data-rive-live={ready || undefined}
       style={style} aria-pressed={live} aria-label={`Live, ${count} in play`} onClick={() => onChange(!live)} {...feel}>
-      {liveIconSource && start ? (
-        <Suspense fallback={staticButton}>
-          <Graphic source={liveIconSource} live={live} count={count} onReady={artworkReady} fallback={staticButton} />
-        </Suspense>
-      ) : staticButton}
-      {ready && lightClassName && <span className={`m-light ${lightClassName}`} style={light} data-on={live || undefined} aria-hidden="true" />}
+      {dom || !liveIconSource ? staticButton : (
+        <>
+          {!ready && live && <LiveStill count={count} />}
+          {start && (
+            <Suspense fallback={null}>
+              <Graphic source={liveIconSource} live={live} count={count} onReady={artworkReady} onFailed={artworkFailed} fallback={staticButton} light={lightClassName ? lightRef : undefined} />
+            </Suspense>
+          )}
+        </>
+      )}
+      {ready && lightClassName && <span ref={lightRef} className={`m-light ${lightClassName}`} style={light} data-on={live || undefined} aria-hidden="true" />}
     </button>
   );
 }

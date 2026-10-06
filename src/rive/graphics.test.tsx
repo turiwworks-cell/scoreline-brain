@@ -6,7 +6,8 @@ import { RiveStartContext } from './startGate';
 import LiveGraphic from './LiveGraphic';
 import WordGraphic from './WordGraphic';
 import type { RiveCanvasProps } from './RiveCanvas';
-import type { Property, RiveInstance, ViewModel } from './types';
+import type { GoalWordProps } from './GoalWord';
+import type { Property, RiveInstance, RiveLayout, ViewModel } from './types';
 
 const mock = vi.hoisted(() => ({ canvas: null as RiveCanvasProps | null, source: null as string | null }));
 vi.mock('./RiveCanvas', () => ({ RiveCanvas: (props: RiveCanvasProps) => { mock.canvas = props; return <canvas aria-hidden="true" style={{ pointerEvents: 'none' }} />; } }));
@@ -21,29 +22,40 @@ function fixture() {
   const live = property(false); const kind = property(''); const c1 = property(0); const c2 = property(0); const phase = property(0); const textCount = property('12');
   const trigger = vi.fn();
   const vm: ViewModel = { boolean: () => live, string: (name) => name === 'count' ? textCount : kind, color: (name) => name === 'color1' ? c1 : c2, number: () => phase, trigger: () => ({ trigger }) };
-  const instance: RiveInstance = { stateMachineNames: ['State Machine 1'], viewModelInstance: vm, reset: vi.fn(), play: vi.fn(), pause: vi.fn(), startRendering: vi.fn(), stopRendering: vi.fn(), resizeDrawingSurfaceToCanvas: vi.fn(), cleanup: vi.fn() };
+  const layoutOf = (b: { minX: number; minY: number; maxX: number; maxY: number }): RiveLayout => ({ ...b, copyWith: layoutOf });
+  const instance: RiveInstance = { stateMachineNames: ['State Machine 1'], viewModelInstance: vm, layout: layoutOf({ minX: 0, minY: 0, maxX: 0, maxY: 0 }), reset: vi.fn(), play: vi.fn(), pause: vi.fn(), startRendering: vi.fn(), stopRendering: vi.fn(), resizeDrawingSurfaceToCanvas: vi.fn(), cleanup: vi.fn() };
   return { instance, live, kind, c1, c2, phase, trigger, textCount };
 }
 afterEach(() => { cleanup(); mock.canvas = null; mock.source = null; vi.restoreAllMocks(); });
 describe('Live icon binding and hit target', () => {
-  it('replaces the whole glass button and counter only after native artwork is ready', async () => {
+  it('shows no second Live design: nothing until the art has drawn and settled, the DOM button only if it fails', async () => {
     mock.source = '/rive/live-icon.riv';
     const view = render(<LiveIcon live count={8} onChange={vi.fn()} className="m-glass live" fallback={<span>Live</span>}><span>8</span></LiveIcon>);
-    await waitFor(() => expect(view.container.querySelector('canvas')).not.toBeNull());
     const button = view.getByRole('button', { name: 'Live, 8 in play' });
-    expect(button.classList.contains('m-glass')).toBe(true);
-    act(() => mock.canvas!.onReady?.());
+    // while the art is on its way: the art's box, no glass, no DOM pill, but the art's still with the count
     expect(button.classList.contains('m-glass')).toBe(false);
-    expect(button.getAttribute('data-rive-live')).toBe('true');
     expect(view.queryByText('8')).toBeNull(); expect(view.queryByText('Live')).toBeNull();
+    const still = () => button.querySelector('[data-live-still]');
+    expect([...still()!.querySelectorAll('use')].map((u) => u.getAttribute('href'))).toEqual(['#live-still', '#ld8']);
     // the capsule, not the artboard, is the round button's 40 px (luau:8352)
     expect(parseFloat(button.style.height)).toBe(40);
     expect(parseFloat(button.style.width)).toBeCloseTo((410.5 - 32.5) * 40 / 137.5, 1);
+    await waitFor(() => expect(view.container.querySelector('canvas')).not.toBeNull());
+    act(() => mock.canvas!.onReady?.());
+    // Rive's first frame plays the opening timeline: the art stays hidden through it
+    expect(button.getAttribute('data-rive-live')).toBeNull();
+    expect(mock.canvas!.style?.opacity).toBe(0);
+    expect(still()).not.toBeNull();
+    await waitFor(() => expect(button.getAttribute('data-rive-live')).toBe('true'), { timeout: 1500 });
+    // Rive takes the still's place in the same frame
+    expect(mock.canvas!.style?.opacity).toBe(1);
+    expect(still()).toBeNull();
+    expect(view.queryByText('8')).toBeNull(); expect(view.queryByText('Live')).toBeNull();
     act(() => mock.canvas!.onError?.(new Error('renderer failed')));
     expect(button.classList.contains('m-glass')).toBe(true);
     expect(view.getByText('8')).toBeTruthy(); expect(view.getByText('Live')).toBeTruthy();
   });
-  it('is the DOM button alone until the shell lets Rive start, and the same button after', async () => {
+  it('is an empty button until the shell lets Rive start, and the same button after', async () => {
     mock.source = '/rive/live-icon.riv';
     const icon = (start: boolean) => (
       <RiveStartContext.Provider value={start}>
@@ -53,20 +65,59 @@ describe('Live icon binding and hit target', () => {
     const view = render(icon(false));
     const button = view.getByRole('button', { name: 'Live, 4 in play' });
     button.focus();
-    // nothing of Rive has been asked for: no graphic chunk, no canvas
+    // nothing of Rive has been asked for: no graphic chunk, no canvas; and no DOM pill, and with
+    // Live off no still either (the still is the art with Live on)
     await new Promise((resolve) => setTimeout(resolve, 20));
     expect(view.container.querySelector('canvas')).toBeNull();
     expect(mock.canvas).toBeNull();
-    expect(view.getByText('Live')).toBeTruthy(); expect(view.getByText('4')).toBeTruthy();
+    expect(view.queryByText('Live')).toBeNull(); expect(view.queryByText('4')).toBeNull();
+    expect(button.querySelector('[data-live-still]')).toBeNull();
     view.rerender(icon(true));
     await waitFor(() => expect(view.container.querySelector('canvas')).not.toBeNull());
-    // the artwork starts behind the fallback: the button is the one that was there, still focused, the fallback still showing
+    // the artwork starts in the button that was there, still focused
     expect(view.getByRole('button', { name: 'Live, 4 in play' })).toBe(button);
     expect(document.activeElement).toBe(button);
-    expect(view.getByText('Live')).toBeTruthy(); expect(view.getByText('4')).toBeTruthy();
-    expect(button.getAttribute('data-rive-live')).toBeNull();
     act(() => mock.canvas!.onReady?.());
-    expect(button.getAttribute('data-rive-live')).toBe('true');
+    await waitFor(() => expect(button.getAttribute('data-rive-live')).toBe('true'), { timeout: 1500 });
+  });
+  it('plays the art\'s own timeline on the hover light on every toggle, its clock on Rive\'s first frame', async () => {
+    mock.source = '/rive/live-icon.riv';
+    const motions: { keyframes: Keyframe[]; duration: number; cancel: ReturnType<typeof vi.fn>; startTime: number | null }[] = [];
+    const animate = vi.fn(function (keyframes: Keyframe[], options: KeyframeAnimationOptions) {
+      const motion = { keyframes, duration: Number(options.duration), cancel: vi.fn(), startTime: null as number | null };
+      motions.push(motion);
+      return motion as unknown as Animation;
+    });
+    Object.defineProperty(HTMLElement.prototype, 'animate', { value: animate, configurable: true, writable: true });
+    Object.defineProperty(document, 'timeline', { value: { currentTime: 1000 }, configurable: true });
+    try {
+      const icon = (live: boolean) => <LiveIcon live={live} count={2} onChange={vi.fn()} lightClassName="light" fallback={<span>Live</span>} />;
+      const view = render(icon(false));
+      await waitFor(() => expect(view.container.querySelector('canvas')).not.toBeNull());
+      act(() => mock.canvas!.onReady?.());
+      await waitFor(() => expect(view.container.querySelector('.light')).not.toBeNull(), { timeout: 1500 });
+      const light = view.container.querySelector<HTMLElement>('.light')!;
+      // the art appears settled: the light has nothing to play
+      await new Promise((resolve) => setTimeout(resolve, 40));
+      expect(animate).not.toHaveBeenCalled();
+      const open = (frame: Keyframe | undefined) => Number(frame?.['--open']);
+      view.rerender(icon(true));
+      await waitFor(() => expect(motions).toHaveLength(1));
+      expect(animate.mock.contexts[0]).toBe(light);
+      expect(motions[0]!.startTime).toBe(1000);
+      expect(open(motions[0]!.keyframes[0])).toBe(0);
+      expect(open(motions[0]!.keyframes.at(-1))).toBe(1);
+      view.rerender(icon(false));
+      await waitFor(() => expect(motions).toHaveLength(2));
+      expect(motions[0]!.cancel).toHaveBeenCalled();
+      expect(open(motions[1]!.keyframes[0])).toBe(1);
+      expect(open(motions[1]!.keyframes.at(-1))).toBe(0);
+      // as small as the round button's light beside it: a 40 px control's, not the 110 px button's
+      expect(light.style.getPropertyValue('--spot-r')).toBe('26px');
+    } finally {
+      delete (HTMLElement.prototype as Partial<HTMLElement>).animate;
+      Reflect.deleteProperty(document, 'timeline');
+    }
   });
   it('keeps a DOM button, static fallback and controlled pressed state', () => {
     const change = vi.fn();
@@ -166,6 +217,41 @@ describe('goal word View Model contract', () => {
     act(() => b.rerender(true));
     expect(b.onFallback).not.toHaveBeenCalled(); expect(b.view.container.querySelector('canvas')).not.toBeNull();
     b.binding.cleanup?.();
+  });
+  const risen = (rise: NonNullable<GoalWordProps['rise']>, size?: number) => {
+    const f = fixture();
+    render(<WordGraphic source="/rive/moments.riv" kind="goal" size={size} colors={['#123456', '#654321']} time={motionValue(0)} elapsed={motionValue(0)} start={0.1} late={() => false} full={4} skipped={false} onPhase={vi.fn()} onBound={vi.fn()} onFallback={vi.fn()} rise={rise} fallback={<span>GOAAAL</span>} />);
+    return { ...f, canvas: mock.canvas! };
+  };
+  it('draws its rise in Rive, on a canvas that never moves', async () => {
+    const rise = { y: motionValue(0), scale: motionValue(1), top: -200 };
+    const { canvas, instance } = risen(rise);
+    // the start box, reaching up over the whole rise; placed by margins, untransformed
+    expect(canvas.alwaysDraw).toBe(true);
+    expect(canvas.style).toMatchObject({ width: 390, height: 540, marginLeft: -195, marginTop: -370 });
+    expect(canvas.style?.transform).toBeUndefined();
+    const binding = canvas.bind(instance, () => {})!;
+    // a surface of 2 device pixels per CSS pixel: the artboard where the headline starts
+    binding.resized?.(780, 1080);
+    expect(instance.layout).toMatchObject({ minX: 0, minY: 400, maxX: 780, maxY: 1080 });
+    // risen to the top at half its size, about its centre
+    act(() => { rise.y.set(-200); rise.scale.set(0.5); });
+    await waitFor(() => expect(instance.layout).toMatchObject({ minX: 195, minY: 170, maxX: 585, maxY: 510 }));
+    // a resize resets Rive's layout to the whole surface: the word is placed again
+    binding.resized?.(390, 540);
+    expect(instance.layout).toMatchObject({ minX: 97.5, minY: 85, maxX: 292.5, maxY: 255 });
+    binding.cleanup?.();
+  });
+  it('sizes its canvas in whole CSS pixels, the artboard centred in them', () => {
+    const k = 50 / (326000 / 3788);
+    const { canvas, instance } = risen({ y: motionValue(0), scale: motionValue(1), top: -100.3 }, 50);
+    expect(canvas.style).toMatchObject({ width: Math.ceil(390 * k), height: Math.ceil(340 * k + 100.3), marginLeft: -Math.ceil(390 * k) / 2, marginTop: -(170 * k + 100.3) });
+    const binding = canvas.bind(instance, () => {})!;
+    binding.resized?.(Math.ceil(390 * k), Math.ceil(340 * k + 100.3));
+    const { minX, minY, maxX, maxY } = instance.layout;
+    expect((minX + maxX) / 2).toBeCloseTo(Math.ceil(390 * k) / 2, 9);
+    expect([maxX - minX, minY, maxY - minY]).toEqual([expect.closeTo(390 * k, 9), expect.closeTo(100.3, 9), expect.closeTo(340 * k, 9)]);
+    binding.cleanup?.();
   });
   it('does not fire play while hidden and resumes from the current stage time', () => {
     let hidden = true; vi.spyOn(document, 'hidden', 'get').mockImplementation(() => hidden);

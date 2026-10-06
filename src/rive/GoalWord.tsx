@@ -21,6 +21,13 @@ export type GoalWordProps = {
   full: number;
   /** a first tap: a word that has not landed gives way to the DOM word, shown landed */
   skipped: boolean;
+  /**
+   * The headline's rise once it has landed: its offset from where it starts (0, then up to `top`,
+   * px) and its size against the start. The Rive word draws it itself, while the host keeps its
+   * box still: a canvas moved and scaled by CSS is resampled at a new sub-pixel offset every
+   * frame, and the word shook as it settled at the top.
+   */
+  rise?: { y: MotionValue<number>; scale: MotionValue<number>; top: number };
   /** the Rive word is bound and plays this scene's headline */
   onBound(): void;
   onPhase(phase: number): void;

@@ -35,7 +35,8 @@ test('list: rows and group labels', async ({ page }) => {
 });
 
 test('list: the live cards', async ({ page }) => {
-  await ready(page, '/?demo');
+  // Begin on Today so the click below opens Live; Live is now the default URL state.
+  await ready(page, '/?demo&live=0');
   await page.locator(L + 'button[aria-pressed]').first().click();
   await page.waitForTimeout(1500);
   // drawCards, luau:3797-3841, at the 70 px card: pad 8, crest 14, rows on 15 and 34

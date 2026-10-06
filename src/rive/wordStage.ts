@@ -1,4 +1,5 @@
 import { afterPaint } from './afterPaint';
+import type { DrawOptimizationOptions } from '@rive-app/webgl2';
 import type { Borrowed } from './canvasLifecycle';
 import { riveLoader, riveSlots } from './loader';
 import type { RiveInstance } from './types';
@@ -98,6 +99,8 @@ export function warmWord(source: string): void {
         shouldDisableRiveListeners: true,
         autoplay: false,
         autoBind: true,
+        // The borrowed word's rise changes layout after its own timeline has stopped.
+        drawingOptions: 'alwaysDraw' as DrawOptimizationOptions.AlwaysDraw,
         useOffscreenRenderer: true,
         enableRiveAssetCDN: false,
         onLoad: () => {

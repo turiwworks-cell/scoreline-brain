@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mountCanvas } from './canvasLifecycle';
 import { createSlots } from './loader';
-import type { RiveInstance, RiveOptions, RiveRuntime } from './types';
+import type { RiveInstance, RiveLayout, RiveOptions, RiveRuntime } from './types';
 import { borrowWord, freeWord, resetWordStage, warmWord } from './wordStage';
 
 /* Issue #6: with a live match the goal word is made once, and a scene's mount neither creates a Rive instance nor parses the file. */
@@ -12,9 +12,12 @@ vi.mock('./loader', async (original) => { const actual = await original<typeof i
 
 const SOURCE = '/rive/moments.riv';
 const instances: Fake[] = [];
+let resize: ResizeObserverCallback;
+const layoutOf = (b: { minX: number; minY: number; maxX: number; maxY: number }): RiveLayout => ({ ...b, copyWith: layoutOf });
 class Fake implements RiveInstance {
   stateMachineNames = ['Moments'];
   viewModelInstance = null;
+  layout = layoutOf({ minX: 0, minY: 0, maxX: 0, maxY: 0 });
   reset = vi.fn(); play = vi.fn(); pause = vi.fn(); stopRendering = vi.fn(); startRendering = vi.fn(); resizeDrawingSurfaceToCanvas = vi.fn(); cleanup = vi.fn();
   constructor(public options: RiveOptions) { instances.push(this); }
 }
@@ -29,7 +32,7 @@ const scene = () => {
   canvas.style.opacity = '0';
   box.append(canvas);
   document.body.append(box);
-  const binding = { cleanup: vi.fn(), resume: vi.fn() };
+  const binding = { cleanup: vi.fn(), resume: vi.fn(), resized: vi.fn() };
   const options = { source: SOURCE, eager: true, bind: vi.fn<(instance: RiveInstance, sync: () => void) => typeof binding>(() => binding), ready: vi.fn(), error: vi.fn(), borrow: () => borrowWord(SOURCE) };
   const life = mountCanvas(canvas, options);
   return { box, canvas, binding, options, life };
@@ -41,7 +44,7 @@ beforeEach(() => {
   mock.runtime.mockResolvedValue({ Rive: Fake });
   mock.file.mockResolvedValue(new Uint8Array([82, 73, 86, 69]).buffer);
   vi.stubGlobal('IntersectionObserver', class { observe() {} unobserve() {} disconnect() {} });
-  vi.stubGlobal('ResizeObserver', class { observe() {} unobserve() {} disconnect() {} });
+  vi.stubGlobal('ResizeObserver', class { constructor(fn: ResizeObserverCallback) { resize = fn; } observe() {} unobserve() {} disconnect() {} });
 });
 afterEach(() => { vi.unstubAllGlobals(); });
 
@@ -52,6 +55,7 @@ describe('the warm goal word', () => {
     const inst = await warm();
     expect(instances).toHaveLength(1);
     expect(inst.stopRendering).toHaveBeenCalled();
+    expect(inst.options.drawingOptions).toBe('alwaysDraw');
     expect(inst.options.canvas.parentElement?.id).toBe('rive-word-parking');
     expect(mock.slots!.count).toBe(1);
   });
@@ -91,6 +95,20 @@ describe('the warm goal word', () => {
     expect(inst.reset).toHaveBeenCalledTimes(2);
     expect(b.options.bind).toHaveBeenCalledWith(inst, expect.any(Function));
     b.life.dispose();
+  });
+
+  it('uses the borrowed surface and its observed pixel size for the word rise', async () => {
+    const inst = await warm();
+    const s = scene(); await flush();
+    const drawn = inst.options.canvas;
+    // The React placeholder is hidden; only the borrowed canvas owns a drawing surface.
+    drawn.width = 780; drawn.height = 1080;
+    vi.spyOn(drawn, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 390, 540));
+    vi.spyOn(s.canvas, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 0, 0));
+    resize([{ target: drawn, devicePixelContentBoxSize: [{ inlineSize: 780, blockSize: 1080 }], contentBoxSize: [{ inlineSize: 390, blockSize: 540 }] } as unknown as ResizeObserverEntry], {} as ResizeObserver);
+    expect(s.binding.resized).toHaveBeenLastCalledWith(780, 1080);
+    expect(inst.resizeDrawingSurfaceToCanvas.mock.calls.at(-1)![0]).toBeCloseTo(2, 4);
+    s.life.dispose();
   });
 
   it('a scene that mounts while it is still loading waits for it', async () => {

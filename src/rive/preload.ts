@@ -2,7 +2,6 @@ import { afterPaint } from './afterPaint';
 import { liveIconSource, momentsSource } from './assets';
 import { riveLoader } from './loader';
 import { preloadWord } from './wordChunk';
-import { freeWord, warmWord } from './wordStage';
 
 /**
  * A live match warms the word before a goal: the runtime, the file and the word's own chunk, then
@@ -15,15 +14,22 @@ export function preloadRive(hasLiveMatch: boolean): () => void {
   const sources = [liveIconSource, hasLiveMatch ? momentsSource : null].filter((s): s is string => s !== null);
   if (sources.length === 0) return () => {};
   const moments = hasLiveMatch ? momentsSource : null;
+  let disposed = false;
+  let freeWord: (() => void) | undefined;
   const cancel = afterPaint(() => {
-    const word = moments !== null ? [preloadWord()] : [];
+    // The stage is needed only after the gate opens, alongside the word's existing lazy chunk.
+    const word = moments !== null ? [preloadWord(), import('./wordStage').then((stage) => {
+      if (disposed) return;
+      stage.warmWord(moments);
+      freeWord = stage.freeWord;
+    })] : [];
     void Promise.all([riveLoader.runtime(), ...sources.map((source) => riveLoader.file(source)), ...word]).catch(() => {
       // The mounted component retains its fallback and can retry on a later mount.
     });
-    if (moments !== null) warmWord(moments);
   });
   return () => {
+    disposed = true;
     cancel();
-    if (moments !== null) freeWord();
+    freeWord?.();
   };
 }
