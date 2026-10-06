@@ -283,8 +283,9 @@ describe('the toast', () => {
     expect(a.stage()!.kind).toBe('toast');
     const toast = screen.getByTestId('moment-toast');
     expect(toast.textContent).toContain('Doué');
-    // no slide: it sits in its place, and the player and his name are already in
-    expect(toast.style.transform === '' || toast.style.transform === 'none').toBe(true);
+    // no slide: it sits in its place (only the hair of rotation that keeps it drawn between pixels),
+    // and the player and his name are already in
+    expect(toast.style.transform).not.toMatch(/translate/);
     const photo = toast.querySelector<HTMLElement>('[data-photo="bust"]')!.parentElement!;
     expect(photo.style.opacity).toBe('1');
   });

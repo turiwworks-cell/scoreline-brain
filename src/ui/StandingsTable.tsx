@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { m } from 'motion/react';
 import type { League, StandingRow, Team } from '../domain';
-import { CASCADE, cascade, transition } from '../motion';
+import { AT_REST, CASCADE, cascade, LANDED, slide, transition } from '../motion';
 import { Crest } from './Crest';
 import { Glass } from './Glass';
 import styles from './StandingsTable.module.css';
@@ -28,10 +28,10 @@ export function StandingsTable({
       delay === 0
         ? cascade('stats', { lift: 8 })
         : {
-            hidden: { opacity: 0, y: 8 },
+            hidden: { opacity: 0, transform: slide(0, 8) },
             shown: (index: number) => {
               const t = transition('stats', { index });
-              return { opacity: 1, y: 0, transition: { ...t, delay: (t.delay as number) + delay } };
+              return { opacity: 1, transform: AT_REST, transitionEnd: LANDED, transition: { ...t, delay: (t.delay as number) + delay } };
             },
           },
     [delay],

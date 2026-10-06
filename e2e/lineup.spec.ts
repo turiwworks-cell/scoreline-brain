@@ -28,15 +28,25 @@ function near(actual: Record<string, number>, want: Record<string, number>, tol 
 async function settled(page: Page) {
   await expect.poll(() => page.evaluate(() => document.querySelectorAll('[data-present="false"]').length)).toBe(0);
   await expect
-    .poll(() => panel(page).evaluate((el) => [getComputedStyle(el).opacity, getComputedStyle(el).transform, getComputedStyle(el.firstElementChild!).transform].join(' ')))
-    .toBe('1 none none');
+    // at rest a block keeps only the hair of rotation it slid with (src/motion/variants.ts)
+    .poll(() =>
+      panel(page).evaluate((el) => {
+        const still = (t: string) => { const m = new DOMMatrix(t); return !m.m41 && !m.m42 && Math.abs(m.a - 1) < 1e-6 && Math.abs(m.d - 1) < 1e-6 && Math.abs(m.b) < 1e-3 && Math.abs(m.c) < 1e-3; };
+        // the tab's body renders a frame after the bar: until then there is nothing to have settled
+        const body = el.firstElementChild;
+        if (!body) return 'no body yet';
+        return [getComputedStyle(el).opacity, still(getComputedStyle(el).transform), still(getComputedStyle(body).transform)].join(' ');
+      }),
+    )
+    .toBe('1 true true');
   await expect
     .poll(() =>
       page.evaluate(() =>
         [...document.querySelectorAll('[data-screen="match"][data-present="true"] [data-lineup] [data-row], [data-screen="match"][data-present="true"] [data-lineup] section button')].some((el) => {
           const host = el.closest('[data-row]') ?? el.parentElement!;
           const s = getComputedStyle(host);
-          return s.opacity !== '1' || (s.transform !== 'none' && s.transform !== 'matrix(1, 0, 0, 1, 0, 0)');
+          const still = (t: string) => { const m = new DOMMatrix(t); return !m.m41 && !m.m42 && Math.abs(m.a - 1) < 1e-6 && Math.abs(m.d - 1) < 1e-6 && Math.abs(m.b) < 1e-3 && Math.abs(m.c) < 1e-3; };
+          return s.opacity !== '1' || !still(s.transform);
         }),
       ),
     )

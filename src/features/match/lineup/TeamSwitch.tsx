@@ -1,7 +1,7 @@
 import { memo, useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { animate, m, useMotionValue, useMotionValueEvent, useReducedMotion, useTransform } from 'motion/react';
 import type { Side, Team } from '../../../domain';
-import { transition } from '../../../motion';
+import { drawn, transition } from '../../../motion';
 import { Crest, feel, Glass, mix, pastel, RollLabel } from '../../../ui';
 import styles from './Lineup.module.css';
 
@@ -49,7 +49,7 @@ export const TeamSwitch = memo(function TeamSwitch({ home, away, side, onChange 
 
   return (
     <Glass radius={23} className={styles.switch} role="radiogroup" aria-label="Team">
-      <m.span className={styles.thumb} style={{ x, background: thumbFill(teams[near]) }} aria-hidden="true" data-thumb={near} />
+      <m.span className={styles.thumb} transformTemplate={drawn} style={{ x, background: thumbFill(teams[near]) }} aria-hidden="true" data-thumb={near} />
       <div ref={group} className={styles.segs} onKeyDown={onKeyDown}>
         {(['home', 'away'] as const).map((s) => {
           const t = teams[s];

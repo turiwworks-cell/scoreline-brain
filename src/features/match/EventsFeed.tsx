@@ -1,7 +1,7 @@
 import { memo, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { cubicBezier, m, useReducedMotion, type Variants } from 'motion/react';
 import { minText, type Match, type Team } from '../../domain';
-import { snapPx, timing, transition } from '../../motion';
+import { AT_REST, HAIR, LANDED, slide, timing, transition } from '../../motion';
 import { useScoreline } from '../../store';
 import { Button, Crest, Icon, matchStops, PhotoTile, Pill, withFeel } from '../../ui';
 import { useMatchMinute } from './clock';
@@ -32,8 +32,8 @@ function feedTiming(): FeedTiming {
 // the tab's opening cascade (open, luau:5165): from 12 px above, row i after i × stagger, at most
 // twelve apart; rows shown by "Show all" fade in one after another (luau:5172)
 const rowIn: Variants = {
-  hidden: { opacity: 0, y: -12 },
-  shown: (i: number) => ({ opacity: 1, y: 0, transition: transition('events', { index: i }) }),
+  hidden: { opacity: 0, transform: slide(0, -12) },
+  shown: (i: number) => ({ opacity: 1, transform: AT_REST, transitionEnd: LANDED, transition: transition('events', { index: i }) }),
   faded: { opacity: 0 },
   all: (i: number) => ({ opacity: 1, transition: transition('events', { index: i }) }),
 };
@@ -94,17 +94,19 @@ export const EventsFeed = memo(function EventsFeed({ match, home, away, onReplay
     const slots = Array.from(feed.querySelectorAll<HTMLElement>(':scope > [data-row]'));
     const rail = railRef.current;
     const after = afterRef.current;
+    // at rest the rows and what follows them keep the hair they slide with (variants.ts), so they
+    // stand on the pixels they moved on
     const rest = () => {
       for (const s of slots) {
-        s.style.transform = '';
+        s.style.transform = HAIR;
         s.style.opacity = '';
       }
       if (rail) rail.style.transform = '';
-      if (after) after.style.transform = '';
+      if (after) after.style.transform = HAIR;
       feed.style.clipPath = '';
     };
     const left = g.until - clock();
-    if (still || !(left > 0)) {
+    if (still || !(left > 0) || typeof feed.animate !== 'function') {
       rest();
       // the rows were chosen while one was still opening: choose them again once it has (at once
       // when that passed unseen, in a hidden tab or a re-render at the motion's end)
@@ -112,32 +114,53 @@ export const EventsFeed = memo(function EventsFeed({ match, home, away, onReplay
       const timer = setTimeout(() => setAt(clock()), Math.max(0, left) * 1000);
       return () => clearTimeout(timer);
     }
-    let raf = 0;
     const frameRows: FrameRow[] = rows.map((r, j) => ({
       h: slots[j]?.offsetHeight ?? 0,
       start: r.kind === 'e' ? (startOf.get(r.key) ?? OLD) : OLD,
       index: r.kind === 'e' ? r.index : 0,
     }));
     const full = frameRows.reduce((s, r) => s + r.h, 0);
-    const frame = () => {
-      const now = clock();
-      const f = feedFrame(frameRows, { now, evAll, growing: g.growing, foldT: g.foldT, limit: LIMIT, t });
-      slots.forEach((s, j) => {
-        s.style.transform = f.lift[j] ? `translateY(${-f.lift[j]!}px)` : '';
-        s.style.opacity = f.alpha[j] === 1 ? '' : String(f.alpha[j]);
-      });
-      if (rail) rail.style.transform = `scaleY(${full > 36 ? Math.max(0, full - f.end - 36) / (full - 36) : 0})`;
-      if (after) after.style.transform = f.end ? `translateY(${-f.end}px)` : '';
-      feed.style.clipPath = `inset(0 0 ${f.end - 1}px 0)`;
-      if (now < g.until) raf = requestAnimationFrame(frame);
-      else {
+    // The motion from now to its end, baked into keyframes a frame apart and run by the compositor: the
+    // rows slide with a hair of rotation (slide, variants.ts), drawn between pixels rather than a pixel at
+    // a time, and the main thread's work can't stall them. When it ends they rest on the hair (rest).
+    const now = clock();
+    const steps = Math.max(1, Math.ceil(left * 60));
+    const kf = { slots: slots.map((): Keyframe[] => []), rail: [] as Keyframe[], after: [] as Keyframe[], clip: [] as Keyframe[] };
+    let ends = false;
+    for (let k = 0; k <= steps; k++) {
+      const offset = k / steps;
+      const f = feedFrame(frameRows, { now: now + offset * left, evAll, growing: g.growing, foldT: g.foldT, limit: LIMIT, t });
+      slots.forEach((_, j) => kf.slots[j]!.push({ offset, transform: slide(0, -(f.lift[j] ?? 0)), opacity: f.alpha[j] ?? 1 }));
+      kf.rail.push({ offset, transform: `scaleY(${full > 36 ? Math.max(0, full - f.end - 36) / (full - 36) : 0})` });
+      kf.after.push({ offset, transform: slide(0, -f.end) });
+      kf.clip.push({ offset, clipPath: `inset(0 0 ${f.end - 1}px 0)` });
+      ends ||= f.end !== 0;
+    }
+    const run = { duration: left * 1000, easing: 'linear', fill: 'both' } as const;
+    // a row that stays put all the while gets no animation (nor a layer)
+    const stays = (frames: Keyframe[]) => frames.every((f) => f.transform === AT_REST && f.opacity === 1);
+    const anims = [
+      ...slots.map((s, j) => (stays(kf.slots[j]!) ? undefined : s.animate(kf.slots[j]!, run))),
+      rail?.animate(kf.rail, run),
+      ends ? after?.animate(kf.after, run) : undefined,
+      feed.animate(kf.clip, run),
+    ];
+    const done = anims.at(-1)!;
+    let live = true;
+    done.finished.then(
+      () => {
+        if (!live) return;
+        for (const a of anims) a?.cancel();
         rest();
         // the rows that folded away go now
-        setAt(now);
-      }
+        setAt(clock());
+      },
+      () => {},
+    );
+    return () => {
+      live = false;
+      for (const a of anims) a?.cancel();
     };
-    frame();
-    return () => cancelAnimationFrame(raf);
     // rowsKey and the starts stand for `rows` and `startOf`, which are new objects every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowsKey, starts.join('|'), evAll, g.until, g.growing, g.foldT, still]);
@@ -168,7 +191,6 @@ export const EventsFeed = memo(function EventsFeed({ match, home, away, onReplay
                 // startsOf staggers rows born together, so only the first old row's start is OLD.
                 initial={(born.get(row.key) ?? OLD) !== OLD ? false : row.index > LIMIT && evAll ? 'faded' : 'hidden'}
                 animate={row.index > LIMIT && evAll ? 'all' : 'shown'}
-                transformTemplate={snapPx}
               >
                 <EventRow
                   item={row.item}

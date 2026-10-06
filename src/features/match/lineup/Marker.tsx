@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { m, useReducedMotion } from 'motion/react';
 import type { Player, Team } from '../../../domain';
-import { snapPx, transition } from '../../../motion';
+import { AT_REST, LANDED, slide, transition } from '../../../motion';
 import { EventTags, Glass, KitDisc, PlayerPhoto, RatingBadge, Star, SubOffTag, textWidth, useFontVersion, withFeel, type PhotoSources } from '../../../ui';
 import { PITCH, type Slot } from './formation';
 import type { Marks } from './model';
@@ -53,16 +53,15 @@ export const Marker = memo(function Marker({ team, slot, name, marks, rating, be
   const w = clamp(inner + 18, PITCH.face + 8, maxW);
 
   // forwards first, then midfield, defence and the keeper (motion: lineup)
-  const enter = { opacity: 1, y: 0, transition: transition('lineup', { index: slot.fromTop + (slot.index - 1) * 0.25 }) };
+  const enter = { opacity: 1, transform: AT_REST, transitionEnd: LANDED, transition: transition('lineup', { index: slot.fromTop + (slot.index - 1) * 0.25 }) };
   const label = `${num} ${player?.short ?? name}`;
 
   return (
     <m.div
       className={styles.slot}
       style={{ left: slot.x - 38, top: slot.y - 65 }}
-      initial={reduce ? false : { opacity: 0, y: 26 }}
-      animate={hold && !reduce ? { opacity: 0, y: 26 } : enter}
-      transformTemplate={snapPx}
+      initial={reduce ? false : { opacity: 0, transform: slide(0, 26) }}
+      animate={hold && !reduce ? { opacity: 0, transform: slide(0, 26) } : enter}
       data-row={slot.row}
     >
       <button

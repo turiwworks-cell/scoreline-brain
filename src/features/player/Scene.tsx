@@ -1,5 +1,6 @@
 import { memo, useState } from 'react';
 import { m, useTransform, type MotionValue } from 'motion/react';
+import { drawn } from '../../motion';
 import { inkCentre, KitDisc, mix, SoftLight, useFontVersion, type PhotoSources } from '../../ui';
 import type { CrestTeam } from '../../ui';
 import { CUT_H, HERO, LINE_Y, NUMBER } from './layout';
@@ -24,7 +25,7 @@ export const GiantNumber = memo(function GiantNumber({ n, blur, slide }: { n: nu
   useFontVersion();
   const centre = inkCentre(NUMBER.weight, NUMBER.size, NUMBER.track, String(n));
   return (
-    <m.span className={blur ? `${styles.number} ${styles.numberBlur}` : styles.number} style={{ x: slide, left: `calc(50% - ${centre}px)` }} aria-hidden="true" data-pv="number">
+    <m.span className={blur ? `${styles.number} ${styles.numberBlur}` : styles.number} transformTemplate={drawn} style={{ x: slide, left: `calc(50% - ${centre}px)` }} aria-hidden="true" data-pv="number">
       {n}
     </m.span>
   );
@@ -80,7 +81,7 @@ export const Hero = memo(function Hero({ team, n, photo, opening, dir }: HeroPro
     <>
       {shown && <GiantNumber n={n} slide={numberSlide} />}
       <div className={styles.hero} data-pv="hero">
-        <m.div className={styles.heroArt} style={{ x: slide, opacity: alpha, scale: opening.heroScale }}>
+        <m.div className={styles.heroArt} transformTemplate={drawn} style={{ x: slide, opacity: alpha, scale: opening.heroScale }}>
           <span className={shown ? styles.bust : styles.kit} data-pv="bust">
             {shown ? <Picture photo={shown} className={styles.bustImg} priority onError={() => setFailed(shown.src)} /> : <KitDisc team={team} n={n} size={92} />}
           </span>

@@ -1,4 +1,4 @@
-import { timing, type TimingKey } from './tokens';
+import { reduced, timing, type TimingKey } from './tokens';
 
 /*
  * A Lua-style timed animation: `bez(curve, prog(now - t0, delay + i × stagger, dur))` (anim,
@@ -8,7 +8,8 @@ import { timing, type TimingKey } from './tokens';
  * takes over at once (the Lua's agility).
  *
  * Timings come from src/motion/tokens.ts when the animation starts. fill: 'both' holds the first
- * frame through the delay and the last after the end, as the Lua's clamped progress does.
+ * frame through the delay and the last after the end, as the Lua's clamped progress does: a slide
+ * that ends AT_REST (variants.ts) keeps the hair it landed with.
  */
 
 export interface PlayOptions {
@@ -18,7 +19,6 @@ export interface PlayOptions {
   withDelay?: boolean;
 }
 
-const reduced = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /** Stops every animation `play` started on the element; it snaps back to its own styles. */
 export function stop(el: Element | null | undefined): void {

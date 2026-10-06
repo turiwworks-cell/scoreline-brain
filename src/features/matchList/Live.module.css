@@ -113,8 +113,11 @@
   -webkit-tap-highlight-color: transparent;
   /* the dip of a goal, the step the other cards take, and the press: scale about the card's centre.
      No hover: a card never lifts or lights under the pointer (only the press dips it). */
-  transform: translateY(calc(var(--gdy, 0) * 1px)) scale(calc(var(--gsc, 1) * (1 - 0.03 * var(--dip))));
+  transform: translateY(calc(var(--gdy, 0) * 1px)) scale(calc(var(--gsc, 1) * (1 - 0.03 * var(--dip)))) rotate(0.001deg);
   transform-origin: 50% 50%;
+  /* the goal's step and dip are written frame by frame: its own layer and the hair of rotation draw
+     them between pixels, not a pixel at a time (drawn, src/motion/variants.ts) */
+  will-change: transform;
 }
 .card:focus-visible {
   outline: 2px solid var(--c-text);

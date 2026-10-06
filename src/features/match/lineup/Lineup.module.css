@@ -17,6 +17,8 @@
   margin: 0 var(--gutter) 22px;
 }
 .thumb {
+  /* its own layer: drawn between pixels as its motion value moves it (drawn, variants.ts) */
+  will-change: transform;
   position: absolute;
   top: 4px;
   left: 4px;

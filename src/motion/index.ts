@@ -17,9 +17,8 @@ export {
   type TimingDef,
   type TimingKey,
 } from './tokens';
-export { CASCADE, cascade, LAYER, paneSwap, playerPage, pushBase, pushLayer, scrim, sheetRise, transition, type CascadeOptions, type TransitionOptions } from './variants';
+export { AT_REST, CASCADE, cascade, drawn, HAIR, LANDED, LAYER, paneSwap, playerPage, pushBase, pushLayer, scrim, sheetRise, slide, transition, type CascadeOptions, type TransitionOptions } from './variants';
 export { play, stop, type PlayOptions } from './play';
-export { snapPx } from './snap';
 export { useAfterPaint } from './afterPaint';
 export { MotionProvider } from './MotionProvider';
 export { bez, clamp, ease, env, lerp, prog } from './curve';

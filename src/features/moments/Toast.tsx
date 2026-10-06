@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { animate, m, useMotionValue, useTransform, type MotionValue } from 'motion/react';
 import { minText, scoreStr } from '../../domain';
-import { bez, CURVES, lerp, prog, timing, TOAST_OUT, type MomentDirector, type Presentation } from '../../motion';
+import { bez, CURVES, drawn, lerp, prog, timing, TOAST_OUT, type MomentDirector, type Presentation } from '../../motion';
 import { Crest, Glass, KitDisc, PlayerPhoto, photoProps, SoftLight, Star, textWidth, useFontVersion, type PhotoSources } from '../../ui';
 import { DRAG_SLOP, PULL_DOWN, SPRING_BACK, SWIPE_DY, SWIPE_VY, TOAST, TOAST_LEAVE_SHARE, TOAST_RISE } from './choreo';
 import { kindLabel, summaryLine, type MomentInfo } from './model';
@@ -126,6 +126,7 @@ export function Toast({ p, info, d, reduced, photo, followed, onOpen }: ToastPro
   return (
     <m.div
       className={styles.toastSlot}
+      transformTemplate={drawn}
       style={{ y, opacity: fade }}
       data-testid="moment-toast"
       data-kind={p.kind}
@@ -182,12 +183,12 @@ function MomentBody({ p, info, photo, followed, pPhoto, pName }: { p: Presentati
     <span className={styles.toastBody} aria-hidden="true">
       <span className={styles.photoSlot}>
         {photo ? (
-          <m.span className={styles.photoRise} style={{ y: photoY, opacity: pPhoto }}>
+          <m.span className={styles.photoRise} transformTemplate={drawn} style={{ y: photoY, opacity: pPhoto }}>
             <PlayerPhoto team={info.team} n={info.n} width={54} {...photoProps(photo)} alt="" />
           </m.span>
         ) : (
           info.n > 0 && (
-            <m.span className={styles.discRise} style={{ y: discY, opacity: pPhoto }}>
+            <m.span className={styles.discRise} transformTemplate={drawn} style={{ y: discY, opacity: pPhoto }}>
               <KitDisc team={info.team} n={info.n} size={40} />
             </m.span>
           )
@@ -196,16 +197,16 @@ function MomentBody({ p, info, photo, followed, pPhoto, pName }: { p: Presentati
       <m.span className={styles.badge} style={{ x: badgeX, y: badgeY, scale: badgeS }}>
         {red ? <span className={styles.redCard} /> : <Crest team={info.team} size={36} />}
       </m.span>
-      <m.span className={styles.toastText} style={{ x: textX }}>
+      <m.span className={styles.toastText} transformTemplate={drawn} style={{ x: textX }}>
         <span className={styles.toastLabel}>
           <span className={red ? styles.red : cancelled ? styles.muted : styles.live}>{kindLabel(p.moment.kind)}</span>
           <span className={styles.muted}>{minText(p.moment.minute)}</span>
         </span>
-        <m.span className={styles.toastName} style={{ y: swap ? teamY : 0, opacity: swap ? teamO : 1, fontSize: teamSize }}>
+        <m.span className={styles.toastName} transformTemplate={drawn} style={{ y: swap ? teamY : 0, opacity: swap ? teamO : 1, fontSize: teamSize }}>
           {info.team.name}
         </m.span>
         {swap && (
-          <m.span className={styles.toastName} style={{ y: nameY, opacity: pName, fontSize: nameSize }}>
+          <m.span className={styles.toastName} transformTemplate={drawn} style={{ y: nameY, opacity: pName, fontSize: nameSize }}>
             {info.name}
             {followed && <Star className={styles.star} />}
           </m.span>

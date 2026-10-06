@@ -72,7 +72,7 @@ describe('DayTabs widths', () => {
     const word = (s: string) => s.length * glyph;
     const w = LABELS.map((t) => word(t.label) + DAY_PAD * 2);
     const x = w[0]! + w[1]!;
-    expect(strip(container).style.transform).toBe(`translateX(${Math.floor(354 / 2 - (x + w[2]! / 2) + 0.5)}px)`);
+    expect(strip(container).style.transform).toBe(`translateX(${Math.floor(354 / 2 - (x + w[2]! / 2) + 0.5)}px) rotate(0.001deg)`);
   });
 
   it('measures again when the face loads, and the strip follows', async () => {

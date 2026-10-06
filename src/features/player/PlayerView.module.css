@@ -43,6 +43,8 @@
 
 /* ---- the giant number (bigNumber, luau:5895): L 300, white at 8 %, its baseline on the line ---- */
 .number {
+  /* its own layer: drawn between pixels as its motion value moves it (drawn, variants.ts) */
+  will-change: transform;
   position: absolute;
   top: calc(399.1667px - 0.9485em);
   font: var(--fw-l) 300px / 1.2 var(--font-sans);
@@ -69,6 +71,8 @@
 }
 /* the cell, which grows from 0.9 about its middle as he opens (luau:5965) */
 .heroArt {
+  /* its own layer: drawn between pixels as its motion value moves it (drawn, variants.ts) */
+  will-change: transform;
   position: absolute;
   top: 90px;
   left: calc(50% - 140px);
@@ -287,6 +291,8 @@
   height: 92px;
 }
 .infoSlide {
+  /* its own layer: drawn between pixels as its motion value moves it (drawn, variants.ts) */
+  will-change: transform;
   position: absolute;
   inset: 0;
 }

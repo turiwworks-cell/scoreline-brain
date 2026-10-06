@@ -24,6 +24,8 @@
 .ch {
   position: relative;
   display: inline-block;
+  /* the hair the roll carries (below), kept at rest: the letters rest on the pixel they rolled on */
+  transform: rotate(0.001deg);
 }
 
 /* the copy that comes in from below */
@@ -39,11 +41,12 @@
   animation-delay: calc(var(--i) * var(--roll-stagger));
 }
 
+/* a hair of rotation lets the compositor draw the roll between pixels (variants.ts) */
 @keyframes roll {
   from {
-    transform: translateY(0);
+    transform: translateY(0) rotate(0.001deg);
   }
   to {
-    transform: translateY(calc(-1 * var(--roll-rise)));
+    transform: translateY(calc(-1 * var(--roll-rise))) rotate(0.001deg);
   }
 }

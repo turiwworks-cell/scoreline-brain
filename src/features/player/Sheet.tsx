@@ -1,6 +1,6 @@
 import { memo, useEffect, useLayoutEffect, useRef, type CSSProperties } from 'react';
 import { animate, m, useTransform, type MotionValue } from 'motion/react';
-import { CASCADE, cascade, CURVES } from '../../motion';
+import { CASCADE, cascade, CURVES, drawn } from '../../motion';
 import type { Match, Player, PStats, Team } from '../../domain';
 import { Glass, pastel, ratingTone, Tag, textWidth, useFontVersion } from '../../ui';
 import { barsOf, factsOf, fitSize, notPlayed, roleLabel, type Bar, type MatchTag, type Substitution } from './model';
@@ -40,8 +40,8 @@ export const Info = memo(function Info({ player, team, n, fallbackName, slide, s
   const lastW = textWidth(500, ls, -0.03, last);
   const x = useTransform(slide, (v) => v * 0.4);
   return (
-    <m.div className={styles.info} variants={c} custom={lift(0)} initial={stepped ? false : CASCADE.initial} animate={CASCADE.animate} transformTemplate={CASCADE.transformTemplate} data-pv="info">
-      <m.div className={styles.infoSlide} style={{ x }}>
+    <m.div className={styles.info} variants={c} custom={lift(0)} initial={stepped ? false : CASCADE.initial} animate={CASCADE.animate} data-pv="info">
+      <m.div className={styles.infoSlide} transformTemplate={drawn} style={{ x }}>
       <span className={`${styles.line} ${styles.first}`} style={baseline(0)}>
         {first}
       </span>
@@ -66,7 +66,7 @@ export const Facts = memo(function Facts({ player, team, n, now, stepped }: { pl
   const cells = factsOf(player, team, n, now);
   const cw = 354 / cells.length;
   return (
-    <m.div className={styles.facts} variants={c} custom={lift(1)} initial={stepped ? false : CASCADE.initial} animate={CASCADE.animate} transformTemplate={CASCADE.transformTemplate} data-pv="facts">
+    <m.div className={styles.facts} variants={c} custom={lift(1)} initial={stepped ? false : CASCADE.initial} animate={CASCADE.animate} data-pv="facts">
       {cells.map((cell, i) => (
         <div key={cell.label} className={styles.cell} style={{ width: cw }} data-pv="fact">
           {i > 0 && <span className={styles.divider} aria-hidden="true" />}
@@ -163,7 +163,7 @@ export const MatchBlock = memo(function MatchBlock({ match, stats, tags, team, k
   if (!stats.played) {
     const note = notPlayed(match.status, match.kickoff);
     return (
-      <m.div className={styles.match} variants={c} custom={lift(2)} initial={initial} animate={CASCADE.animate} transformTemplate={CASCADE.transformTemplate} data-pv="match" data-played="no">
+      <m.div className={styles.match} variants={c} custom={lift(2)} initial={initial} animate={CASCADE.animate} data-pv="match" data-played="no">
         <div className={styles.matchHead}>
           <span className={styles.label}>This match</span>
           <span className={`${styles.label} ${styles.ink}`}>{note.head}</span>
@@ -179,7 +179,7 @@ export const MatchBlock = memo(function MatchBlock({ match, stats, tags, team, k
   const fill = pastel(team.colors[0]);
   return (
     <>
-      <m.div className={styles.match} variants={c} custom={lift(2)} initial={initial} animate={CASCADE.animate} transformTemplate={CASCADE.transformTemplate} data-pv="match" data-played="yes">
+      <m.div className={styles.match} variants={c} custom={lift(2)} initial={initial} animate={CASCADE.animate} data-pv="match" data-played="yes">
         <div className={styles.matchHead}>
           <span className={styles.label}>This match</span>
           <span className={`${styles.label} ${styles.ink}`}>{stats.mins} min</span>
@@ -197,7 +197,7 @@ export const MatchBlock = memo(function MatchBlock({ match, stats, tags, team, k
           </div>
         </div>
       </m.div>
-      <m.div className={styles.numbers} variants={c} custom={lift(3)} initial={initial} animate={CASCADE.animate} transformTemplate={CASCADE.transformTemplate} data-pv="numbers">
+      <m.div className={styles.numbers} variants={c} custom={lift(3)} initial={initial} animate={CASCADE.animate} data-pv="numbers">
         {!stats.real && <p className={styles.pending}>
             <span>Player numbers will show once the data has them.</span>
           </p>}

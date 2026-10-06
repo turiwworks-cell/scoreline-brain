@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { m } from 'motion/react';
 import { AccountSheet, CHEST_SIZES, followPref, MatchList, useFollowed } from '../../features/matchList';
 import type { Team } from '../../domain';
-import { pushBase, snapPx } from '../../motion';
+import { pushBase } from '../../motion';
 import { playerPhoto, usePhotoManifest, warmPhoto } from '../../ui';
 import { demoFollowed } from '../followed';
 import { useNav } from '../nav/useNav';
@@ -33,7 +33,7 @@ export function ListPane({ layout, shifted, covered, list, openId }: { layout: L
   const openSheet = useCallback(() => setSheet(true), []);
   const closeSheet = useCallback(() => setSheet(false), []);
   return (
-    <m.div className={layout === 'phone' ? styles.base : styles.pane} data-pane="list" variants={pushBase} initial={false} animate={shifted ? 'covered' : 'rest'} transformTemplate={snapPx}>
+    <m.div className={layout === 'phone' ? styles.base : styles.pane} data-pane="list" variants={pushBase} initial={false} animate={shifted ? 'covered' : 'rest'}>
       <Screen pane="list" contentKey={`${list.day}|${list.live ? 'live' : ''}`} label="Matches" covered={covered || sheet}>
         <MatchList
           list={list}

@@ -19,9 +19,11 @@ const landed = (target: Locator) =>
   expect
     .poll(() =>
       target.evaluate((el) => {
+        // at rest a block keeps only the hair of rotation it slid with (src/motion/variants.ts)
+        const still = (t: string) => { const m = new DOMMatrix(t); return !m.m41 && !m.m42 && Math.abs(m.a - 1) < 1e-6 && Math.abs(m.d - 1) < 1e-6 && Math.abs(m.b) < 1e-3 && Math.abs(m.c) < 1e-3; };
         for (let n: Element | null = el; n && !n.hasAttribute('data-scroller'); n = n.parentElement) {
           const s = getComputedStyle(n);
-          if (s.opacity !== '1' || (s.transform !== 'none' && s.transform !== 'matrix(1, 0, 0, 1, 0, 0)')) return false;
+          if (s.opacity !== '1' || !still(s.transform)) return false;
         }
         return true;
       }),

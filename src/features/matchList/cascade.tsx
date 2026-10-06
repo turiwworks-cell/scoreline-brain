@@ -1,6 +1,6 @@
 import { useContext, type CSSProperties, type ReactNode } from 'react';
 import { m, type Variants } from 'motion/react';
-import { snapPx, transition } from '../../motion';
+import { AT_REST, LANDED, slide, transition } from '../../motion';
 import { FeedContext } from './feedContext';
 
 /*
@@ -24,13 +24,13 @@ interface Custom {
 
 const enter = (c: Custom) => ({
   opacity: [0, 1],
-  x: [18 * c.dir, 0],
-  y: [6, 0],
+  transform: [slide(18 * c.dir, 6), AT_REST],
+  transitionEnd: LANDED,
   transition: transition('list', { index: Math.min(c.i, BLOCK_CAP) }),
 });
 
 const listBlock: Variants = {
-  hidden: (c: Custom) => ({ opacity: 0, x: 18 * c.dir, y: 6 }),
+  hidden: (c: Custom) => ({ opacity: 0, transform: slide(18 * c.dir, 6) }),
   odd: enter,
   even: enter,
 };
@@ -38,7 +38,7 @@ const listBlock: Variants = {
 export function Block({ index, className, style, hidden, children }: { index: number; className?: string; style?: CSSProperties; hidden?: boolean; children: ReactNode }) {
   const { epoch, dir, fresh } = useContext(FeedContext);
   return (
-    <m.div className={className} style={style} hidden={hidden} variants={listBlock} custom={{ i: index, dir }} initial={fresh ? 'hidden' : false} animate={epoch % 2 ? 'odd' : 'even'} transformTemplate={snapPx}>
+    <m.div className={className} style={style} hidden={hidden} variants={listBlock} custom={{ i: index, dir }} initial={fresh ? 'hidden' : false} animate={epoch % 2 ? 'odd' : 'even'}>
       {children}
     </m.div>
   );

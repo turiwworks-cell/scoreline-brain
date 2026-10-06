@@ -175,6 +175,28 @@ provider API → adapter server ─┬─ GET /feed        (snapshot, ETag)
   use springs with `bounce: 0`.
 - Animate only `transform` and `opacity`, plus `filter` on at most 6 live cards. No Motion
   `layout` and no `layoutId`.
+- **Slides are drawn between pixels** (`slide`, `HAIR`, `drawn` in `src/motion/variants.ts`).
+  Chromium draws a block moved by a plain translation on whole device pixels, so the slow end
+  of an eased slide stands on its last pixel for several frames and drops into place: a hold
+  and a one-frame jump at the end of every entrance (measured in 2026-10: every slide stair-
+  stepped through its last two pixels, by Motion's `y`, WAAPI or CSS alike). So:
+  - a slide is a `transform` keyframe with a hair of rotation (`rotate(0.001deg)`): Motion and
+    `play()` run it on the compositor, which draws a transform that is more than a translation
+    where it is, a fraction of a pixel at a time. Never Motion's `x`/`y` (they run on the main
+    thread and stair-step), and no `transformTemplate` on a slide (it keeps Motion off the
+    compositor);
+  - a block **keeps the hair when it lands** (`transitionEnd: LANDED`, or a fill that holds
+    `AT_REST`). With more than a translation the browser draws a block from a whole pixel; with
+    none, from wherever its layout puts it, between two. Dropping the hair moves a line of text
+    that sits near half a pixel by a whole one, the jump all over again. Text under the hair is
+    as crisp as without it. The shell's layers (screen push, the list under it, the tablet
+    sheet) sit on whole pixels and scroll: they land on `none`;
+  - what a motion value moves frame by frame (the toast, the goal scene, the player page's step
+    slides, the line-up switch, a live card's goal step) keeps its own layer (`will-change:
+    transform`) and the hair for as long as it lives (`transformTemplate={drawn}`);
+  - the live feed's arrival is baked into compositor keyframes a frame apart (`EventsFeed.tsx`).
+  - Not covered: what moves by layout, not transform (the Live section opening, the follow card
+    and a league group folding, the Today tab's width), and SVG (the momentum chart's goal tags).
 - **No shared elements.** Nothing flies between screens, as in the Lua. (Card→hero and
   face→bust flights were built in Part 9 and removed after the 2026-10-04 review: logos flew from
   the middle of the page, and ghosts showed under the lineup plates.)

@@ -40,7 +40,8 @@ async function settled(page: Page, withPlayer = true) {
       const h = el.querySelector('[data-pv="hero"]');
       if (!h) return true;
       const c = getComputedStyle(h);
-      return c.opacity === '1' && (c.transform === 'none' || c.transform === 'matrix(1, 0, 0, 1, 0, 0)');
+      const still = (t: string) => { const m = new DOMMatrix(t); return !m.m41 && !m.m42 && Math.abs(m.a - 1) < 1e-6 && Math.abs(m.d - 1) < 1e-6 && Math.abs(m.b) < 1e-3 && Math.abs(m.c) < 1e-3; };
+      return c.opacity === '1' && still(c.transform);
     }))
     .toBe(true);
   await expect.poll(() => screenOf(page).evaluate((el) => [...el.querySelectorAll('[data-pv="match"], [data-pv="facts"]')].every((b) => getComputedStyle(b).opacity === '1'))).toBe(true);

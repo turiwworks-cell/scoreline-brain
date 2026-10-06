@@ -104,6 +104,9 @@ export function resetMotion(): void {
   live = DEFAULTS;
 }
 
+/** Whether the person asked for reduced motion (MotionConfig reducedMotion="user" follows the same). */
+export const reduced = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 /** A section ready to animate with: seconds, divided by `speed`, clamped like the Lua does. */
 export interface Timing {
   readonly duration: number;

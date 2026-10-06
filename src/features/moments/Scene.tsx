@@ -4,7 +4,7 @@ import { GoalWord, type GoalWordProps } from '../../rive/GoalWord';
 import { momentsSource } from '../../rive/assets';
 import { createWordClock } from '../../rive/wordClock';
 import { minText } from '../../domain';
-import { bez, clamp, CURVES, ease, goalLetters, lerp, prog, timing, type MomentDirector, type Presentation, type Timing } from '../../motion';
+import { bez, clamp, CURVES, drawn, ease, goalLetters, lerp, prog, timing, type MomentDirector, type Presentation, type Timing } from '../../motion';
 import { Crest, Icon, KitDisc, matchStops, mix, pastel, RoundButton, SoftLight, Star, textWidth, useFontVersion, type PhotoSources } from '../../ui';
 import {
   BUST_K,
@@ -372,7 +372,7 @@ function Bust({ t, T, at, g, info, photo }: { t: MotionValue<number>; T: Timing;
   if (photo && !failed) {
     const w = 288 * BUST_K;
     return (
-      <m.div className={styles.bust} style={{ left: g.cx - dw / 2, top: g.floor - dh, width: dw, height: dh, y: lift, opacity: o }}>
+      <m.div className={styles.bust} transformTemplate={drawn} style={{ left: g.cx - dw / 2, top: g.floor - dh, width: dw, height: dh, y: lift, opacity: o }}>
         <picture>
           {photo.sources.map((s) => (
             <source key={s.type} type={s.type} srcSet={s.srcSet} sizes={`${w}px`} />
@@ -395,7 +395,7 @@ function Bust({ t, T, at, g, info, photo }: { t: MotionValue<number>; T: Timing;
   }
   if (info.n <= 0) return null;
   return (
-    <m.div className={styles.bust} style={{ left: g.cx - 84, top: g.floor - 110 - 84, width: 168, height: 168, y: lift, opacity: o }}>
+    <m.div className={styles.bust} transformTemplate={drawn} style={{ left: g.cx - 84, top: g.floor - 110 - 84, width: 168, height: 168, y: lift, opacity: o }}>
       <KitDisc team={info.team} n={info.n} size={168} />
     </m.div>
   );
@@ -431,7 +431,7 @@ function Story({ t, T, p, info, g, followed, red, line }: { t: MotionValue<numbe
   return (
     <div className={styles.floor} style={{ top: g.floor }}>
       <m.span className={styles.floorLine} style={{ background: line, scaleX: pF }} />
-      <m.div className={styles.story} style={{ y: nameY, opacity: pN }}>
+      <m.div className={styles.story} transformTemplate={drawn} style={{ y: nameY, opacity: pN }}>
         <span className={styles.first}>{info.first || ' '}</span>
         <span className={styles.last} style={{ fontSize: lastSize }}>
           {info.last}
@@ -449,7 +449,7 @@ function Story({ t, T, p, info, g, followed, red, line }: { t: MotionValue<numbe
         </span>
       </m.div>
       {info.commentary && (
-        <m.div className={styles.commentary} style={{ y: cY, opacity: pC }}>
+        <m.div className={styles.commentary} transformTemplate={drawn} style={{ y: cY, opacity: pC }}>
           <span className={styles.commentaryHead}>
             <span className={styles.commentaryBar} style={{ background: red ? 'var(--c-red)' : 'var(--c-text)' }} />
             <span className={styles.muted}>Commentary</span>
@@ -497,7 +497,7 @@ function Digit({ prev, cur, rolls, roll }: { prev: number; cur: number; rolls: b
   const y = useTransform(() => (rolls ? -26 * roll.get() : -26));
   return (
     <span className={styles.digit}>
-      <m.span className={styles.digitCol} style={{ y }}>
+      <m.span className={styles.digitCol} transformTemplate={drawn} style={{ y }}>
         <span>{rolls ? prev : ''}</span>
         <span>{cur}</span>
       </m.span>

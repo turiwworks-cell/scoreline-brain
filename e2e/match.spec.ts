@@ -28,8 +28,17 @@ function near(actual: Record<string, number>, want: Record<string, number>, tol 
 async function settled(page: Page) {
   await expect.poll(() => page.evaluate(() => document.querySelectorAll('[data-present="false"]').length)).toBe(0);
   await expect
-    .poll(() => panel(page).evaluate((el) => [getComputedStyle(el).opacity, getComputedStyle(el).transform, getComputedStyle(el.firstElementChild!).transform].join(' ')))
-    .toBe('1 none none');
+    // at rest a block keeps only the hair of rotation it slid with (src/motion/variants.ts)
+    .poll(() =>
+      panel(page).evaluate((el) => {
+        const still = (t: string) => { const m = new DOMMatrix(t); return !m.m41 && !m.m42 && Math.abs(m.a - 1) < 1e-6 && Math.abs(m.d - 1) < 1e-6 && Math.abs(m.b) < 1e-3 && Math.abs(m.c) < 1e-3; };
+        // the tab's body renders a frame after the bar: until then there is nothing to have settled
+        const body = el.firstElementChild;
+        if (!body) return 'no body yet';
+        return [getComputedStyle(el).opacity, still(getComputedStyle(el).transform), still(getComputedStyle(body).transform)].join(' ');
+      }),
+    )
+    .toBe('1 true true');
 }
 
 async function open(page: Page, url: string) {
@@ -148,7 +157,14 @@ test('Table marks the top two and the sides playing now', async ({ page }, info)
   const rows = s.getByRole('row');
   // the header and the four teams, the last one in (motion: stats, row by row)
   await expect(rows).toHaveCount(5);
-  await expect.poll(() => rows.nth(4).evaluate((el) => getComputedStyle(el).transform + getComputedStyle(el).opacity)).toBe('none1');
+  await expect
+    .poll(() =>
+      rows.nth(4).evaluate((el) => {
+        const still = (t: string) => { const m = new DOMMatrix(t); return !m.m41 && !m.m42 && Math.abs(m.a - 1) < 1e-6 && Math.abs(m.d - 1) < 1e-6 && Math.abs(m.b) < 1e-3 && Math.abs(m.c) < 1e-3; };
+        return `${still(getComputedStyle(el).transform)}${getComputedStyle(el).opacity}`;
+      }),
+    )
+    .toBe('true1');
   const top = 96 + 269.9 + 61;
   near(await box(page, rows.nth(1)), { y: top + 27.7 + 28, h: 46, x: 18, r: 18 });
   // a dashed line after the second, 7 px
@@ -186,12 +202,14 @@ test('a live event slides into Facts', async ({ page }) => {
   await settled(page);
   const first = () => eventRows(page).first().textContent();
   const before = await first();
-  // watch every frame from here: did any row move, and did one open at the top
+  // watch every frame from here: did any row move, and did one open at the top (the slide runs on
+  // the compositor, so it shows in the rows' computed transforms, not their inline style)
   await page.evaluate(() => {
     const w = window as unknown as { __moved: number };
     w.__moved = 0;
+    const lifted = (e: Element) => new DOMMatrix(getComputedStyle(e).transform).m42 < -0.5;
     const tick = () => {
-      if (document.querySelector('[data-screen="match"] [data-row][style*="translateY"]')) w.__moved += 1;
+      if ([...document.querySelectorAll('[data-screen="match"] [data-row]')].some(lifted)) w.__moved += 1;
       requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
@@ -199,9 +217,8 @@ test('a live event slides into Facts', async ({ page }) => {
   await expect.poll(first, { timeout: 30_000 }).not.toBe(before);
   // the rows under it slid down: several frames with rows lifted, then at rest with ten rows again
   await expect.poll(() => page.evaluate(() => (window as unknown as { __moved: number }).__moved)).toBeGreaterThan(5);
-  await expect
-    .poll(async () => `${await screen(page).locator('[data-row][style*="translateY"]').count()} ${await eventRows(page).count()}`, { timeout: 10_000 })
-    .toBe('0 10');
+  const atRest = () => screen(page).locator('[data-row]').evaluateAll((rows) => rows.filter((e) => new DOMMatrix(getComputedStyle(e).transform).m42 !== 0).length);
+  await expect.poll(async () => `${await atRest()} ${await eventRows(page).count()}`, { timeout: 10_000 }).toBe('0 10');
 });
 
 test('no horizontal overflow on any tab', async ({ page }) => {

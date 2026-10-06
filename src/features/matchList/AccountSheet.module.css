@@ -11,15 +11,18 @@
   z-index: 4;
   overflow: hidden;
   background: var(--c-bg);
-  /* closed: below the screen. Opening glides 0.6 s; closing eases 0.45 s (luau:6683–6687) */
-  transform: translateY(100%);
+  /* closed: below the screen. Opening glides 0.6 s; closing eases 0.45 s (luau:6683–6687). The hair
+     of rotation lets the compositor draw the glide between pixels (variants.ts); open, the sheet
+     keeps its own layer, which the compositor draws as crisp as an untransformed sheet */
+  transform: translateY(100%) rotate(0.001deg);
   visibility: hidden;
   transition:
     transform 450ms var(--ease),
     visibility 0s linear 450ms;
 }
 .sheet[data-open] {
-  transform: none;
+  transform: translateY(0) rotate(0.001deg);
+  will-change: transform;
   visibility: visible;
   transition:
     transform 600ms var(--ease-glide),
@@ -58,12 +61,12 @@
   flex: 1 1 0;
   /* + 0.5 px each, so no seam shows between neighbours */
   margin-right: -0.5px;
-  transform: translateY(340px);
+  transform: translateY(340px) rotate(0.001deg);
   /* closing: they stay risen until the sheet is gone */
   transition: transform 0s linear 450ms;
 }
 .sheet[data-open] .bar {
-  transform: none;
+  transform: translateY(0) rotate(0.001deg);
   transition: transform 900ms var(--ease-glide) calc(120ms + var(--i) * 50ms);
 }
 

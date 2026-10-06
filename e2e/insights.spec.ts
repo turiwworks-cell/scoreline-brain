@@ -85,9 +85,11 @@ test.describe('desktop insights', () => {
     ]);
     expect(r!.x - p!.x).toBeCloseTo(12, 0);
     expect(r!.y - p!.y).toBeCloseTo(133.7, 0);
-    expect(r!.width).toBe(366);
-    expect(r!.height).toBe(64);
-    expect(g!.height).toBe(52);
+    // the rows rest on a hair of rotation (src/motion/variants.ts): their boxes measure a few
+    // thousandths of a px more
+    expect(r!.width).toBeCloseTo(366, 1);
+    expect(r!.height).toBeCloseTo(64, 1);
+    expect(g!.height).toBeCloseTo(52, 1);
     const scroller = c.locator('xpath=ancestor::*[@data-scroller][1]');
     await scroller.evaluate((el) => el.scrollTo(0, 100));
     await expect.poll(() => scroller.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
@@ -160,7 +162,10 @@ test.describe('desktop insights', () => {
     await page.keyboard.press('End');
     await expect(tabs(page).getByRole('tab', { name: 'Leaders', exact: true })).toBeFocused();
     const c = content(page, 'leaders');
-    await expect(c.locator('[data-insight-leader]').first()).toHaveCSS('transform', 'none');
+    // at rest it keeps only the hair of rotation it slid with (src/motion/variants.ts)
+    await expect
+      .poll(() => c.locator('[data-insight-leader]').first().evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m42))
+      .toBe(0);
     const goal = c.locator('[data-insight-goal]').first();
     await expect(goal).toBeVisible();
     const id = (await goal.getAttribute('data-insight-goal'))!.split(':')[0];

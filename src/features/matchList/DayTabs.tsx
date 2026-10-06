@@ -63,7 +63,8 @@ export function DayTabs({ items, value, morph, live, onChange }: DayTabsProps) {
   useLayoutEffect(() => {
     if (!place) return;
     // placing is a style write, so it never goes through React's render
-    if (stripRef.current) stripRef.current.style.transform = `translateX(${place.shift}px)`;
+    // a hair of rotation: the strip (its own layer) slides between pixels, not a pixel at a time (variants.ts)
+    if (stripRef.current) stripRef.current.style.transform = `translateX(${place.shift}px) rotate(0.001deg)`;
     if (indRef.current) indRef.current.style.transform = `translateX(${place.indX}px) scaleX(${place.indW / 100})`;
   }, [place?.shift, place?.indX, place?.indW]); // eslint-disable-line react-hooks/exhaustive-deps
   // the first placement doesn't slide

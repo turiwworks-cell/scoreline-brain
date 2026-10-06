@@ -7,6 +7,8 @@
 /* ── The toast (drawToast, luau:6205) ──────────────────────────────────────────── */
 
 .toastSlot {
+  /* its own layer: drawn between pixels as its motion value moves it (drawn, variants.ts) */
+  will-change: transform;
   position: absolute;
   z-index: 4;
   top: 50px;
@@ -60,12 +62,16 @@
 }
 
 .photoRise {
+  /* its own layer: drawn between pixels as its motion value moves it (drawn, variants.ts) */
+  will-change: transform;
   position: absolute;
   left: 0;
   top: 12px;
 }
 
 .discRise {
+  /* its own layer: drawn between pixels as its motion value moves it (drawn, variants.ts) */
+  will-change: transform;
   position: absolute;
   left: 7px;
   top: 13px;
@@ -93,6 +99,8 @@
 }
 
 .toastText {
+  /* its own layer: drawn between pixels as its motion value moves it (drawn, variants.ts) */
+  will-change: transform;
   position: absolute;
   left: 60px;
   top: 0;
@@ -113,6 +121,8 @@
 }
 
 .toastName {
+  /* its own layer: drawn between pixels as its motion value moves it (drawn, variants.ts) */
+  will-change: transform;
   position: absolute;
   left: 0;
   top: 34px;
@@ -283,6 +293,8 @@
 }
 
 .bust {
+  /* its own layer: drawn between pixels as its motion value moves it (drawn, variants.ts) */
+  will-change: transform;
   position: absolute;
   overflow: hidden;
 }
@@ -311,6 +323,8 @@
 }
 
 .story {
+  /* its own layer: drawn between pixels as its motion value moves it (drawn, variants.ts) */
+  will-change: transform;
   position: absolute;
   left: var(--gutter);
   right: var(--gutter);
@@ -356,6 +370,8 @@
 }
 
 .commentary {
+  /* its own layer: drawn between pixels as its motion value moves it (drawn, variants.ts) */
+  will-change: transform;
   position: absolute;
   left: var(--gutter);
   right: var(--gutter);
@@ -487,6 +503,8 @@
 }
 
 .digitCol {
+  /* its own layer: drawn between pixels as its motion value moves it (drawn, variants.ts) */
+  will-change: transform;
   display: flex;
   flex-direction: column;
   padding-top: 2px;

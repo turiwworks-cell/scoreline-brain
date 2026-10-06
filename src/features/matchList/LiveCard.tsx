@@ -1,6 +1,6 @@
 import { memo, useLayoutEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import { liveMinute, minLabel, scoreStr, type Match, type Team } from '../../domain';
-import { play, stop } from '../../motion';
+import { AT_REST, play, slide, stop } from '../../motion';
 import { Crest, feel, subscribeSecond, textWidth, useFontVersion } from '../../ui';
 import { cardMetrics, minuteSize, nameFit, type CardMetrics } from './cardLayout';
 import { cardColors } from './cardColors';
@@ -56,12 +56,12 @@ function useEntrance(open: boolean, index: number, grow: boolean) {
       stop(settle.current);
       // a match that kicks off while Live is open grows in where it stands (its width, luau:3906)
       if (first && late) return;
-      play(rise.current, 'cards', [{ transform: `translateY(${RISE}px)` }, { transform: 'translateY(0)' }], { index: i });
+      play(rise.current, 'cards', [{ transform: slide(0, RISE) }, { transform: AT_REST }], { index: i });
     } else if (first) {
       // arrives while the section is closing: nothing to show
       play(settle.current, 'live', [{ opacity: 0 }, { opacity: 0 }], { index: 0, withDelay: false });
     } else {
-      play(settle.current, 'live', [{ transform: 'translateY(0)', opacity: 1 }, { transform: `translateY(${SETTLE}px)`, opacity: 0 }], { index: i });
+      play(settle.current, 'live', [{ transform: AT_REST, opacity: 1 }, { transform: slide(0, SETTLE), opacity: 0 }], { index: i });
     }
   }, [open]);
   return { rise, settle };
