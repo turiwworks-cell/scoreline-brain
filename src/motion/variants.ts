@@ -1,4 +1,5 @@
 import type { Transition, Variants } from 'motion/react';
+import { snapPx } from './snap';
 import { timing, type TimingKey } from './tokens';
 
 /*
@@ -23,8 +24,11 @@ export function transition(key: TimingKey, { index = 0, withDelay = true, scale 
   return { duration: t.duration * scale, delay: (withDelay ? t.delay : 0) + index * t.stagger, ease: t.ease };
 }
 
-/** The labels a cascade item uses: it mounts `hidden` and animates to `shown`. Spread it on the item. */
-export const CASCADE = { initial: 'hidden', animate: 'shown' } as const;
+/**
+ * The labels a cascade item uses: it mounts `hidden` and animates to `shown`, its lift on whole
+ * device pixels (snap.ts) so it doesn't settle by a pixel when it lands. Spread it on the item.
+ */
+export const CASCADE = { initial: 'hidden', animate: 'shown', transformTemplate: snapPx } as const;
 
 export interface CascadeOptions {
   /** px the block rises while it fades in (blockIn lifts 12, the player sheet 14) */

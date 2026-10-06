@@ -101,8 +101,12 @@
   position: relative;
   display: block;
   width: 100%;
-  /* 128 + 116 × minutes / 90; --mm is written once a second */
+  /* 128 + 116 × minutes / 90; --mm is written once a second. In whole px: it grows 0.02 px a
+     second, and a top edge creeping between pixels had its crests, names and edges each round their
+     own way, so the cards shimmered by a pixel every few seconds. Whole px move them as one, a px
+     every 47 s. (Device emulation rounds a box edge to whole CSS px, so half a px would not do.) */
   height: calc((128 + 116 * var(--mm, 0) / 90) * 1px);
+  height: round(calc((128 + 116 * var(--mm, 0) / 90) * 1px), 1px);
   color: var(--c-ink);
   text-align: left;
   cursor: pointer;

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { m, PresenceContext, useIsPresent, type Variants } from 'motion/react';
-import { useAfterPaint } from '../../motion';
+import { snapPx, useAfterPaint } from '../../motion';
 import type { ScrollPane } from '../nav/scrollMemory';
 import { useScrollMemory } from '../nav/useScrollMemory';
 import { useElasticEdges } from './useElasticEdges';
@@ -51,6 +51,8 @@ export function Screen({ pane, contentKey, label, covered = false, className, va
       initial={initial}
       animate={animate}
       exit={exit}
+      // the layer's slide lands on whole device pixels (snap.ts)
+      transformTemplate={snapPx}
     >
       <LaterMountsAnimate>{children}</LaterMountsAnimate>
     </m.section>

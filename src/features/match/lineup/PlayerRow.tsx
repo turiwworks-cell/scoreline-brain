@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { m, useReducedMotion } from 'motion/react';
 import type { Player, Team } from '../../../domain';
-import { transition } from '../../../motion';
+import { snapPx, transition } from '../../../motion';
 import { EventTags, PhotoTile, RatingBadge, Star, Tag, textWidth, useFontVersion, withFeel, type PhotoSources } from '../../../ui';
 import { fullName, roleOf, type Marks } from './model';
 import styles from './Lineup.module.css';
@@ -47,7 +47,7 @@ export const PlayerRow = memo(function PlayerRow({ team, n, player, name, replac
   const on = marks?.on;
 
   return (
-    <m.div initial={reduce ? false : { opacity: 0, y: 10 }} animate={hold && !reduce ? { opacity: 0, y: 10 } : enter}>
+    <m.div initial={reduce ? false : { opacity: 0, y: 10 }} animate={hold && !reduce ? { opacity: 0, y: 10 } : enter} transformTemplate={snapPx}>
       <button
         type="button"
         className={`m-feel ${styles.row}`}

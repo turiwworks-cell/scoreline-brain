@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { m, useReducedMotion } from 'motion/react';
 import type { Player, Team } from '../../../domain';
-import { transition } from '../../../motion';
+import { snapPx, transition } from '../../../motion';
 import { EventTags, Glass, KitDisc, PlayerPhoto, RatingBadge, Star, SubOffTag, textWidth, useFontVersion, withFeel, type PhotoSources } from '../../../ui';
 import { PITCH, type Slot } from './formation';
 import type { Marks } from './model';
@@ -62,6 +62,7 @@ export const Marker = memo(function Marker({ team, slot, name, marks, rating, be
       style={{ left: slot.x - 38, top: slot.y - 65 }}
       initial={reduce ? false : { opacity: 0, y: 26 }}
       animate={hold && !reduce ? { opacity: 0, y: 26 } : enter}
+      transformTemplate={snapPx}
       data-row={slot.row}
     >
       <button

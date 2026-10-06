@@ -1,7 +1,7 @@
 import { memo, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { cubicBezier, m, useReducedMotion, type Variants } from 'motion/react';
 import { minText, type Match, type Team } from '../../domain';
-import { timing, transition } from '../../motion';
+import { snapPx, timing, transition } from '../../motion';
 import { useScoreline } from '../../store';
 import { Button, Crest, Icon, matchStops, PhotoTile, Pill, withFeel } from '../../ui';
 import { useMatchMinute } from './clock';
@@ -168,6 +168,7 @@ export const EventsFeed = memo(function EventsFeed({ match, home, away, onReplay
                 // startsOf staggers rows born together, so only the first old row's start is OLD.
                 initial={(born.get(row.key) ?? OLD) !== OLD ? false : row.index > LIMIT && evAll ? 'faded' : 'hidden'}
                 animate={row.index > LIMIT && evAll ? 'all' : 'shown'}
+                transformTemplate={snapPx}
               >
                 <EventRow
                   item={row.item}

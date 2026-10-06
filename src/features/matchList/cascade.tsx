@@ -1,6 +1,6 @@
 import { useContext, type CSSProperties, type ReactNode } from 'react';
 import { m, type Variants } from 'motion/react';
-import { transition } from '../../motion';
+import { snapPx, transition } from '../../motion';
 import { FeedContext } from './feedContext';
 
 /*
@@ -38,7 +38,7 @@ const listBlock: Variants = {
 export function Block({ index, className, style, hidden, children }: { index: number; className?: string; style?: CSSProperties; hidden?: boolean; children: ReactNode }) {
   const { epoch, dir, fresh } = useContext(FeedContext);
   return (
-    <m.div className={className} style={style} hidden={hidden} variants={listBlock} custom={{ i: index, dir }} initial={fresh ? 'hidden' : false} animate={epoch % 2 ? 'odd' : 'even'}>
+    <m.div className={className} style={style} hidden={hidden} variants={listBlock} custom={{ i: index, dir }} initial={fresh ? 'hidden' : false} animate={epoch % 2 ? 'odd' : 'even'} transformTemplate={snapPx}>
       {children}
     </m.div>
   );

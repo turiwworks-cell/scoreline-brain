@@ -40,14 +40,19 @@ export const Hero = memo(function Hero({ match, home, away, matchday, width, onO
     const items = feedItems({ teams, players }, match);
     return (['home', 'away'] as const).map((side) => {
       const lines = scorerLines(scorersOf(items, side), measureScorer, width, scheduled);
-      return { side, lines, rowH: rowHeight(lines.length, scheduled), blockH: blockHeight(lines.length) };
+      return { side, lines, rowH: Math.round(rowHeight(lines.length, scheduled)), blockH: blockHeight(lines.length) };
     });
     // fonts: a measure taken before the face loaded is taken again
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [match.events, match.home, match.away, teams, players, width, scheduled, fonts]);
 
   const [h, a] = sides as [(typeof sides)[0], (typeof sides)[0]];
-  const awayTop = META_H + 1 + h.rowH + 1;
+  // The rows and the hero's height on whole pixels (the Lua's 48.9 rule, a row of 105.6 under three
+  // scorer lines): its rows, and the tab bar and the pane under it, fade and rise in, and a block
+  // resting between two pixels is drawn one way while it moves and another when it lands.
+  const rule = Math.round(META_H);
+  const homeTop = rule + 1;
+  const awayTop = homeTop + h.rowH + 1;
   const height = awayTop + a.rowH + 1 + HERO_AFTER;
   const c = cascade('screen');
   // the side behind on the scoreboard (trails, luau:2478)
@@ -59,11 +64,11 @@ export const Hero = memo(function Hero({ match, home, away, matchday, width, onO
         <span className={styles.matchday}>Matchday {matchday}</span>
         {match.status === 'live' ? <HeroClock match={match} /> : <span className={styles.state}>{match.status === 'finished' ? 'Full time' : `Kick-off ${match.kickoff}`}</span>}
       </m.div>
-      <span className={styles.rule} style={{ top: META_H }} />
+      <span className={styles.rule} style={{ top: rule }} />
       {sides.map(({ side, lines, rowH, blockH }, i) => {
         const team = side === 'home' ? home : away;
         return (
-          <m.div key={side} className={styles.side} style={{ top: i === 0 ? META_H + 1 : awayTop, height: rowH }} variants={c} custom={i + 1} {...CASCADE}>
+          <m.div key={side} className={styles.side} style={{ top: i === 0 ? homeTop : awayTop, height: rowH }} variants={c} custom={i + 1} {...CASCADE}>
             <span className={styles.crest}>
               <Crest team={team} size={38} />
             </span>
@@ -86,7 +91,7 @@ export const Hero = memo(function Hero({ match, home, away, matchday, width, onO
       <span className={styles.rule} style={{ top: awayTop - 1 }} />
       <span className={styles.rule} style={{ top: awayTop + a.rowH }} />
       {!scheduled && (
-        <m.div className={styles.scoreBlock} style={{ top: META_H + 1, height: awayTop + a.rowH - META_H - 1 }} variants={c} custom={1} {...CASCADE}>
+        <m.div className={styles.scoreBlock} style={{ top: homeTop, height: awayTop + a.rowH - homeTop }} variants={c} custom={1} {...CASCADE}>
           <span className={styles.scoreCol}>
             <span className={styles.scoreCell} style={{ height: h.rowH }}>
               <BigNumber value={match.score[0]} dim={trails('home')} />

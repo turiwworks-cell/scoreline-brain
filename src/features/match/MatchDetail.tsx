@@ -1,6 +1,6 @@
 import { useCallback, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import { m } from 'motion/react';
-import { CASCADE, cascade, transition, useAfterPaint } from '../../motion';
+import { CASCADE, cascade, snapPx, transition, useAfterPaint } from '../../motion';
 import type { Side } from '../../domain';
 import { selectLeague, selectMatch, selectTeam, useScoreline } from '../../store';
 import { Icon, RoundButton, Tabs } from '../../ui';
@@ -133,6 +133,7 @@ export function MatchDetail({ id, tab, chrome, onBack, onTab, onOpenPlayer, onFa
             key={shown}
             initial={first ? false : { opacity: 0, x: 24 * dir }}
             animate={{ opacity: 1, x: 0, transition: transition('tabs', { index: 1 }) }}
+            transformTemplate={snapPx}
           >
             {shown === 'facts' ? (
               <Facts match={match} home={home} away={away} league={league} width={width} onReplayGoal={onReplayGoal} />
