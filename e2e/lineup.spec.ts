@@ -175,6 +175,41 @@ test('a clock tick does not rebuild the pitch or play the entrance again', async
   expect(st).toEqual({ same: true, still: true });
 });
 
+test('the page wheeled under a resting mouse lights nothing on the way, and the hover comes back once it is still', async ({ page }) => {
+  await open(page, '/match/1/lineup?demo');
+  await screen(page).evaluate((el) => (el.scrollTop = 300));
+  const p = (await pitch(page).boundingBox())!;
+  await page.mouse.move(p.x + p.width / 2 - 40, Math.max(p.y, 0) + 150);
+  // every hover light that starts, and whether the page held the hover while it moved
+  await screen(page).evaluate((el) => {
+    const w = window as unknown as { __lit: string[]; __held: boolean };
+    w.__lit = [];
+    w.__held = false;
+    el.addEventListener('transitionrun', (e) => {
+      const t = e.target as HTMLElement;
+      if ((e as TransitionEvent).propertyName === '--lit') w.__lit.push(t.dataset.player ?? t.className);
+    });
+    new MutationObserver(() => (w.__held ||= el.hasAttribute('data-scrolling'))).observe(el, { attributes: true, attributeFilter: ['data-scrolling'] });
+  });
+  // a fast flick down and back up: markers and rows pass under the cursor all the way
+  for (let i = 0; i < 12; i++) {
+    await page.mouse.wheel(0, 120);
+    await page.waitForTimeout(16);
+  }
+  for (let i = 0; i < 12; i++) {
+    await page.mouse.wheel(0, -120);
+    await page.waitForTimeout(16);
+  }
+  expect(await page.evaluate(() => (window as unknown as { __lit: string[] }).__lit)).toEqual([]);
+  expect(await page.evaluate(() => (window as unknown as { __held: boolean }).__held)).toBe(true);
+
+  // still again, the hover works as before
+  await expect(screen(page)).not.toHaveAttribute('data-scrolling');
+  const m = marker(page, 'fra:14');
+  await m.hover();
+  await expect.poll(() => m.evaluate((el) => getComputedStyle(el).getPropertyValue('--lit').trim())).toBe('1');
+});
+
 test('photos: France and Argentina have them, another team keeps the kit disc, one manifest request', async ({ page }) => {
   const manifests: string[] = [];
   page.on('request', (r) => r.url().endsWith('/img/players/manifest.json') && manifests.push(r.url()));

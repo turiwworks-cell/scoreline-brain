@@ -3,6 +3,7 @@ import { m, PresenceContext, useIsPresent, type Variants } from 'motion/react';
 import type { ScrollPane } from '../nav/scrollMemory';
 import { useScrollMemory } from '../nav/useScrollMemory';
 import { useElasticEdges } from './useElasticEdges';
+import { useScrollHover } from './useScrollHover';
 import styles from './Shell.module.css';
 
 export type ScreenProps = {
@@ -32,6 +33,7 @@ export function Screen({ pane, contentKey, label, covered = false, className, va
   const present = useIsPresent();
   useScrollMemory(ref, pane, contentKey, present);
   useElasticEdges(ref);
+  useScrollHover(ref);
   return (
     <m.section
       ref={ref}
