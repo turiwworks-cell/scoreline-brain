@@ -43,8 +43,8 @@ export default function LiveGraphic({ source, live, count, onReady, onFailed, fa
   }, [live, count, onReady, onFailed]);
   /*
    * Rive's first frame plays the timeline of the state it starts in (the capsule opening, or
-   * closing). The art stays hidden through it and appears settled, so the page opens on the button
-   * as it is; a toggle meanwhile waits for its own timeline instead.
+   * closing). The art stays hidden through it, behind the host's still of the same art, and takes
+   * its place settled, in one frame; a toggle meanwhile waits for its own timeline instead.
    */
   useEffect(() => {
     if (!drawn || shown) return;
@@ -111,7 +111,7 @@ export default function LiveGraphic({ source, live, count, onReady, onFailed, fa
   return (
     <span aria-hidden="true" style={{ display: 'contents' }}>
       {failed && fallback}
-      {!failed && <RiveCanvas source={source} artboard="aniamtion" oversample={2} bind={bind} onReady={() => setDrawn(true)} onError={failedLoad} style={{ ...LIVE_CANVAS_STYLE, opacity: shown ? 1 : 0, transition: 'opacity 160ms ease-out' }} />}
+      {!failed && <RiveCanvas source={source} artboard="aniamtion" oversample={2} bind={bind} onReady={() => setDrawn(true)} onError={failedLoad} style={{ ...LIVE_CANVAS_STYLE, opacity: shown ? 1 : 0 }} />}
     </span>
   );
 }

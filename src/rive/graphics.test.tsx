@@ -30,9 +30,11 @@ describe('Live icon binding and hit target', () => {
     mock.source = '/rive/live-icon.riv';
     const view = render(<LiveIcon live count={8} onChange={vi.fn()} className="m-glass live" fallback={<span>Live</span>}><span>8</span></LiveIcon>);
     const button = view.getByRole('button', { name: 'Live, 8 in play' });
-    // while the art is on its way: the art's box, no glass, no DOM pill
+    // while the art is on its way: the art's box, no glass, no DOM pill, but the art's still with the count
     expect(button.classList.contains('m-glass')).toBe(false);
     expect(view.queryByText('8')).toBeNull(); expect(view.queryByText('Live')).toBeNull();
+    const still = () => button.querySelector('[data-live-still]');
+    expect([...still()!.querySelectorAll('use')].map((u) => u.getAttribute('href'))).toEqual(['#live-still', '#ld8']);
     // the capsule, not the artboard, is the round button's 40 px (luau:8352)
     expect(parseFloat(button.style.height)).toBe(40);
     expect(parseFloat(button.style.width)).toBeCloseTo((410.5 - 32.5) * 40 / 137.5, 1);
@@ -41,8 +43,11 @@ describe('Live icon binding and hit target', () => {
     // Rive's first frame plays the opening timeline: the art stays hidden through it
     expect(button.getAttribute('data-rive-live')).toBeNull();
     expect(mock.canvas!.style?.opacity).toBe(0);
+    expect(still()).not.toBeNull();
     await waitFor(() => expect(button.getAttribute('data-rive-live')).toBe('true'), { timeout: 1500 });
+    // Rive takes the still's place in the same frame
     expect(mock.canvas!.style?.opacity).toBe(1);
+    expect(still()).toBeNull();
     expect(view.queryByText('8')).toBeNull(); expect(view.queryByText('Live')).toBeNull();
     act(() => mock.canvas!.onError?.(new Error('renderer failed')));
     expect(button.classList.contains('m-glass')).toBe(true);
@@ -58,11 +63,13 @@ describe('Live icon binding and hit target', () => {
     const view = render(icon(false));
     const button = view.getByRole('button', { name: 'Live, 4 in play' });
     button.focus();
-    // nothing of Rive has been asked for: no graphic chunk, no canvas; and no DOM pill either
+    // nothing of Rive has been asked for: no graphic chunk, no canvas; and no DOM pill, and with
+    // Live off no still either (the still is the art with Live on)
     await new Promise((resolve) => setTimeout(resolve, 20));
     expect(view.container.querySelector('canvas')).toBeNull();
     expect(mock.canvas).toBeNull();
     expect(view.queryByText('Live')).toBeNull(); expect(view.queryByText('4')).toBeNull();
+    expect(button.querySelector('[data-live-still]')).toBeNull();
     view.rerender(icon(true));
     await waitFor(() => expect(view.container.querySelector('canvas')).not.toBeNull());
     // the artwork starts in the button that was there, still focused

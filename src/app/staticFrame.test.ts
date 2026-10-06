@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { LIVE_STILL_VIEWBOX, liveDigits } from '../rive/liveStill';
+import { LIVE_CANVAS_STYLE } from '../rive/liveGeometry';
 
 /*
  * index.html carries the first frame (the list header and day tabs, drawn before any script runs).
@@ -68,7 +70,9 @@ describe('the first frame', () => {
   });
 
   it('loads nothing: no image, no script, no request of its own', () => {
-    expect(frame.querySelectorAll('img, picture, video, iframe, script, link, [src], [href], [style*="url("]').length).toBe(0);
+    expect(frame.querySelectorAll('img, picture, video, iframe, script, link, [src], [style*="url("]').length).toBe(0);
+    // the Live still's <use> elements point into the page (#live-sprite), never out of it
+    expect([...frame.querySelectorAll('[href]')].every((el) => el.getAttribute('href')!.startsWith('#'))).toBe(true);
     expect(sheet).not.toMatch(/url\(|@import|@font-face/);
   });
 
@@ -79,5 +83,26 @@ describe('the first frame', () => {
   it('keeps the font preload and does not touch the font strategy', () => {
     expect(html).toMatch(/<link rel="preload" href="\/fonts\/hanken-grotesk-latin-wght-normal\.woff2" as="font" type="font\/woff2" crossorigin \/>/);
     expect(sheet).not.toMatch(/font-display/);
+  });
+});
+
+describe('the Live still', () => {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const sprite = doc.getElementById('live-sprite')!;
+  const still = frame.querySelector('.sf-still')!;
+
+  it('is drawn once, outside #root, so React keeps it: the art and the ten digits', () => {
+    expect(sprite.closest('#root')).toBeNull();
+    expect(sprite.querySelector('#live-still')).not.toBeNull();
+    for (let d = 0; d < 10; d++) expect(sprite.querySelector(`path#ld${d}`)?.getAttribute('d')).toBeTruthy();
+  });
+
+  it('sits in the first frame where the app puts it, with the count before any data, 0, where the app puts a 0', () => {
+    expect(still.getAttribute('viewBox')).toBe(LIVE_STILL_VIEWBOX);
+    const css = /\.sf-still\{([^}]*)\}/.exec(sheet)?.[1] ?? '';
+    for (const key of ['left', 'top', 'width', 'height'] as const) expect(css).toContain(`${key}:${String(LIVE_CANVAS_STYLE[key])}`);
+    const uses = [...still.querySelectorAll('use')].map((u) => [u.getAttribute('href'), u.getAttribute('x')]);
+    const [zero] = liveDigits(0);
+    expect(uses).toEqual([['#live-still', null], ['#ld0', zero!.x.toFixed(2)]]);
   });
 });
