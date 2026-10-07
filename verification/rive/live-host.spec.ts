@@ -20,8 +20,8 @@ test('full Live host renders native artwork, updates count, supports keyboard an
   await expect(page.getByTestId('fallback-live')).toHaveCount(0);
   await expect(page.getByTestId('fallback-count')).toHaveCount(0);
   const bounds = await button.boundingBox();
-  expect(bounds!.height).toBeCloseTo(38);
-  expect(bounds!.width / bounds!.height).toBeCloseTo(443 / 152);
+  expect(bounds!.height).toBeCloseTo(40);
+  expect(bounds!.width / bounds!.height).toBeCloseTo(378 / 137.5);
   const samples: string[] = [];
   for (const count of [0, 3, 12, 99]) {
     await page.locator('#count-' + count).click();
