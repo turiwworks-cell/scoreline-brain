@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, type CSSProperties } from 'react';
+import { useLayoutEffect, useRef, type CSSProperties } from 'react';
 import { feel, Icon, matchStops, RoundButton } from '../../ui';
 import { useScoreline } from '../../store';
 import { selectSheetPairs, selectTeams } from './selectors';
@@ -29,28 +29,51 @@ export function AccountSheet({ open, onClose }: AccountSheetProps) {
   const teams = useScoreline(selectTeams);
   const root = useRef<HTMLDivElement>(null);
   const close = useRef<HTMLButtonElement>(null);
-  const opener = useRef<Element | null>(null);
+  const returnTo = useRef<HTMLElement | null>(null);
 
-  // a dialog: focus moves in when it opens and back to what opened it when it closes
+  // The sheet is visually contained in the list pane, but its declared modal behavior applies
+  // to every pane. Own only the inert attributes we add, leaving covered screens' guards alone.
   useLayoutEffect(() => {
-    if (open) {
-      opener.current = document.activeElement;
-      close.current?.focus({ preventScroll: true });
-    } else if (opener.current instanceof HTMLElement && root.current?.contains(document.activeElement)) {
-      opener.current.focus({ preventScroll: true });
-      opener.current = null;
+    const dialog = root.current;
+    if (!open) {
+      // Run after the closed DOM is committed: React's selection restoration can otherwise
+      // move focus back to the sheet after the opening effect's cleanup.
+      returnTo.current?.focus({ preventScroll: true });
+      returnTo.current = null;
+      return;
     }
-  }, [open]);
-  useEffect(() => {
-    if (!open) return;
+    if (!dialog) return;
+    returnTo.current ??= document.activeElement as HTMLElement | null;
+    const blocked: Element[] = [];
+    for (let branch: HTMLElement = dialog; branch.parentElement; branch = branch.parentElement) {
+      for (const sibling of branch.parentElement.children) {
+        if (sibling !== branch && !sibling.hasAttribute('inert')) {
+          sibling.setAttribute('inert', '');
+          blocked.push(sibling);
+        }
+      }
+    }
+    close.current?.focus();
     const key = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        e.preventDefault();
         e.stopPropagation();
         onClose();
+      } else if (e.key === 'Tab') {
+        const buttons = dialog.querySelectorAll<HTMLButtonElement>('button:not(:disabled)');
+        const first = buttons[0];
+        const last = buttons[buttons.length - 1];
+        if (document.activeElement === (e.shiftKey ? first : last)) {
+          e.preventDefault();
+          (e.shiftKey ? last : first)?.focus();
+        }
       }
     };
-    window.addEventListener('keydown', key);
-    return () => window.removeEventListener('keydown', key);
+    window.addEventListener('keydown', key, true);
+    return () => {
+      window.removeEventListener('keydown', key, true);
+      for (const element of blocked) element.removeAttribute('inert');
+    };
   }, [open, onClose]);
 
   const list = pairs ? pairs.split('|') : [];

@@ -32,6 +32,15 @@ export interface MatchLookup {
   readonly teamMatch?: number;
 }
 
+/** Demo rounds replace match IDs. History retains only an ID, not enough information to
+ * identify its replacement reliably, so an expired route returns to the list. A player stays
+ * open, without its expired underlay. Do not call until the first feed has loaded. */
+export function recoverDemoNav(nav: Nav, matchIds: readonly number[]): Nav {
+  const match = nav.match ?? nav.under;
+  if (!match || matchIds.includes(match.id)) return nav;
+  return nav.match ? { list: nav.list } : { ...nav, under: undefined };
+}
+
 export function resolve(nav: Nav, layout: LayoutMode, lookup: MatchLookup): Resolved {
   const player = nav.player ?? null;
   let match: MatchRef | null;

@@ -31,13 +31,10 @@
 .screen[data-pull] > * {
   translate: 0 var(--pull, 0px);
 }
-/* while the wheel moves a page, nothing on it takes the pointer, so nothing it passes under the
-   cursor lights and repaints mid-scroll; a lit control goes out at once (useScrollHover.ts).
-   On every descendant, to win over the controls that turn the pointer back on for themselves. */
-.screen[data-scrolling] * {
-  pointer-events: none;
-}
+/* Hold the hover light while the wheel moves the page (useScrollHover.ts). Keep hit testing
+   enabled: a click during the scroll or its settling timer must still reach the control. */
 .screen[data-scrolling] :global(.m-feel) {
+  --lit: 0;
   --t-lit: 0s;
 }
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Nav } from '../nav/url';
 import { layoutFor } from './layoutMode';
-import { resolve, stackDepth, type Resolved } from './resolve';
+import { recoverDemoNav, resolve, stackDepth, type Resolved } from './resolve';
 
 const list = { day: 0, live: false };
 const at = (n: Partial<Nav>): Nav => ({ list, ...n });
@@ -14,6 +14,26 @@ describe('layoutFor', () => {
 });
 
 describe('resolve', () => {
+  it('an expired demo entry falls back to the list, without guessing a replacement ID', () => {
+    const nav = at({ match: { id: 1, tab: 'lineup' } });
+    expect(recoverDemoNav(nav, [201, 202])).toEqual({ list });
+    expect(recoverDemoNav(nav, [1, 2])).toBe(nav);
+    for (const layout of ['phone', 'two', 'three'] as const) {
+      const r = resolve(recoverDemoNav(nav, [201]), layout, { featured: 201 });
+      expect(r.match).toEqual(layout === 'phone' ? null : { id: 201, tab: 'facts' });
+    }
+  });
+
+  it('a player remains open after its demo underlay expires', () => {
+    const nav = at({ player: { team: 'fra', n: 10 }, under: { id: 1, tab: 'facts' }, step: 1 });
+    const current = recoverDemoNav(nav, [201]);
+    expect(current.player).toEqual(nav.player);
+    expect(current.step).toBe(1);
+    expect(current.under).toBeUndefined();
+    expect(resolve(current, 'phone', { featured: 201 }).match).toBeNull();
+    expect(resolve(current, 'three', { featured: 202, teamMatch: 201 }).match?.id).toBe(201);
+  });
+
   it('phone: only what the URL opens, plus the match a player came from', () => {
     expect(resolve(at({}), 'phone', lookup)).toMatchObject({ match: null, player: null });
     expect(resolve(at({ match: { id: 2, tab: 'stats' } }), 'phone', lookup).match).toEqual({ id: 2, tab: 'stats' });

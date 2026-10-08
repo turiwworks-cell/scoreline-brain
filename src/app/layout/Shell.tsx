@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useNavigationType } from 'react-router';
-import { selectFeaturedMatchId, selectMatchIdOfTeam, useScoreline } from '../../store';
+import { demoMode } from '../../data';
+import { selectFeaturedMatchId, selectLoaded, selectMatchIdOfTeam, selectMatchOrder, useScoreline } from '../../store';
 import { afterPaint } from '../../rive/afterPaint';
 import { prepareScreen, preloadScreens } from '../screens/screenChunks';
-import { canonicalPath, parseNav } from '../nav/url';
+import { canonicalPath, hrefOf, parseNav } from '../nav/url';
 import { useLayoutMode } from './layoutMode';
 import { ListPane } from './ListPane';
 import { PhoneStack } from './PhoneStack';
 import { RiveGate } from './RiveGate';
-import { resolve } from './resolve';
+import { recoverDemoNav, resolve } from './resolve';
 import { Stage } from './Stage';
 import { ThreePane } from './ThreePane';
 import { TwoPane } from './TwoPane';
@@ -28,18 +29,25 @@ export function Shell() {
   const location = useLocation();
   const navType = useNavigationType();
   const layout = useLayoutMode();
-  const nav = useMemo(() => parseNav(location.pathname, location.search, location.state), [location.pathname, location.search, location.state]);
+  const routeNav = useMemo(() => parseNav(location.pathname, location.search, location.state), [location.pathname, location.search, location.state]);
+  const loaded = useScoreline(selectLoaded);
+  const matchIds = useScoreline(selectMatchOrder);
+  const nav = loaded && demoMode(location.search) ? recoverDemoNav(routeNav, matchIds) : routeNav;
   const featured = useScoreline(selectFeaturedMatchId);
   const teamMatch = useScoreline(selectMatchIdOfTeam(nav.player?.team ?? ''));
-  const r = useMemo(() => resolve(nav, layout, { featured, teamMatch }), [nav, layout, featured, teamMatch]);
+  const r = resolve(nav, layout, { featured, teamMatch });
 
   // one spelling per screen: `/match/7` becomes `/match/7/facts` before it paints (the parse
   // above already reads both the same, so nothing changes on screen)
   const navigate = useNavigate();
   const canonical = canonicalPath(location.pathname);
   useLayoutEffect(() => {
-    if (canonical !== null) void navigate(canonical + location.search, { replace: true, state: location.state });
-  }, [canonical, location.search, location.state, navigate]);
+    if (nav !== routeNav) {
+      // Replace the stale entry rather than push another one. Back/Forward can revisit older
+      // entries; each is validated again against the current feed before its screen paints.
+      void navigate(hrefOf(nav, location.search), { replace: true, state: null });
+    } else if (canonical !== null) void navigate(canonical + location.search, { replace: true, state: location.state });
+  }, [canonical, nav, routeNav, location.search, location.state, navigate]);
 
   const root = useRef<HTMLElement>(null);
   const title = useScreenTitle(nav);

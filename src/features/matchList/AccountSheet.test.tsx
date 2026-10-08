@@ -40,6 +40,51 @@ describe('account sheet (drawSheet, luau:6680)', () => {
     expect(onClose).toHaveBeenCalledTimes(4);
   });
 
+  it('wraps Tab at both ends and blocks outside controls', () => {
+    const outside = document.createElement('button');
+    document.body.appendChild(outside);
+    const view = render(<AccountSheet open onClose={vi.fn()} />);
+    const first = screen.getByRole('button', { name: 'Close' });
+    const last = screen.getByRole('button', { name: 'Not now' });
+    first.focus();
+    expect(fireEvent.keyDown(first, { key: 'Tab', shiftKey: true })).toBe(false);
+    expect(document.activeElement).toBe(last);
+    expect(fireEvent.keyDown(last, { key: 'Tab' })).toBe(false);
+    expect(document.activeElement).toBe(first);
+    expect(outside.hasAttribute('inert')).toBe(true);
+    view.unmount();
+    expect(outside.hasAttribute('inert')).toBe(false);
+    outside.remove();
+  });
+
+  it('blocks other panes, preserves existing guards, and restores the opener on reopen', () => {
+    const onClose = vi.fn();
+    const opener = document.createElement('button');
+    const outside = document.createElement('button');
+    const covered = document.createElement('section');
+    covered.setAttribute('inert', '');
+    document.body.append(opener, outside, covered);
+    const view = render(<AccountSheet open={false} onClose={onClose} />);
+    for (let i = 0; i < 2; i++) {
+      opener.focus();
+      view.rerender(<AccountSheet open onClose={onClose} />);
+      expect(opener.hasAttribute('inert')).toBe(true);
+      screen.getByRole('button', { name: 'Not now' }).focus();
+      // jsdom does not enforce native inert. Simulate the previously escaped focus and prove
+      // dismissal still restores Menu; the browser test verifies inert prevents escape.
+      outside.focus();
+      expect(document.activeElement).toBe(outside);
+      view.rerender(<AccountSheet open={false} onClose={onClose} />);
+      expect(opener.hasAttribute('inert')).toBe(false);
+      expect(document.activeElement).toBe(opener);
+      expect(covered.hasAttribute('inert')).toBe(true);
+    }
+    view.unmount();
+    opener.remove();
+    outside.remove();
+    covered.remove();
+  });
+
   it('paints seven bars in tonight’s match colours', () => {
     const view = render(<AccountSheet open onClose={vi.fn()} />);
     const bars = view.container.querySelectorAll('[aria-hidden="true"] > span');

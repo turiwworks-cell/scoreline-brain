@@ -127,11 +127,13 @@ export function MatchDetail({ id, tab, chrome, onBack, onTab, onOpenPlayer, onFa
         <Tabs items={tabItems(scheduled)} value={tab} onChange={(t) => isTab(t) && onTab(t)} aria-label="Match" idBase={idBase} />
       </m.div>
 
-      <m.div className={styles.panel} variants={c} custom={4} {...CASCADE} role="tabpanel" id={`${idBase}-panel-${tab}`} aria-labelledby={`${idBase}-tab-${tab}`}>
+      <m.div className={styles.panel} variants={c} custom={4} {...CASCADE} role="tabpanel" id={`${idBase}-panel-${tab}`} aria-labelledby={`${idBase}-tab-${tab}`} aria-busy={shown !== tab}>
         {shown && (
           <m.div
             key={shown}
-            initial={first ? false : { opacity: 0, transform: slide(24 * dir, 0) }}
+            // A ready replacement stays visible while it slides. Repeated reversals must not
+            // restart a fade from zero and leave the whole body blank during the tab delay.
+            initial={first ? false : { opacity: 1, transform: slide(24 * dir, 0) }}
             animate={{ opacity: 1, transform: AT_REST, transitionEnd: LANDED, transition: transition('tabs', { index: 1 }) }}
           >
             {shown === 'facts' ? (
