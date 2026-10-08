@@ -64,6 +64,8 @@ export const CASCADE = { initial: 'hidden', animate: 'shown' } as const;
 export interface CascadeOptions {
   /** px the block rises while it fades in (blockIn lifts 12, the player sheet 14) */
   lift?: number;
+  /** false starts the rows without the section's extra wait */
+  withDelay?: boolean;
 }
 
 const cascades = new Map<string, Variants>();
@@ -77,13 +79,13 @@ const cascades = new Map<string, Variants>();
  *   <m.div variants={c} custom={0} {...CASCADE}>hero</m.div>
  *   <m.div variants={c} custom={1} {...CASCADE}>tabs</m.div>
  */
-export function cascade(key: TimingKey, { lift = 12 }: CascadeOptions = {}): Variants {
-  const id = `${key}:${lift}`;
+export function cascade(key: TimingKey, { lift = 12, withDelay = true }: CascadeOptions = {}): Variants {
+  const id = `${key}:${lift}:${withDelay}`;
   let v = cascades.get(id);
   if (!v) {
     v = {
       hidden: { opacity: 0, transform: slide(0, lift) },
-      shown: (i: number | undefined) => ({ opacity: 1, transform: AT_REST, transitionEnd: LANDED, transition: transition(key, { index: i ?? 0 }) }),
+      shown: (i: number | undefined) => ({ opacity: 1, transform: AT_REST, transitionEnd: LANDED, transition: transition(key, { index: i ?? 0, withDelay }) }),
     };
     cascades.set(id, v);
   }

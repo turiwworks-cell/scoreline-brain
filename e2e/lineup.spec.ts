@@ -141,12 +141,17 @@ test('the switch shows the other team and plays its entrance again', async ({ pa
 test('markers rise line by line, forwards first', async ({ page }) => {
   await page.goto('/match/1/lineup?demo');
   await expect(screen(page).getByRole('heading', { level: 1 })).toBeAttached();
+  // Start from a ready side: waiting for page load can finish the cold entrance before
+  // sampling begins. A team change starts the same cascade at an observed click.
+  await screen(page).getByRole('radio', { name: 'Argentina', exact: true }).click();
+  await settled(page);
   // the time each marker first shows, sampled every frame until the keeper is in
-  const seen = await page.evaluate(
-    () =>
+  const seen = await screen(page).getByRole('radio', { name: 'France', exact: true }).evaluate(
+    (button) =>
       new Promise<Record<string, number>>((done) => {
         const at: Record<string, number> = {};
         const t0 = performance.now();
+        (button as HTMLButtonElement).click();
         const tick = (frame: number) => {
           for (const b of document.querySelectorAll<HTMLElement>('[data-screen="match"][data-present="true"] [data-pitch] [data-player]')) {
             const op = Number(getComputedStyle(b.parentElement!).opacity);

@@ -1,4 +1,5 @@
 import { lazy, Suspense, useCallback, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useReducedMotionPreference } from '../motion/useReducedMotionPreference';
 import { feel, spotRadius } from '../ui/feel';
 import { liveIconSource } from './assets';
 import { useRiveStart } from './startGate';
@@ -36,12 +37,18 @@ function LiveStill({ count }: { count: number }) {
  * (index.html's first frame shows the same still). Rive takes its place in the same frame.
  */
 export function LiveIcon({ live, count, onChange, className, lightClassName, fallback, children }: LiveIconProps) {
+  const reduce = useReducedMotionPreference();
   const [art, setArt] = useState<'coming' | 'shown' | 'failed'>('coming');
+  const [preference, setPreference] = useState(reduce);
+  if (preference !== reduce) {
+    setPreference(reduce);
+    setArt('coming');
+  }
   const lightRef = useRef<HTMLSpanElement>(null);
   // the artwork is fetched and started only once the shell lets Rive start (startGate.ts)
   const start = useRiveStart();
-  const ready = art === 'shown';
-  const dom = !liveIconSource || art === 'failed';
+  const ready = !reduce && art === 'shown';
+  const dom = reduce || !liveIconSource || art === 'failed';
   const artworkReady = useCallback((value: boolean) => setArt((a) => (a === 'failed' ? a : value ? 'shown' : 'coming')), []);
   const artworkFailed = useCallback(() => setArt('failed'), []);
   const staticButton = <>{fallback}{children}</>;

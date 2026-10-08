@@ -1,4 +1,5 @@
 import { useEffect, type RefObject } from 'react';
+import { useReducedMotionPreference } from '../../motion/useReducedMotionPreference';
 
 /*
  * The Lua's scroll edges (pointerMove, luau:8803; stepScroll, luau:8559): a page dragged past its
@@ -23,9 +24,10 @@ const REST = 0.3;
 const SLOP = 6;
 
 export function useElasticEdges(ref: RefObject<HTMLElement | null>) {
+  const still = useReducedMotionPreference();
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el || still) return;
     let pull = 0;
     let raf = 0;
     let gesture: { x: number; y: number; from: number; edge: 'top' | 'bottom' | null; decided: boolean } | null = null;
@@ -115,5 +117,5 @@ export function useElasticEdges(ref: RefObject<HTMLElement | null>) {
       el.style.removeProperty('--pull');
       delete el.dataset.pull;
     };
-  }, [ref]);
+  }, [ref, still]);
 }

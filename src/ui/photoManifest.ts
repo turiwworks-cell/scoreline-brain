@@ -1,5 +1,5 @@
 import { useEffect, useSyncExternalStore } from 'react';
-import { PHOTO_ROOT, photoSources, type FaceFrame, type PhotoKind, type PhotoSources } from './photos';
+import { PHOTO_ROOT, photoSources, warmPhoto, type FaceFrame, type PhotoKind, type PhotoSources } from './photos';
 
 /*
  * Which players have a photo: public/img/players/manifest.json (Part 8), read once for the whole
@@ -126,6 +126,14 @@ const sourcesOf = (path: string, kind: PhotoKind = 'bust', face?: FaceFrame): Ph
 export function playerPhoto(manifest: PhotoManifest | null, team: string, n: number): PhotoSources | undefined {
   const path = manifest?.players[`${team}:${n}`];
   return path ? sourcesOf(path, 'bust', manifest?.faces?.[path]) : undefined;
+}
+
+/** Warm only the selected profile, alongside its lazy screen download. */
+export function warmPlayerPhoto(team: string, n: number, sizes: string): void {
+  void loadPhotoManifest().then(() => {
+    const photo = playerPhoto(state.manifest, team, n);
+    if (photo) warmPhoto(photo, sizes);
+  });
 }
 
 /** The same player's frosted bust (the pre-blurred picture seen through glass), or undefined. */

@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useLocation } from 'react-router';
-import { AnimatePresence, m } from 'motion/react';
+import { AnimatePresence } from 'motion/react';
 import { paneSwap } from '../../motion';
-import { cascade, CASCADE } from '../../motion';
 import { Icon, RoundButton, Tabs } from '../../ui';
 import { useNav } from '../nav/useNav';
 import { scrollMemory } from '../nav/scrollMemory';
@@ -132,13 +131,11 @@ export function ThreePane({ r }: { r: Resolved }) {
               animate="in"
               exit="out"
             >
-              <m.div
+              <div
                 key={tab}
                 role="tabpanel"
                 id={`insights-panel-${tab}`}
                 aria-labelledby={`insights-tab-${tab}`}
-                variants={cascade('tabs', { lift: 0 })}
-                {...CASCADE}
               >
                 <InsightsScreen
                   tab={tab}
@@ -147,7 +144,7 @@ export function ThreePane({ r }: { r: Resolved }) {
                   // face rather than falling back to a different copy in the line-up.
                   onShowPlayer={() => setView({ playerKey, tab, returnTab: tab, reveal })}
                 />
-              </m.div>
+              </div>
             </Screen>
           )}
         </AnimatePresence>

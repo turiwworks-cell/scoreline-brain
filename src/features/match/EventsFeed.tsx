@@ -35,7 +35,7 @@ const rowIn: Variants = {
   hidden: { opacity: 0, transform: slide(0, -12) },
   shown: (i: number) => ({ opacity: 1, transform: AT_REST, transitionEnd: LANDED, transition: transition('events', { index: i }) }),
   faded: { opacity: 0 },
-  all: (i: number) => ({ opacity: 1, transition: transition('events', { index: i }) }),
+  all: (i: number) => ({ opacity: 1, transition: transition('events', { index: Math.min(i, 12) }) }),
 };
 
 export type EventsFeedProps = {

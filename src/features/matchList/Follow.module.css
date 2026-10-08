@@ -991,7 +991,16 @@
 
 @media (prefers-reduced-motion: reduce) {
   .follow {
-    transition-duration: 1ms;
+    transition: none;
+    transform: none;
+  }
+  .picker {
+    transition: none;
+  }
+  .section *,
+  .section *::before,
+  .section *::after {
+    animation: none !important;
   }
   .ballDot[data-ball]::before,
   .cDot::before {

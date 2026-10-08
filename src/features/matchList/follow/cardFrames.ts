@@ -4,6 +4,7 @@
 // while one of them is on.
 
 import { useEffect, type RefObject } from 'react';
+import { useReducedMotionPreference } from '../../../motion/useReducedMotionPreference';
 import { CURVES } from '../../../motion';
 import { ease } from '../curve';
 import { startFrames } from '../frames';
@@ -38,10 +39,18 @@ const NUMS = ['--gm', '--rf', '--rt', '--shake'] as const;
  * (px) on `card` from the times the player last scored and was last sent off, in `now`'s seconds.
  */
 export function useCardFrames(card: RefObject<HTMLElement | null>, goalAt: number, redAt: number, phase: Phase, now: () => number) {
+  const still = useReducedMotionPreference();
   useEffect(() => {
     const el = card.current;
     if (!el) return;
     const clear = () => NUMS.forEach((p) => el.style.removeProperty(p));
+    if (still) {
+      el.style.setProperty('--gm', '0');
+      el.style.setProperty('--rf', phase === 'red' ? '1' : '0');
+      el.style.setProperty('--rt', phase === 'red' ? '1' : '0');
+      el.style.setProperty('--shake', '0');
+      return clear;
+    }
     const stop = startFrames((t) => {
       const gm = phase === 'live' ? followGoal(t - goalAt) : 0;
       const rt = t - redAt;
@@ -57,5 +66,5 @@ export function useCardFrames(card: RefObject<HTMLElement | null>, goalAt: numbe
       stop();
       clear();
     };
-  }, [card, goalAt, redAt, phase, now]);
+  }, [card, goalAt, redAt, phase, now, still]);
 }

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useReducedMotionPreference } from '../../motion/useReducedMotionPreference';
 import type { Match, Team } from '../../domain';
 import { timing } from '../../motion';
 import { selectCardIds, selectMatchOrder } from './selectors';
@@ -114,9 +115,15 @@ function cardOrderOf(ids: readonly number[], live: readonly number[]): readonly 
  * computed from the time since the goal, once a frame, and written as custom properties.
  */
 function useGoalFrames(root: React.RefObject<HTMLDivElement | null>, ids: readonly number[], feed: GoalFeed) {
+  const still = useReducedMotionPreference();
   useEffect(() => {
     let stop: (() => void) | undefined;
     const cards = () => Array.from(root.current?.querySelectorAll<HTMLElement>('[data-card]') ?? []);
+    if (still) {
+      const rest = () => cards().forEach((el) => write(el, undefined, cardFeel(0, undefined), 1, 0));
+      rest();
+      return feed.subscribe(rest);
+    }
     const apply = (now: number): boolean => {
       const els = cards();
       const marks = new Map<number, GoalMark | undefined>(els.map((el) => [Number(el.dataset.card), feed.mark(Number(el.dataset.card))]));
@@ -151,7 +158,7 @@ function useGoalFrames(root: React.RefObject<HTMLDivElement | null>, ids: readon
       stop?.();
     };
     // the cards present change the marks the loop looks at
-  }, [root, feed, ids]);
+  }, [root, feed, ids, still]);
 }
 
 function write(el: HTMLElement, mk: GoalMark | undefined, f: ReturnType<typeof cardFeel>, sc: number, grey: number) {

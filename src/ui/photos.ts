@@ -67,6 +67,7 @@ export function warmPhoto(photo: PhotoSources, sizes: string): void {
   }
   const img = document.createElement('img');
   img.decoding = 'async';
+  img.fetchPriority = 'high';
   img.alt = '';
   img.sizes = sizes;
   img.srcset = photo.srcSet;

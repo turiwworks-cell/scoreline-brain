@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { appRoutes } from '../router';
 import { createNavActions } from './actions';
 import { triggerFor } from './focusMemory';
+import { scrollMemory } from './scrollMemory';
 
 function setup(path = '/?demo') {
   // routes without the shell: these tests only read the router's state
@@ -19,6 +20,20 @@ afterEach(() => {
 });
 
 describe('nav actions', () => {
+  it('saves the departing scroll before a pending scroll event can use the new location key', async () => {
+    const { nav, loc } = setup();
+    const screen = document.createElement('section');
+    screen.dataset.screen = 'list';
+    screen.dataset.present = 'true';
+    const card = document.createElement('button');
+    screen.append(card);
+    document.body.append(screen);
+    screen.scrollTop = 572;
+    const key = loc().key;
+    nav.openMatch(2, { from: card });
+    await tick();
+    expect(scrollMemory.get(key, 'list')).toBe(572);
+  });
   it('opening a screen pushes, and opening it again does nothing', async () => {
     const { router, nav, loc } = setup();
     nav.openMatch(2);

@@ -1,5 +1,6 @@
-import { memo, useEffect, useLayoutEffect, useRef, type CSSProperties } from 'react';
+import { memo, useLayoutEffect, useRef, type CSSProperties } from 'react';
 import { animate, m, useTransform, type MotionValue } from 'motion/react';
+import { useReducedMotionPreference } from '../../motion/useReducedMotionPreference';
 import { CASCADE, cascade, CURVES, drawn } from '../../motion';
 import type { Match, Player, PStats, Team } from '../../domain';
 import { Glass, pastel, ratingTone, Tag, textWidth, useFontVersion } from '../../ui';
@@ -84,12 +85,18 @@ export const Facts = memo(function Facts({ player, team, n, now, stepped }: { pl
 
 /** A number that glides to its target in 0.7 s on GLIDE (retarget, luau:6086), written to the DOM. */
 function useGlideText(target: number, from: number, seconds: number, write: (v: number) => void) {
+  const still = useReducedMotionPreference();
   const current = useRef(from);
   const put = useRef(write);
   useLayoutEffect(() => {
     put.current = write;
   });
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (still) {
+      current.current = target;
+      put.current(target);
+      return;
+    }
     const controls = animate(current.current, target, {
       duration: seconds,
       ease: CURVES.glide,
@@ -99,8 +106,8 @@ function useGlideText(target: number, from: number, seconds: number, write: (v: 
       },
     });
     return () => controls.stop();
-  }, [target, seconds]);
-  useEffect(() => put.current(current.current), []);
+  }, [target, seconds, still]);
+  useLayoutEffect(() => put.current(current.current), []);
 }
 
 /** His rating in its coloured box: it glides from 6.0 to his rating and takes the colour of each value on the way. */

@@ -1,5 +1,6 @@
 import type { DataRouter } from 'react-router';
 import { rememberTrigger } from './focusMemory';
+import { scrollMemory, type ScrollPane } from './scrollMemory';
 import { revealCurrentPlayer } from './playerReveal';
 import { DEFAULT_TAB, hrefOf, matchPath, parseNav, type MatchRef, type MatchTab, type NavHistoryState, type PlayerRef, type PlayerStep } from './url';
 
@@ -50,13 +51,21 @@ export function createNavActions(router: DataRouter): NavActions {
     const a = typeof document === 'undefined' ? null : document.activeElement;
     return a && a !== document.body ? a : null;
   };
+  const remember = (key: string, from: Element | null | undefined) => {
+    const opener = pressed(from);
+    rememberTrigger(key, opener);
+    // A scroll followed by a tap in the same frame can beat the scroll event. Save the
+    // departing entry before navigation changes its key or Back can restore an older zero.
+    const screen = opener?.closest<HTMLElement>('[data-screen][data-present="true"]');
+    if (screen) scrollMemory.set(key, screen.dataset.screen as ScrollPane, screen.scrollTop);
+  };
 
   return {
     openMatch(id, opts = {}) {
       const { loc, href, nav } = here();
       const to = hrefOf({ list: nav.list, match: { id, tab: opts.tab ?? DEFAULT_TAB } }, loc.search);
       if (to === href || to === pending()) return;
-      rememberTrigger(loc.key, pressed(opts.from));
+      remember(loc.key, opts.from);
       void router.navigate(to, NOW);
     },
     setTab(id, tab) {
@@ -79,7 +88,7 @@ export function createNavActions(router: DataRouter): NavActions {
         return;
       }
       if (to === pending()) return;
-      rememberTrigger(loc.key, pressed(opts.from));
+      remember(loc.key, opts.from);
       const state: NavHistoryState = opts.under ? { under: opts.under } : {};
       void router.navigate(to, { ...NOW, state });
     },

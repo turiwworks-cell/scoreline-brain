@@ -142,7 +142,7 @@ const LeaderRow = memo(function LeaderRow({
       data-insight-leader={`${it.team}:${it.n}`}
       data-focus-key={`leader-${it.matchId}-${it.team}-${it.n}`}
       aria-label={`Open ${name}, rating ${it.rating.toFixed(1)}`}
-      variants={cascade('squad', { lift: 10 })}
+      variants={cascade('squad', { lift: 10, withDelay: false })}
       custom={index}
       {...CASCADE}
       {...withFeel({ onClick: (e: MouseEvent<HTMLButtonElement>) => onOpen({ team: it.team, n: it.n }, it.matchId, e.currentTarget) })}

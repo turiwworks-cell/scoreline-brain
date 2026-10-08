@@ -151,7 +151,7 @@ async function samplesAfterRow(page: Page, n: number, act: () => Promise<void>) 
   });
 }
 
-test('the desktop Insights pane cascades a tab it switches to', async ({ page }, info) => {
+test('the desktop Insights rows still cascade when switching tabs', async ({ page }, info) => {
   test.skip(layoutOf(info) !== 'three', 'the Insights pane is the desktop’s third pane');
   await page.goto('/match/1/facts?demo');
   await settled(page);
@@ -159,7 +159,8 @@ test('the desktop Insights pane cascades a tab it switches to', async ({ page },
   await insights.getByRole('tab', { name: 'Tables' }).click();
   await expect(page.locator('#insights-panel-tables')).toBeVisible();
   await page.waitForTimeout(800);
-  const samples = await samplesAfter(page, '#insights-panel-leaders', () => insights.getByRole('tab', { name: 'Leaders' }).click());
+  // The rows own their entrance; a second parent fade delayed ready Leaders content.
+  const samples = await samplesAfter(page, '#insights-panel-leaders [data-insight-leader]', () => insights.getByRole('tab', { name: 'Leaders' }).click());
   cameIn(samples);
 });
 

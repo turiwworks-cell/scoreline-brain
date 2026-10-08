@@ -3,6 +3,8 @@ import { useLocation, useNavigate, useNavigationType } from 'react-router';
 import { demoMode } from '../../data';
 import { selectFeaturedMatchId, selectLoaded, selectMatchIdOfTeam, selectMatchOrder, useScoreline } from '../../store';
 import { afterPaint } from '../../rive/afterPaint';
+import { warmPlayerPhoto } from '../../ui/photoManifest';
+import { HERO } from '../../features/player/layout';
 import { prepareScreen, preloadScreens } from '../screens/screenChunks';
 import { canonicalPath, hrefOf, parseNav } from '../nav/url';
 import { useLayoutMode } from './layoutMode';
@@ -36,6 +38,11 @@ export function Shell() {
   const featured = useScoreline(selectFeaturedMatchId);
   const teamMatch = useScoreline(selectMatchIdOfTeam(nav.player?.team ?? ''));
   const r = resolve(nav, layout, { featured, teamMatch });
+  const playerTeam = r.player?.team;
+  const playerNumber = r.player?.n;
+  useEffect(() => {
+    if (playerTeam && playerNumber !== undefined) warmPlayerPhoto(playerTeam, playerNumber, `${HERO.w}px`);
+  }, [playerTeam, playerNumber]);
 
   // one spelling per screen: `/match/7` becomes `/match/7/facts` before it paints (the parse
   // above already reads both the same, so nothing changes on screen)

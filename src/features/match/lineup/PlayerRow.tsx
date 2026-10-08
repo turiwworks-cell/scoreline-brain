@@ -43,11 +43,11 @@ export const PlayerRow = memo(function PlayerRow({ team, n, player, name, replac
   // S 15, shrunk to fit 190 px (fit, luau:1634)
   const w = measure(15, full);
   const size = w <= 190 || w <= 0 ? 15 : (15 * 190) / w;
-  const enter = { opacity: 1, transform: AT_REST, transitionEnd: LANDED, transition: transition('squad', { index }) };
+  const enter = { opacity: 1, transform: AT_REST, transitionEnd: LANDED, transition: transition('squad', { index, withDelay: showMatch }) };
   const on = marks?.on;
 
   return (
-    <m.div initial={reduce ? false : { opacity: 0, transform: slide(0, 10) }} animate={hold && !reduce ? { opacity: 0, transform: slide(0, 10) } : enter}>
+    <m.div initial={reduce ? false : { opacity: 0, transform: slide(0, 10) }} animate={hold && showMatch && !reduce ? { opacity: 0, transform: slide(0, 10) } : enter}>
       <button
         type="button"
         className={`m-feel ${styles.row}`}

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useReducedMotionPreference } from '../../motion/useReducedMotionPreference';
 import { isKeeper, minText, nameOf, playerKey, scoreStr, type Match, type NextFixture, type Team } from '../../domain';
 import { selectMatch, selectTeam, useScoreline } from '../../store';
 import { Crest, EventTags, feel, Icon, KitDisc, MatchClock, mix, pastel, photoProps, PlayerPhoto, RatingBadge, SoftLight, Tag, tagList, tagLayout, textWidth, useFontVersion, type PhotoSources } from '../../ui';
@@ -355,16 +356,17 @@ function NextMatch({ next, opp, nowMs }: { next: NextFixture | undefined; opp: T
 
 /** One unit of the countdown: when it changes the old value eases up and out while the new one comes in from below. */
 function Unit({ index, value, name }: { index: number; value: number; name: string }) {
+  const reduce = useReducedMotionPreference();
   const [shown, setShown] = useState({ cur: value, old: -1 });
-  if (shown.cur !== value) setShown({ cur: value, old: shown.cur });
+  if (shown.cur !== value) setShown({ cur: value, old: reduce ? -1 : shown.cur });
   return (
     <span className={styles.unit} style={{ '--i': index } as CSSProperties}>
-      {shown.old >= 0 && (
+      {!reduce && shown.old >= 0 && (
         <span key={`o${shown.old}`} className={styles.digit} data-old="" onAnimationEnd={() => setShown((s) => ({ cur: s.cur, old: -1 }))}>
           {PAD(shown.old)}
         </span>
       )}
-      <span key={shown.cur} className={styles.digit} data-new={shown.old >= 0 ? '' : undefined}>
+      <span key={shown.cur} className={styles.digit} data-new={!reduce && shown.old >= 0 ? '' : undefined}>
         {PAD(shown.cur)}
       </span>
       <span className={styles.unitName}>{name}</span>

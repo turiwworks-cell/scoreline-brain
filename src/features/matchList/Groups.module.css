@@ -294,3 +294,11 @@
   background-clip: text;
   color: transparent;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .group,
+  .rule,
+  .group[data-collapsed] .rows {
+    transition: none;
+  }
+}
