@@ -3,7 +3,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vite
 import { parseFeed } from '../../domain';
 import { demoFeedJson } from '../../domain/testing/demo';
 import { scorelineStore } from '../../store';
-import { IconSprite } from '../../ui';
+import { IconSprite, parsePhotoManifest, setPhotoManifest } from '../../ui';
 import { MatchDetail, type MatchDetailProps } from './MatchDetail';
 
 beforeAll(() => {
@@ -18,7 +18,10 @@ beforeAll(() => {
 beforeEach(() => {
   scorelineStore.getState().actions.applyFeed(parseFeed(demoFeedJson()), Date.now());
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  setPhotoManifest(null);
+});
 
 function setup(props: Partial<MatchDetailProps> = {}) {
   const calls = { onBack: vi.fn(), onTab: vi.fn(), onOpenPlayer: vi.fn() };
@@ -106,6 +109,46 @@ describe('Facts', () => {
     const form = screen.getByRole('region', { name: 'Form' });
     expect(within(form).getByText('Nigeria')).toBeTruthy();
     expect(within(form).getByText('Senegal')).toBeTruthy();
+  });
+});
+
+describe('a goal in the commentary', () => {
+  // a fresh feed: the goals are Mbappé 12', Messi 33' and Olise 52', all within the first ten rows
+  beforeEach(() => scorelineStore.getState().actions.resetFeed(parseFeed(demoFeedJson()), Date.now()));
+  const goals = () => [...document.querySelectorAll<HTMLElement>('[data-row="e"]')].filter((r) => r.querySelector('.goalPhoto'));
+  const tileOf = (scorer: string) => goals().find((r) => r.querySelector('.goalName')?.textContent === scorer)?.querySelector('[data-photo]');
+
+  it("shows the scorer's photo when there is one, and the kit disc when there is none", () => {
+    setPhotoManifest(parsePhotoManifest({ players: { 'fra:10': { path: 'fra/10' } }, coaches: {} }));
+    setup();
+    expect(goals()).toHaveLength(3);
+    // Mbappé has files: his bust, not his number
+    expect(tileOf('Mbappé')?.getAttribute('data-photo')).toBe('bust');
+    expect(tileOf('Mbappé')?.querySelector('img')?.getAttribute('src')).toBe('/img/players/fra/10-bust@1x.webp');
+    // a scorer the manifest has no files for keeps the valid fallback, with his number
+    for (const name of ['Messi', 'Olise']) {
+      expect(tileOf(name)?.getAttribute('data-photo')).toBe('kit');
+      expect(tileOf(name)?.querySelector('img')).toBeNull();
+    }
+  });
+
+  it('waits for the photo manifest rather than flashing a kit disc first', () => {
+    setPhotoManifest(null);
+    setup();
+    expect(goals()).toHaveLength(3);
+    for (const r of goals()) expect(r.querySelector('.goalPhoto')?.childElementCount).toBe(0);
+  });
+
+  it('has no chevron beside the score: the row does nothing when pressed', () => {
+    setPhotoManifest(parsePhotoManifest({ players: {}, coaches: {} }));
+    setup();
+    expect(goals()).toHaveLength(3);
+    for (const r of goals()) {
+      expect(r.querySelector('use[href="#sl-i-chevR"]')).toBeNull();
+      expect(r.querySelector('button')).toBeNull();
+      // the score, in its capsule, is still there
+      expect(r.querySelector('.chip')?.textContent).toMatch(/\d–\d/);
+    }
   });
 });
 
