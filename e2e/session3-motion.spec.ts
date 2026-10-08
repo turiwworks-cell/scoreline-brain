@@ -194,16 +194,20 @@ test('phone first and repeat match navigation restore a usable list and its scro
   await page.evaluate(() => new Promise<void>(done => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
   for (let i = 0; i < 2; i++) {
     await row.scrollIntoViewIfNeeded();
-    const scroll = await list.evaluate(el => el.scrollTop);
-    const frames = await row.evaluate(button => new Promise<{ title: string | null; x: number[] }>(done => {
+    const frames = await row.evaluate(button => new Promise<{ title: string | null; x: number[]; scroll: number }>(done => {
       const x: number[] = [];
       const start = performance.now();
+      const list = button.closest('[data-screen]')!;
+      // Make the reported ordering deterministic: do not yield between the final scroll
+      // and the tap, so its native scroll event has not yet saved the departing entry.
+      list.scrollTop += 80;
+      const scroll = list.scrollTop;
       (button as HTMLButtonElement).click();
       const tick = () => {
         const pane = document.querySelector<HTMLElement>('[data-screen="match"][data-present="true"]')!;
         x.push(new DOMMatrix(getComputedStyle(pane).transform).m41);
         if (performance.now() - start < 1000) { requestAnimationFrame(tick); return; }
-        done({ title: pane.querySelector('[data-screen-heading]')?.textContent ?? null, x });
+        done({ title: pane.querySelector('[data-screen-heading]')?.textContent ?? null, x, scroll });
       };
       requestAnimationFrame(tick);
     }));
@@ -217,7 +221,7 @@ test('phone first and repeat match navigation restore a usable list and its scro
     await expect(screen(page, 'match')).toHaveCount(0);
     await expect(list).not.toHaveAttribute('inert');
     await expect(row).toBeFocused();
-    expect(await list.evaluate(el => el.scrollTop)).toBeCloseTo(scroll, 0);
+    expect(await list.evaluate(el => el.scrollTop)).toBeCloseTo(frames.scroll, 0);
     await expect(row).toBeEnabled();
   }
 });
