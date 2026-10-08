@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { MatchEvent, Player, Team } from '../../domain';
-import { ageOf, barsOf, factsOf, fitSize, notPlayed, roleLabel, sideIn, stepOf, substitutionOf, tagsOf } from './model';
+import { ageOf, barsOf, factsOf, fitSize, notPlayed, quietNote, roleLabel, savesText, sideIn, stepOf, substitutionOf, tagsOf } from './model';
 
 const ev = (e: Partial<MatchEvent>): MatchEvent => ({ id: String(Math.random()), seq: 0, kind: 'goal', side: 'home', minute: 1, ...e }) as MatchEvent;
 const team = { id: 'fra', name: 'France', short: 'FRA', colors: ['#0055A4', '#EF4135'] } as Team;
@@ -50,6 +50,26 @@ describe('player model', () => {
   it('bars carry only what the provider sends', () => {
     expect(barsOf({ touches: 30, passes: 20, passOk: 15, shots: 2 }, false).map((b) => [b.label, b.value])).toEqual([['Touches', 30], ['Pass accuracy', 75], ['Shots', 2]]);
     expect(barsOf({ touches: 30, passes: 0, passOk: 0, shots: 0 }, true).map((b) => b.label)).toEqual(['Touches', 'Pass accuracy']);
+  });
+  it('a keeper has saves where the others have shots, and only when the provider sent a count', () => {
+    const base = { touches: 30, passes: 20, passOk: 15, shots: 0 };
+    expect(barsOf({ ...base, saves: 4 }, true).map((b) => [b.label, b.value])).toEqual([['Touches', 30], ['Pass accuracy', 75], ['Saves', 4]]);
+    // a genuine zero is shown as one
+    expect(barsOf({ ...base, saves: 0 }, true).at(-1)).toMatchObject({ label: 'Saves', value: 0 });
+    // no count is not a count of 0: no saves bar at all
+    expect(barsOf(base, true).map((b) => b.label)).toEqual(['Touches', 'Pass accuracy']);
+    // an outfield player never gets one, whatever the line carries
+    expect(barsOf({ ...base, saves: 3 }, false).map((b) => b.label)).toEqual(['Touches', 'Pass accuracy', 'Shots']);
+  });
+  it('a keeper is not told he has no goals or assists', () => {
+    expect(quietNote(false, undefined)).toBe('No goals or assists yet');
+    expect(quietNote(false, 5)).toBe('No goals or assists yet');
+    expect(quietNote(true, undefined)).toBe('In goal');
+    expect(quietNote(true, 0)).toBe('No saves yet');
+    // with saves to show the chip speaks, there is no extra line
+    expect(quietNote(true, 3)).toBe('');
+    expect(savesText(1)).toBe('1 save');
+    expect(savesText(3)).toBe('3 saves');
   });
   it('steps through the squad and wraps', () => {
     expect(stepOf([1, 2, 3], 3, 1)).toBe(1);

@@ -216,3 +216,39 @@ describe('his name', () => {
     expect(c.getByText('First goal of the match')).toBeTruthy();
   });
 });
+
+describe('a goalkeeper', () => {
+  const keeperLine = (extra: Record<string, number> = {}) => ({ home: { '16': { rating: 7.1, minutes: 58, touches: 21, passes: 14, passesOk: 11, shots: 0, ...extra } }, away: {} });
+  const labels = () => [...document.querySelectorAll('.cellLabel')].map((c) => c.textContent);
+  const onPitch = { followed: { team: 'fra', n: 16 } };
+
+  it('has saves in the last cell and is told them, not that he has not scored', () => {
+    show({ players: keeperLine({ saves: 3 }) });
+    card(onPitch);
+    expect(labels()).toEqual(['Rating', 'Touches', 'Passes', 'Saves']);
+    expect(document.querySelector('.cell:last-child .cellValue')?.textContent).toBe('3');
+    expect(screen.getByText('3 saves tonight')).toBeTruthy();
+    expect(screen.queryByText('No goals yet tonight')).toBeNull();
+  });
+
+  it('says no saves yet for a genuine 0', () => {
+    show({ players: keeperLine({ saves: 0 }) });
+    card(onPitch);
+    expect(document.querySelector('.cell:last-child .cellValue')?.textContent).toBe('0');
+    expect(screen.getByText('No saves yet')).toBeTruthy();
+  });
+
+  it('with no count from the provider leaves the saves out: no 0, no shots', () => {
+    show({ players: keeperLine() });
+    card(onPitch);
+    expect(labels()).toEqual(['Rating', 'Touches', 'Passes']);
+    expect(screen.getByText('In goal tonight')).toBeTruthy();
+    expect(screen.queryByText('No goals yet tonight')).toBeNull();
+  });
+
+  it('an outfield player still has his shots and his goals line', () => {
+    show({ players: { home: {}, away: { '10': { rating: 7.6, minutes: 58, touches: 30, passes: 20, passesOk: 16, shots: 2 } } } });
+    card({ followed: { team: 'arg', n: 10 } });
+    expect(labels()).toEqual(['Rating', 'Touches', 'Passes', 'Shots']);
+  });
+});

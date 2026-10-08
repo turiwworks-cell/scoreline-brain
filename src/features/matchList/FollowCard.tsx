@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { minText, nameOf, playerKey, scoreStr, type Match, type NextFixture, type Team } from '../../domain';
+import { isKeeper, minText, nameOf, playerKey, scoreStr, type Match, type NextFixture, type Team } from '../../domain';
 import { selectMatch, selectTeam, useScoreline } from '../../store';
 import { Crest, EventTags, feel, Icon, KitDisc, MatchClock, mix, pastel, photoProps, PlayerPhoto, RatingBadge, SoftLight, Tag, tagList, tagLayout, textWidth, useFontVersion, type PhotoSources } from '../../ui';
 import { fitSize } from './cardLayout';
@@ -80,6 +80,7 @@ export function FollowCard({ followed, live, open, hidden, onToggle, onOpenPlaye
   useCardFrames(card, live.goalAt, live.redAt, phase, clock.now);
 
   const player = players[playerKey(teamId, n)];
+  const keeper = isKeeper(player);
   const [photoFailed, setPhotoFailed] = useState<string | undefined>();
   if (!team) return null;
 
@@ -164,7 +165,7 @@ export function FollowCard({ followed, live, open, hidden, onToggle, onOpenPlaye
               {after && match && st && flags && team ? (
                 <AfterLine team={team} opp={opp} match={match} side={side} st={st} flags={flags} />
               ) : (
-                <Goals match={match} side={side} n={n} note={eveningNote(match, st, onP)} />
+                <Goals match={match} side={side} n={n} note={eveningNote(match, st, onP, keeper)} />
               )}
             </span>
           </span>
@@ -177,7 +178,7 @@ export function FollowCard({ followed, live, open, hidden, onToggle, onOpenPlaye
 
           <span className={styles.fade} data-in={phase === 'post' ? '' : undefined}>
             <span className={styles.band}>
-              {bandCells(st, phase, match, opp?.name ?? '', n).map((c, i) => (
+              {bandCells(st, phase, match, opp?.name ?? '', n, keeper).map((c, i) => (
                 <StatCell key={i} index={i} cell={c} />
               ))}
             </span>

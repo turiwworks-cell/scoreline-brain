@@ -16,6 +16,15 @@ describe('the stats band', () => {
     expect(cells[2]).toMatchObject({ kind: 's', value: '0/0' });
   });
 
+  it("a keeper's last cell is his saves, a genuine 0 stays a 0 and no count leaves the cell out", () => {
+    const st = playerStats(state, live, 'away', 10, DEMO_T0);
+    expect(bandCells({ ...st, saves: 3 }, 'live', live, 'France', 10, true).map((c) => [c.label, c.value])).toEqual([['Rating', 7.6], ['Touches', 0], ['Passes', '0/0'], ['Saves', 3]]);
+    expect(bandCells({ ...st, saves: 0 }, 'live', live, 'France', 10, true).at(-1)).toEqual({ label: 'Saves', value: 0, kind: 'n' });
+    expect(bandCells(st, 'live', live, 'France', 10, true).map((c) => c.label)).toEqual(['Rating', 'Touches', 'Passes']);
+    // an outfield player keeps his shots, with or without a saves field
+    expect(bandCells({ ...st, saves: 3 }, 'live', live, 'France', 10).map((c) => c.label)).toEqual(['Rating', 'Touches', 'Passes', 'Shots']);
+  });
+
   it('minutes replace the rating once his match is over', () => {
     const st = playerStats(state, live, 'away', 10, DEMO_T0);
     expect(bandCells(st, 'post', live, 'France', 10)[0]).toMatchObject({ label: 'Minutes', value: 58 });
@@ -24,6 +33,8 @@ describe('the stats band', () => {
   it('with no numbers from the provider it tells what the events tell', () => {
     const st = { ...playerStats(state, live, 'away', 10, DEMO_T0), real: false };
     expect(bandCells(st, 'live', live, 'France', 10).map((c) => c.label)).toEqual(['Minutes', 'Goals', 'Assists', 'Shots']);
+    // a keeper's goals and assists stay, his shots do not
+    expect(bandCells(st, 'live', live, 'France', 10, true).map((c) => c.label)).toEqual(['Minutes', 'Goals', 'Assists']);
   });
 
   it('before kick-off: when, and against whom', () => {
@@ -54,6 +65,17 @@ describe('the evening line', () => {
     expect(eveningNote(live, st, false)).toBe('On the bench');
     expect(eveningNote(live, playerStats(state, live, 'away', 22, DEMO_T0), false)).toBe('Substituted');
     expect(eveningNote(live, st, true)).toBe('No goals yet tonight');
+  });
+
+  it("tells a keeper his saves, not that he has not scored", () => {
+    const st = playerStats(state, live, 'away', 10, DEMO_T0);
+    expect(eveningNote(live, st, true, true)).toBe('In goal tonight');
+    expect(eveningNote(live, { ...st, saves: 0 }, true, true)).toBe('No saves yet');
+    expect(eveningNote(live, { ...st, saves: 1 }, true, true)).toBe('1 save tonight');
+    expect(eveningNote(live, { ...st, saves: 4 }, true, true)).toBe('4 saves tonight');
+    // the other ways a keeper is not in the evening's line are the same as anyone's
+    expect(eveningNote(live, st, false, true)).toBe('Substituted');
+    expect(eveningNote(upcoming, undefined, false, true)).toBe('Today');
   });
 });
 

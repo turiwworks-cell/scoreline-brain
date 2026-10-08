@@ -3,7 +3,7 @@
 
 import { liveMinute } from './clock';
 import { lineupOf } from './leaders';
-import type { DomainState, Match, MatchEvent, Side } from './types';
+import type { DomainState, Match, MatchEvent, Player, Side } from './types';
 
 /** What the events say about one player. A player in the first eleven is on from minute 0. */
 export interface Flags {
@@ -45,6 +45,9 @@ export function playerFlags(state: Pick<DomainState, 'players'>, match: Match, s
   return { starter, onAt, offAt, redAt, yellow, goals, assists, shots };
 }
 
+/** A goalkeeper: the role that gets saves, not shots, goals and assists, as its numbers. */
+export const isKeeper = (p: Pick<Player, 'pos'> | undefined): boolean => p?.pos === 'GK';
+
 /** On the pitch right now: in the eleven or came on, and not taken off (luau:4263). */
 export const onPitch = (f: Flags) => (f.starter || f.onAt !== undefined) && f.offAt === undefined;
 
@@ -57,6 +60,8 @@ export interface PStats {
   readonly touches: number;
   readonly passes: number;
   readonly passOk: number;
+  /** a goalkeeper's saves, when the provider sends them; undefined = not known, which is not 0 */
+  readonly saves?: number;
   readonly played: boolean;
   /** the provider sent his numbers; false = only what the events tell */
   readonly real: boolean;
@@ -85,6 +90,7 @@ export function playerStats(state: Pick<DomainState, 'players'>, match: Match, s
     touches: line?.touches ?? 0,
     passes: Math.max(line?.passes ?? 0, line?.passesOk ?? 0),
     passOk: line?.passesOk ?? 0,
+    ...(line?.saves !== undefined ? { saves: line.saves } : {}),
     played,
     real: line !== undefined,
   };
