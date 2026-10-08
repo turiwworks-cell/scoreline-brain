@@ -18,10 +18,10 @@ if (api) {
     connectSource(source, scorelineStore.getState().actions);
   });
 } else if (demo) {
-  void import('./data/demo').then(({ createDemoSource }) => {
+  void import('./app/followBridge').then(({ createFollowedDemo }) => {
     // The evening is built in this task and its first feed (written out, parsed, applied) is
     // delivered in the next: together they were one long frame on a phone (Part 21, #5).
-    const source = createDemoSource(demo);
+    const source = createFollowedDemo(demo);
     setTimeout(() => connectSource(source, scorelineStore.getState().actions), 0);
   });
 }

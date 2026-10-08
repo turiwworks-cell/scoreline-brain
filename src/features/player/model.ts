@@ -116,16 +116,31 @@ export interface Bar {
 
 /**
  * His bars (luau:2887): the numbers the provider's line carries. The Lua also draws duels, chances
- * created, saves and goals conceded; the v2 line has none of those, so they are not invented.
+ * created and goals conceded; the v2 line has none of those, so they are not invented. A keeper
+ * has no shots bar, he has saves, and only when the provider sent a count: not known is not 0.
  */
-export function barsOf(stats: Pick<PStats, 'touches' | 'passes' | 'passOk' | 'shots'>, keeper: boolean): Bar[] {
+export function barsOf(stats: Pick<PStats, 'touches' | 'passes' | 'passOk' | 'shots' | 'saves'>, keeper: boolean): Bar[] {
   const accuracy = stats.passes > 0 ? Math.floor((stats.passOk / stats.passes) * 100 + 0.5) : 0;
   const bars: Bar[] = [
     { label: 'Touches', value: stats.touches, max: keeper ? 60 : 110, percent: false },
     { label: 'Pass accuracy', value: accuracy, max: 100, percent: true },
   ];
   if (!keeper) bars.push({ label: 'Shots', value: stats.shots, max: 8, percent: false });
+  else if (stats.saves !== undefined) bars.push({ label: 'Saves', value: stats.saves, max: 8, percent: false });
   return bars;
+}
+
+/** "1 save", "3 saves". */
+export const savesText = (saves: number) => (saves === 1 ? '1 save' : `${saves} saves`);
+
+/**
+ * The line that stands where his goals and assists would be when he has none to show. A keeper
+ * is not told "no goals": he has his saves (a chip when he has made some), else he is in goal.
+ */
+export function quietNote(keeper: boolean, saves: number | undefined): string {
+  if (!keeper) return 'No goals or assists yet';
+  if (saves === undefined) return 'In goal';
+  return saves === 0 ? 'No saves yet' : '';
 }
 
 /** The shirt order stepPlayer walks: the eleven, then the bench, wrapping (luau:7280). */

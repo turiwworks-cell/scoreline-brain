@@ -190,6 +190,10 @@ test('the page wheeled under a resting mouse lights nothing on the way, and the 
   await screen(page).evaluate((el) => (el.scrollTop = 300));
   const p = (await pitch(page).boundingBox())!;
   await page.mouse.move(p.x + p.width / 2 - 40, Math.max(p.y, 0) + 150);
+  // Settle the hover caused by positioning the mouse before measuring the wheel. Its queued
+  // transitionrun could otherwise be counted as a scroll repaint, even after the guard cancels it.
+  await page.evaluate(() => new Promise<void>((done) => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
+  await expect.poll(() => screen(page).evaluate(el => el.getAnimations({ subtree: true }).filter(a => a instanceof CSSTransition && a.transitionProperty === '--lit').length)).toBe(0);
   // every hover light that starts, and whether the page held the hover while it moved
   await screen(page).evaluate((el) => {
     const w = window as unknown as { __lit: string[]; __held: boolean };

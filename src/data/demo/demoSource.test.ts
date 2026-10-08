@@ -219,6 +219,64 @@ describe('DemoSource', () => {
   });
 });
 
+describe('DemoSource follow', () => {
+  const actors = (events: LiveEvent[]) => new Set(events.filter((e) => e.kind === 'action').map((e) => `${e.side}:${e.player}`));
+
+  it("tells the acts of whoever is followed now, and of nobody once he is let go", () => {
+    const { scheduler, source, events, start } = recorded({ speed: FAST_SPEED });
+    start();
+    scheduler.advance(20_000);
+    // Argentina's 10 until someone else is chosen
+    expect(actors(events)).toEqual(new Set(['away:10']));
+
+    // another team's player: the old player's acts stop and are never labelled as his
+    source.follow({ team: 'fra', n: 16 });
+    events.length = 0;
+    scheduler.advance(20_000);
+    expect(actors(events)).toEqual(new Set(['home:16']));
+
+    source.follow({ team: 'arg', n: 10 });
+    events.length = 0;
+    scheduler.advance(20_000);
+    expect(actors(events)).toEqual(new Set(['away:10']));
+
+    source.follow(null);
+    events.length = 0;
+    scheduler.advance(20_000);
+    expect(actors(events)).toEqual(new Set());
+  });
+
+  it('the first act of a newly followed player comes a moment after the choice, not at once', () => {
+    const { scheduler, source, events, start } = recorded({ speed: FAST_SPEED, follow: null });
+    start();
+    scheduler.advance(5_000);
+    events.length = 0;
+    source.follow({ team: 'eng', n: 9 });
+    // 1.2 s of match time is 120 ms at 10×
+    scheduler.advance(50);
+    expect(events.some((e) => e.kind === 'action')).toBe(false);
+    scheduler.advance(100);
+    expect(events.find((e) => e.kind === 'action')).toMatchObject({ side: 'home', player: 9 });
+  });
+
+  it('a restart keeps whoever is followed and starts his numbers over', () => {
+    const { scheduler, source, feeds, events, start } = recorded({ speed: FAST_SPEED, follow: { team: 'fra', n: 16 } });
+    start();
+    scheduler.advance(30_000);
+    const line = () => feeds.at(-1)?.matches.find((m) => m.id === 1)?.players?.home['16'];
+    const before = line();
+    expect(feeds.at(-1)?.matches.find((m) => m.id === 1)?.minute).toBeGreaterThan(58);
+    source.restart();
+    // kick-off of the featured match again: the numbers are the evening's start, not what the old one reached
+    expect(feeds.at(-1)?.matches.find((m) => m.id === 1)?.minute).toBe(58);
+    expect(line()?.touches).toBeLessThanOrEqual(before?.touches ?? Infinity);
+    expect(line()?.saves).toBeDefined();
+    events.length = 0;
+    scheduler.advance(5_000);
+    expect(actors(events)).toEqual(new Set(['home:16']));
+  });
+});
+
 describe('DemoSource dev controls', () => {
   it('restart resets the connected store quietly and new goals are accepted afterwards', () => {
     const scheduler = new FakeScheduler();

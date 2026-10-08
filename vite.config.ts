@@ -36,8 +36,8 @@ function bootAfterFirstPaint(): Plugin {
           demo.push(`/${file}`);
           chunk.imports.forEach(walk);
         };
-        const demoChunk = Object.values(bundle).find((c) => c.type === 'chunk' && c.facadeModuleId?.replace(/\\/g, '/').endsWith('/src/data/demo/index.ts'));
-        if (!demoChunk) throw new Error('bootAfterFirstPaint: no chunk for src/data/demo');
+        const demoChunk = Object.values(bundle).find((c) => c.type === 'chunk' && c.facadeModuleId?.replace(/\\/g, '/').endsWith('/src/app/followBridge.ts'));
+        if (!demoChunk) throw new Error('bootAfterFirstPaint: no lazy demo entry');
         walk(demoChunk.fileName);
 
         const boot = `<script>

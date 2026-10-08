@@ -1,6 +1,6 @@
 import { useMemo, useRef, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
 import { m, useTransform } from 'motion/react';
-import { nameOf, playerKey, playerStats, type Team } from '../../domain';
+import { isKeeper, nameOf, playerKey, playerStats, type Team } from '../../domain';
 import { selectMatch, selectPlayer, selectPlayers, selectTeam, useScoreline } from '../../store';
 import { frostPhoto, Icon, playerPhoto, RoundButton, SoftLight, subscribeSecond, usePhotoManifest } from '../../ui';
 import { Bar } from './Bar';
@@ -85,7 +85,7 @@ function Page({ team, n, matchId, following, onFollow, chrome, onBack, enter = 0
   };
   const slide = useTransform(opening.step, (v) => 36 * dir * (1 - v));
   const numberSlide = useTransform(opening.step, (v) => 36 * dir * (1 - v) * 0.5);
-  const keeper = player?.pos === 'GK';
+  const keeper = isKeeper(player);
 
   return (
     <div ref={ref} className={styles.page} style={{ '--c1': team.colors[0] } as CSSProperties} data-pv="page" data-player={`${team.id}:${n}`} data-photo={photo && !hold ? 'bust' : 'kit'}>

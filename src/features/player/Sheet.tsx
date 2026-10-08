@@ -3,7 +3,7 @@ import { animate, m, useTransform, type MotionValue } from 'motion/react';
 import { CASCADE, cascade, CURVES, drawn } from '../../motion';
 import type { Match, Player, PStats, Team } from '../../domain';
 import { Glass, pastel, ratingTone, Tag, textWidth, useFontVersion } from '../../ui';
-import { barsOf, factsOf, fitSize, notPlayed, roleLabel, type Bar, type MatchTag, type Substitution } from './model';
+import { barsOf, factsOf, fitSize, notPlayed, quietNote, roleLabel, savesText, type Bar, type MatchTag, type Substitution } from './model';
 import styles from './PlayerView.module.css';
 
 /*
@@ -175,6 +175,8 @@ export const MatchBlock = memo(function MatchBlock({ match, stats, tags, team, k
     );
   }
   const hasRating = stats.rating > 0;
+  const saved = keeper ? (stats.saves ?? 0) : 0;
+  const quiet = quietNote(keeper, stats.saves);
   const bars = stats.real ? barsOf(stats, keeper) : [];
   const fill = pastel(team.colors[0]);
   return (
@@ -187,13 +189,18 @@ export const MatchBlock = memo(function MatchBlock({ match, stats, tags, team, k
         <div className={styles.did}>
           {hasRating && <RatingBox value={stats.rating} />}
           <div className={styles.tags} data-with-rating={hasRating ? '' : undefined}>
-            {tags.length === 0 && <span className={styles.none}>No goals or assists yet</span>}
+            {tags.length === 0 && quiet !== '' && <span className={styles.none}>{quiet}</span>}
             {tags.map((t) => (
               <Glass key={t.kind} radius={14} className={styles.tag} data-pv="tag" data-kind={t.kind}>
                 <Tag kind={TAG_ICON[t.kind]} size={16} />
                 <span>{t.label}</span>
               </Glass>
             ))}
+            {saved > 0 && (
+              <Glass radius={14} className={styles.tag} data-pv="tag" data-kind="saves">
+                <span>{savesText(saved)}</span>
+              </Glass>
+            )}
           </div>
         </div>
       </m.div>

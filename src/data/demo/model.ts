@@ -74,8 +74,8 @@ export interface SimMatch {
   poss: number;
   stats: Record<StatKey, [number, number]>;
   readonly lu: { readonly h: SimLineup; readonly a: SimLineup };
-  /** The followed player's own numbers: touches, passes, completed, key passes, dribbles. */
-  readonly fx: Map<string, number[]>;
+  /** The evening's seed: a player's numbers are drawn from it, so the team's total can be counted from them. */
+  readonly seed: number;
   /** The match's `seq`: the last one handed out. */
   seq: number;
 }
@@ -210,7 +210,7 @@ function newMatch(n: number, id: number, f: Fixture, seed: number): SimMatch {
     poss: 50,
     stats: zeroStats(),
     lu: { h: newLineup(h), a: newLineup(a) },
-    fx: new Map(),
+    seed,
     seq: 0,
   };
 }
@@ -446,9 +446,6 @@ export function refreshStats(m: SimMatch): void {
     else if (k === 'foul' || k === 'foulx') add(otherSide(e.side), 5, 1);
     else if (k === 'offside') add(e.side, 6, 1);
   }
-  const mins = Math.max(m.min, 1);
-  const ph = Math.floor((m.poss * mins * 5.4) / 50 + 0.5);
-  const pa = Math.floor(((100 - m.poss) * mins * 5.4) / 50 + 0.5);
   const r2 = (x: number) => Math.floor(x * 100 + 0.5) / 100;
   const pair = (i: number): [number, number] => [c.h[i] ?? 0, c.a[i] ?? 0];
   m.stats = {
@@ -457,7 +454,8 @@ export function refreshStats(m: SimMatch): void {
     onTarget: pair(2),
     bigChances: pair(3),
     corners: pair(4),
-    passes: [ph, pa],
+    // a team's passes are its players' passes, so a player can never have more than his team
+    passes: [sidePasses(m, 'h'), sidePasses(m, 'a')],
     fouls: pair(5),
     offsides: pair(6),
   };
@@ -562,47 +560,91 @@ export interface PlayerNumbers {
   readonly passes: number;
   readonly passesOk: number;
   readonly shots: number;
+  /** A goalkeeper's saves, counted from the shots on target he faced. Undefined for everyone else. */
+  readonly saves?: number;
 }
 
-export function playerStats(m: SimMatch, side: LSide, n: number, seed: number): PlayerNumbers {
+/** A player's line on the pitch: the shirt's own, else the one his slot gives (`lineOf`). */
+export function lineIn(m: SimMatch, side: LSide, n: number): string {
+  const lu = m.lu[side];
+  const slot = slotOf(lu, n);
+  return lineOf(lu.team, n, lu.form, slot > 0 ? slot : 6);
+}
+
+/**
+ * What his minutes and his random stream say about his evening: the part of his numbers that
+ * only depends on how long he has played. His touches and passes come from here and nowhere
+ * else, so a team's passes (`sidePasses`) and a player's own can be counted from the same numbers.
+ * `r` carries on from the two draws made here.
+ */
+function baseOf(m: SimMatch, side: LSide, n: number) {
   const lu = m.lu[side];
   const team = lu.team;
   const slot = slotOf(lu, n);
-  const line = lineOf(team, n, lu.form, slot > 0 ? slot : 6);
+  const line = lineIn(m, side, n);
   const ns = m.status === 'ns';
   const now = ns ? 0 : Math.min(m.min, 90);
   const start = slot > 0 ? 0 : (lu.on.get(n) ?? -1);
   const stop = lu.off.get(n) ?? lu.rc.get(n) ?? now;
   const mins = start < 0 || ns ? 0 : Math.max(0, Math.min(stop, now) - start);
   const played = mins > 0 || (start >= 0 && !ns);
-  const r = rng(streamSeed(seed, n * 131 + team.charCodeAt(0) * 7 + team.charCodeAt(1)));
-  const f = mins / 90;
+  const r = rng(streamSeed(m.seed, n * 131 + team.charCodeAt(0) * 7 + team.charCodeAt(1)));
   const pr = PROFILE[line] ?? PROFILE.MF ?? [0, 0, 0, 0, 0, 0];
+  const f = mins / 90;
+  const touches = Math.floor(pr[0] * (0.8 + r() * 0.45) * f + 0.5);
+  // the side with the ball completes more of its passes: possession 50 is the profile's own
+  const share = (side === 'h' ? m.poss : 100 - m.poss) / 50;
+  const passes = Math.floor(touches * (0.62 + r() * 0.12) * share + 0.5);
+  return { line, pr, mins, played, f, r, touches, passes };
+}
+
+/** A team's passes: the sum of its players', so no player has more than his team. */
+function sidePasses(m: SimMatch, side: LSide): number {
+  const lu = m.lu[side];
+  let total = 0;
+  for (const n of [...lu.xi, ...lu.bench]) total += baseOf(m, side, n).passes;
+  return total;
+}
+
+export function playerStats(m: SimMatch, side: LSide, n: number): PlayerNumbers {
+  const lu = m.lu[side];
+  const { line, pr, mins, played, f, r, touches, passes } = baseOf(m, side, n);
   const g = lu.goals.get(n) ?? 0;
   const a = lu.assists.get(n) ?? 0;
   const y = lu.yc.has(n) ? 1 : 0;
   const red = lu.rc.has(n) ? 1 : 0;
   let shots = 0;
   let sot = 0;
+  let saves = 0;
+  // shots after he was taken off or sent off were not his to save (stoppage time still counts)
+  const gone = lu.off.get(n) ?? lu.rc.get(n) ?? Infinity;
   for (const e of m.events) {
+    const k = e.kind;
     if (e.side === side && e.pn === n) {
-      const k = e.kind;
       if (k === 'goal' || k === 'sot' || k === 'miss' || k === 'block' || k === 'big') shots += 1;
       if (k === 'goal' || k === 'sot' || k === 'big') sot += 1;
+    } else if (e.side !== side && e.on === n && (k === 'sot' || k === 'big') && e.min <= gone) {
+      // a shot on target that was not a goal is a save: the shooter's team counts it as on target too
+      saves += 1;
     }
   }
-  const fx = m.fx.get(side + n) ?? [0, 0, 0, 0, 0];
-  const touches = Math.floor(pr[0] * (0.8 + r() * 0.45) * f + 0.5) + (fx[0] ?? 0);
-  let passes = Math.floor(touches * (0.62 + r() * 0.12) + 0.5) + (fx[1] ?? 0);
   const acc = clamp(pr[1] + (r() - 0.5) * 12, 55, 98);
-  const passesOk = Math.floor((passes * acc) / 100 + 0.5) + (fx[2] ?? 0);
-  passes = Math.max(passes, passesOk);
+  const passesOk = Math.floor((passes * acc) / 100 + 0.5);
   r(); // duels won: drawn to keep the Lua's order, shown by the player page later
-  const keyp = Math.floor(pr[4] * (0.6 + r() * 0.8) * f + 0.5) + a + (fx[3] ?? 0);
-  const saves = Math.floor(pr[5] * (0.6 + r() * 0.8) * f + 0.5);
+  const keyp = Math.floor(pr[4] * (0.6 + r() * 0.8) * f + 0.5) + a;
+  r(); // saves: counted from the events now, the draw is kept so the rating's stays where it was
   const conceded = side === 'h' ? m.as : m.hs;
   let rating = 6.2 + r() * 0.8 + g * 1.1 + a * 0.7 - y * 0.35 - red * 1.4 + (keyp - a) * 0.08 + sot * 0.12;
   if (line === 'GK') rating += saves * 0.18 - conceded * 0.3;
   if (!played) rating = 0;
-  return { rating: clamp(Math.floor(rating * 10 + 0.5) / 10, 0, 10), minutes: mins, played, touches, passes, passesOk, shots };
+  return {
+    rating: clamp(Math.floor(rating * 10 + 0.5) / 10, 0, 10),
+    minutes: mins,
+    played,
+    touches,
+    passes,
+    passesOk,
+    shots,
+    ...(line === 'GK' ? { saves } : {}),
+  };
 }

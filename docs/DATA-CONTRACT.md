@@ -97,7 +97,7 @@ Served at `GET /feed`. Send it on start and whenever something changes; the clie
 | `matches[].events` | Every event so far, in `seq` order, in the shape of §3 without `match`. Within its `seq`, the snapshot's list is complete: an event left out is gone. |
 | `matches[].stats` | Pairs `[home, away]` for `xg`, `shots`, `onTarget`, `bigChances`, `corners`, `passes`, `fouls`, `offsides`, plus `possession`. Without stats the app counts shots, corners and fouls from the events. |
 | `matches[].momentum` | One value per minute, -1 (away) to 1 (home). Without it the line is drawn from the events. |
-| `matches[].players` | Ratings and numbers per shirt. Players without numbers show only what the events tell: minutes, goals, assists, shots. Tonight's leaders lists only players with a rating. |
+| `matches[].players` | Ratings and numbers per shirt. Players without numbers show only what the events tell: minutes, goals, assists, shots. Tonight's leaders lists only players with a rating. A goalkeeper's line may carry `saves`; leave it out when the provider has no count (the app then shows none), and send `0` only for a goalkeeper who really made no save. |
 | `next[team].in` | Seconds until that team's next kick-off, for the countdown on the followed player's card. |
 
 Give every event an `id` that never changes. That is how the client knows what it has already

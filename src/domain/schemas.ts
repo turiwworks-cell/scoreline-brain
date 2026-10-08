@@ -228,7 +228,12 @@ const stats = z.transform((v): MatchStats | undefined => {
 const playerLines = lenientRecord(
   z.pipe(record, z.transform((row) => {
     const out: Record<string, number> = {};
-    for (const [k, x] of Object.entries(row)) out[k] = toNum(x) ?? 0;
+    for (const [k, x] of Object.entries(row)) {
+      const v = toNum(x);
+      // a count the provider could not give stays unknown: it is not a save-less evening
+      if (v === undefined && k === 'saves') continue;
+      out[k] = v ?? 0;
+    }
     return out;
   })),
 );

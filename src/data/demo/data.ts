@@ -824,6 +824,17 @@ export const ACTS: readonly (readonly [string, number, string])[] = [
   ['press', 5, 'Presses {Q} into a hurried pass'],
 ];
 
+// What a followed goalkeeper does between the shots he faces (his saves are told from the shots
+// themselves, see DemoSim.noteSave): kind, weight, text. {M} team-mate, {Q} opponent.
+export const KEEPER_ACTS: readonly (readonly [string, number, string])[] = [
+  ['touch', 8, 'Gathers a back-pass'],
+  ['pass', 14, 'Rolls it out to {M}'],
+  ['long', 9, 'Goal kick, long to {M}'],
+  ['claim', 4, 'Comes off the line to claim the cross'],
+  ['lost', 2, 'Hurried by {Q}, clears it out'],
+  ['run', 8, 'Off the ball, organising the back line'],
+];
+
 // `luau:2247–2253`: per-90 output by line: touches, pass accuracy, duels won %, shots, chances created, saves.
 export const PROFILE: Readonly<Record<string, readonly [number, number, number, number, number, number]>> = {
   GK: [36, 79, 62, 0, 0, 3.4],

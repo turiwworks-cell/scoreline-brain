@@ -6,8 +6,8 @@ import { useEffect, type RefObject } from 'react';
  * markers, the substitutes' rows, the cards. Each repaint had the browser draw part of the page
  * again in the middle of the scroll (194 tiles in one flick over the line-up, in Chromium), and on
  * fast flicks a one-pixel row of wrong pixels flashed across the pitch for a frame or two (review
- * of 2026-10-06). While the wheel moves a page, nothing on it takes
- * the pointer: data-scrolling on the scroller, read by Shell.module.css. The control that was lit
+ * of 2026-10-06). While the wheel moves a page, hover lights stay off and controls remain
+ * clickable: data-scrolling on the scroller, read by Shell.module.css. The control that was lit
  * goes out at once; the hover comes back once the page has been still for SCROLL_SETTLE_MS.
  *
  * Only a wheel (a mouse or a trackpad) raises it; a scroll still running keeps it raised. A touch

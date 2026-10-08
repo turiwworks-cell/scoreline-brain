@@ -97,6 +97,66 @@ describe('the player view', () => {
     expect(view.container.querySelector('[data-pv="match"]')).toBeTruthy();
   });
 
+  describe('a goalkeeper', () => {
+    const statLabels = (c: HTMLElement) => [...c.querySelectorAll('[data-pv="stat"]')].map((r) => r.querySelector('.barLabel')?.textContent);
+    const line = () => scorelineStore.getState().domain.matches[1]!.players!.home['16']!;
+
+    it('has saves where the others have shots, and they agree with the data', () => {
+      const saves = line().saves;
+      expect(saves).toBeTypeOf('number');
+      const { container } = setup({ n: 16 });
+      expect(statLabels(container)).toEqual(['Touches', 'Pass accuracy', 'Saves']);
+      // the chip says the same number as the data, when he has made any
+      const chip = container.querySelector('[data-kind="saves"]');
+      if ((saves ?? 0) > 0) expect(chip?.textContent).toBe(saves === 1 ? '1 save' : `${saves} saves`);
+      else expect(chip).toBeNull();
+    });
+
+    it('is not told he has no goals or assists', () => {
+      setup({ n: 16 });
+      expect(screen.queryByText('No goals or assists yet')).toBeNull();
+    });
+
+    it('with no count from the provider shows none, not a 0', () => {
+      const m = scorelineStore.getState().domain.matches[1]!;
+      const home = { ...m.players!.home, '16': Object.fromEntries(Object.entries(m.players!.home['16']!).filter(([k]) => k !== 'saves')) };
+      scorelineStore.getState().actions.applyFeed({ ...demoFeed(), matches: [{ ...demoFeed().matches[0]!, seq: m.seq + 1, players: { home, away: m.players!.away } }] }, Date.now());
+      expect(scorelineStore.getState().domain.matches[1]!.players!.home['16']).not.toHaveProperty('saves');
+      const { container } = setup({ n: 16 });
+      expect(statLabels(container)).toEqual(['Touches', 'Pass accuracy']);
+      expect(container.querySelector('[data-kind="saves"]')).toBeNull();
+      expect(screen.queryByText('No goals or assists yet')).toBeNull();
+      expect(screen.queryByText('No saves yet')).toBeNull();
+    });
+
+    it('a keeper who has made no save says so', () => {
+      const m = scorelineStore.getState().domain.matches[1]!;
+      const home = { ...m.players!.home, '16': { ...m.players!.home['16']!, saves: 0 } };
+      scorelineStore.getState().actions.applyFeed({ ...demoFeed(), matches: [{ ...demoFeed().matches[0]!, seq: m.seq + 1, players: { home, away: m.players!.away } }] }, Date.now());
+      const { container } = setup({ n: 16 });
+      expect(screen.getByText('No saves yet')).toBeTruthy();
+      expect(statLabels(container)).toEqual(['Touches', 'Pass accuracy', 'Saves']);
+    });
+
+    it('keeps the goal he scored', () => {
+      const m = scorelineStore.getState().domain.matches[1]!;
+      const goal = { id: 'keeper-goal', seq: m.seq + 1, kind: 'goal' as const, side: 'home' as const, minute: 50, player: 16, score: [3, 1] as [number, number] };
+      scorelineStore.getState().actions.applyFeed({ ...demoFeed(), matches: [{ ...demoFeed().matches[0]!, seq: m.seq + 1, events: [...m.events, goal] }] }, Date.now());
+      const { container } = setup({ n: 16 });
+      expect(container.querySelector('[data-kind="goal"]')?.textContent).toBe('1 goal');
+    });
+
+    it('an outfield player keeps his shots and his own empty line', () => {
+      const m = scorelineStore.getState().domain.matches[1]!;
+      const busy = new Set(m.events.flatMap((e) => (e.side === 'home' ? [e.player, e.other] : [])));
+      const quiet = m.lineups!.home!.xi.find((n) => n !== 16 && !busy.has(n))!;
+      const { container } = setup({ n: quiet });
+      expect(statLabels(container)).toEqual(['Touches', 'Pass accuracy', 'Shots']);
+      expect(screen.getByText('No goals or assists yet')).toBeTruthy();
+      expect(container.querySelector('[data-kind="saves"]')).toBeNull();
+    });
+  });
+
   it('a clock tick does not rebuild the hero', () => {
     vi.useFakeTimers();
     const { container } = setup();
