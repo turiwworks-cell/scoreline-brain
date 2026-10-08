@@ -1,0 +1,7 @@
+/* Firefox: preserve fractional motion on pitch markers and match table rows.
+   Adds 0.049deg to their existing 0.001deg transform; timings stay in motion/tokens.ts.
+   index.html sets this attribute only for Firefox. Keep the rotation at rest. */
+html[data-scoreline-firefox-motion="on"] [data-screen="match"] [data-pitch] [data-row],
+html[data-scoreline-firefox-motion="on"] [data-screen="match"] [role="table"] [role="row"][data-team] {
+  rotate: 0.049deg;
+}
