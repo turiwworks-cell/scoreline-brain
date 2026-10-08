@@ -56,6 +56,17 @@ export const WALL = { heights: [0.74, 0.94, 1, 0.84], tall: 320, gap: 6, side: 1
  */
 export const TOP = { mid: 72, card: { cx: 29, h: 32 }, crest: 50, text: 82, goalText: 68 } as const;
 
+/**
+ * The flag over the goal word, at centre stage: its bottom stands `gap` above the top of the
+ * letters, 26 px, as the Lua draws it on the 390 × 844 phone (flag centre 318, caps from 376).
+ * The Lua put the flag at 318 of a stage that shrinks with its floor while the word's size follows
+ * the width, so on a shorter phone the flag came down onto the letters (375 × 667: overlapping).
+ * `ink` is how far above the word's middle the Rive word's letters begin, in sizes.
+ */
+export const FLAG_OVER_WORD = { gap: 26, ink: 0.34, r: 32 } as const;
+/** The flag's centre at centre stage, from the word's middle `mid` and its size (the headline's: mid0, size0). */
+export const flagRest = (mid: number, size: number) => mid - FLAG_OVER_WORD.ink * size - FLAG_OVER_WORD.gap - FLAG_OVER_WORD.r;
+
 /** The goal word lands on LAND (luau:6319). */
 export const LAND: Bezier = [0.12, 1, 0.3, 1];
 
