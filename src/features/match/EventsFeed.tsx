@@ -3,7 +3,7 @@ import { cubicBezier, m, useReducedMotion, type Variants } from 'motion/react';
 import { minText, type Match, type Team } from '../../domain';
 import { AT_REST, HAIR, LANDED, slide, timing, transition } from '../../motion';
 import { useScoreline } from '../../store';
-import { Button, Crest, Icon, matchStops, PhotoTile, Pill, withFeel } from '../../ui';
+import { Button, Crest, Icon, matchStops, PhotoTile, photoProps, Pill, playerPhoto, usePhotoManifest, withFeel, type PhotoSources } from '../../ui';
 import { useMatchMinute } from './clock';
 import { sideColors } from './colors';
 import { feedItems, feedRows, KIND_LABEL, LIMIT, markerLabel, type FeedItem, type FeedRow } from './events';
@@ -49,6 +49,10 @@ export type EventsFeedProps = {
 export const EventsFeed = memo(function EventsFeed({ match, home, away, onReplayGoal, children }: EventsFeedProps) {
   const teams = useScoreline(selectTeams);
   const players = useScoreline(selectPlayers);
+  // the scorers' photos: one manifest for the whole app. Until it has answered the tile waits, so a
+  // kit disc is never swapped for a bust under the eye (as on the player page)
+  const photos = usePhotoManifest();
+  const hold = photos.status === 'idle' || photos.status === 'loading';
   const { home: hid, away: aid, events } = match;
   // the clock turning changes the match, not its events: the rows stay the same objects
   const items = useMemo(() => feedItems({ teams, players }, { home: hid, away: aid, events }), [teams, players, hid, aid, events]);
@@ -198,6 +202,8 @@ export const EventsFeed = memo(function EventsFeed({ match, home, away, onReplay
                   color={row.item.side === 'home' ? hc : ac}
                   stops={stops}
                   onReplay={onReplayGoal}
+                  photo={row.item.kind === 'goal' ? playerPhoto(photos.manifest, row.item.side === 'home' ? hid : aid, row.item.player) : undefined}
+                  hold={hold}
                 />
               </m.div>
             ) : (
@@ -233,6 +239,9 @@ type RowProps = {
   color: string;
   stops: readonly [string, string, string, string];
   onReplay?: (eventId: string) => void;
+  /** the scorer's photo files, when the manifest has them; `hold` while it has not answered yet */
+  photo?: PhotoSources;
+  hold?: boolean;
 };
 
 const EventRow = memo(function EventRow(p: RowProps) {
@@ -244,16 +253,14 @@ const EventRow = memo(function EventRow(p: RowProps) {
 const minClass = (min: number) => (min > 90 ? `${styles.min} ${styles.minLong}` : styles.min);
 
 /** A goal (luau:5182): the scorer's face, GOAL, his name and the assist, the score in the match's colours. */
-function GoalRow({ item, team, color, stops, onReplay }: RowProps) {
+function GoalRow({ item, team, color, stops, onReplay, photo, hold }: RowProps) {
   const body = (
     <>
       <span className={minClass(item.minute)} data-tone="text">
         {minText(item.minute)}
       </span>
       <span className={styles.goalNode} style={{ '--c': color } as CSSProperties} aria-hidden="true" />
-      <span className={styles.goalPhoto}>
-        <PhotoTile size={42} team={team} n={item.player} alt="" />
-      </span>
+      <span className={styles.goalPhoto}>{!hold && <PhotoTile size={42} team={team} n={item.player} alt="" {...photoProps(photo)} />}</span>
       <span className={styles.goalKind}>{item.cancelled ? KIND_LABEL.goalCancelled : KIND_LABEL.goal}</span>
       <span className={styles.goalWho}>
         <span className={styles.goalName}>{item.name}</span>
@@ -262,7 +269,6 @@ function GoalRow({ item, team, color, stops, onReplay }: RowProps) {
       <span className={styles.chip} style={{ background: `linear-gradient(90deg, ${stops[0]} 0%, ${stops[1]} 42%, ${stops[2]} 62%, ${stops[3]} 100%)` }}>
         {item.score}
       </span>
-      <Icon name="chevR" className={styles.chev} />
       <span className={styles.goalText}>{item.text}</span>
     </>
   );

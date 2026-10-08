@@ -106,10 +106,20 @@ test('reduced motion keeps Follow, groups, live scores and player counters curre
   await expect(list.getByRole('button', { name: /Lionel Messi, the player you follow/ })).toBeVisible();
   const live = list.getByRole('button', { name: /^Live,/ });
   await expect(live.locator('canvas')).toHaveCount(0);
+  await expect(live.locator('[data-live-still]')).toHaveCount(1);
   await live.click();
   await expect(live).toHaveAttribute('aria-pressed', 'false');
+  await expect(live.locator('[data-live-off]')).toHaveCount(1);
+  const count = (await live.getAttribute('aria-label'))!.match(/Live, (\d+)/)![1]!;
+  if (count !== '0') expect(await live.locator('[data-digit]').evaluateAll(els => els.map(el => el.getAttribute('data-digit')).join(''))).toBe(count);
+  const liveBox = await live.boundingBox();
+  expect(Math.abs(liveBox!.width - 110)).toBeLessThan(0.1);
+  expect(liveBox!.height).toBe(40);
+  await expect(live.locator('canvas, .m-light')).toHaveCount(0);
   await live.click();
   await expect(live).toHaveAttribute('aria-pressed', 'true');
+  await expect(live.locator('[data-live-off]')).toHaveCount(0);
+  await expect(live.locator('[data-live-still]')).toHaveCount(1);
 
   const collapse = await list.getByRole('button', { name: 'Show less', exact: true }).evaluate(button => new Promise<{ k: number; height: number }>(done => {
     (button as HTMLButtonElement).click();

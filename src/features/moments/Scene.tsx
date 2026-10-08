@@ -12,6 +12,7 @@ import {
   BUST_SRC,
   DESIGN_FLOOR,
   FLASH,
+  flagRest,
   FLOOR_FROM_BOTTOM,
   HIT,
   LAND,
@@ -215,7 +216,9 @@ function GoalArt({ t, T, p, info, g, photo, followed, word }: ArtProps) {
   const flareY = useTransform(() => wordMid.get() - 170);
 
   const flagX = useTransform(() => lerp(g.cx, 38, u.get()) - 32);
-  const flagY = useTransform(() => lerp(318 * g.ky, TOP.mid, u.get()) - 32);
+  // centre stage, the flag stands its fixed gap above the letters, whatever the height of the stage
+  const flag0 = flagRest(mid0, size0);
+  const flagY = useTransform(() => lerp(flag0, TOP.mid, u.get()) - 32);
   const flagS = useTransform(() => (lerp(64, 40, u.get()) / 64) * lerp(0.6, 1, pS.get()));
 
   const flash = useTransform(() => FLASH.alpha * (1 - ease(CURVES.ease, t.get(), 0, FLASH.dur)));

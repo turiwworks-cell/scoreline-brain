@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { LIVE_CANVAS_STYLE } from './liveGeometry';
 import { liveLightMotion, liveTimelineMs } from './liveLight';
+import { LiveOff } from './LiveOff';
 import { RiveCanvas } from './RiveCanvas';
 import type { Property, RiveInstance } from './types';
 
@@ -28,11 +29,19 @@ export type LiveGraphicProps = {
  */
 /** A frame or two past the timeline, so the art is still when it appears. */
 const SETTLE_MS = 50;
+/*
+ * With Live off, at rest, the artwork is the owner's supplied OFF art (LiveOff.tsx), not Rive's own
+ * drawing of that state. Rive still draws every move: it plays the opening timeline (and the closing
+ * one) in the same box, and the supplied art takes over the frame the closing timeline has finished,
+ * and gives way the frame Live comes on, so the capsule never jumps nor waits for a swap.
+ */
 
 export default function LiveGraphic({ source, live, count, onReady, onFailed, fallback, light }: LiveGraphicProps) {
   const [drawn, setDrawn] = useState(false);
   const [shown, setShown] = useState(false);
   const [failed, setFailed] = useState(false);
+  // the supplied OFF art stands in for Rive's, Live off and the closing timeline played
+  const [offArt, setOffArt] = useState(false);
   const property = useRef<Property<boolean> | null>(null);
   const counter = useRef<Property<string> | null>(null);
   const latest = useRef({ live, count, onReady, onFailed });
@@ -50,10 +59,26 @@ export default function LiveGraphic({ source, live, count, onReady, onFailed, fa
     if (!drawn || shown) return;
     const timer = setTimeout(() => {
       setShown(true);
+      setOffArt(!latest.current.live);
       latest.current.onReady?.(true);
     }, liveTimelineMs(live) + SETTLE_MS);
     return () => clearTimeout(timer);
   }, [drawn, shown, live]);
+  /*
+   * Any toggle gives the frame back to Rive's canvas before it is painted: it starts its opening (or
+   * closing) timeline from the pose the OFF art stood in. The OFF art returns once the closing
+   * timeline has played.
+   */
+  const [liveWas, setLiveWas] = useState(live);
+  if (liveWas !== live) {
+    setLiveWas(live);
+    if (offArt) setOffArt(false);
+  }
+  useEffect(() => {
+    if (!shown || live) return;
+    const timer = setTimeout(() => setOffArt(true), liveTimelineMs(false) + SETTLE_MS);
+    return () => clearTimeout(timer);
+  }, [live, shown]);
   /*
    * The light's capsule moves with the art's: after each islive write it plays the timeline Rive
    * plays (liveLight.ts), not a transition of its own beside it. Rive starts that timeline on its
@@ -111,7 +136,8 @@ export default function LiveGraphic({ source, live, count, onReady, onFailed, fa
   return (
     <span aria-hidden="true" style={{ display: 'contents' }}>
       {failed && fallback}
-      {!failed && <RiveCanvas source={source} artboard="aniamtion" oversample={2} bind={bind} onReady={() => setDrawn(true)} onError={failedLoad} style={{ ...LIVE_CANVAS_STYLE, opacity: shown ? 1 : 0 }} />}
+      {!failed && <RiveCanvas source={source} artboard="aniamtion" oversample={2} bind={bind} onReady={() => setDrawn(true)} onError={failedLoad} style={{ ...LIVE_CANVAS_STYLE, opacity: shown && !offArt ? 1 : 0 }} />}
+      {!failed && shown && offArt && <LiveOff count={count} />}
     </span>
   );
 }

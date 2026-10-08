@@ -4,7 +4,7 @@ import { demoMode } from '../../data';
 import { selectFeaturedMatchId, selectLoaded, selectMatchIdOfTeam, selectMatchOrder, useScoreline } from '../../store';
 import { afterPaint } from '../../rive/afterPaint';
 import { warmPlayerPhoto } from '../../ui/photoManifest';
-import { HERO } from '../../features/player/layout';
+import { HERO_W } from '../../features/player/heroWidth';
 import { prepareScreen, preloadScreens } from '../screens/screenChunks';
 import { canonicalPath, hrefOf, parseNav } from '../nav/url';
 import { useLayoutMode } from './layoutMode';
@@ -41,7 +41,7 @@ export function Shell() {
   const playerTeam = r.player?.team;
   const playerNumber = r.player?.n;
   useEffect(() => {
-    if (playerTeam && playerNumber !== undefined) warmPlayerPhoto(playerTeam, playerNumber, `${HERO.w}px`);
+    if (playerTeam && playerNumber !== undefined) warmPlayerPhoto(playerTeam, playerNumber, `${HERO_W}px`);
   }, [playerTeam, playerNumber]);
 
   // one spelling per screen: `/match/7` becomes `/match/7/facts` before it paints (the parse

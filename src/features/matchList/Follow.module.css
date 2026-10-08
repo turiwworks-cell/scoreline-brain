@@ -98,7 +98,9 @@
 .pickTitle {
   position: absolute;
   left: 18px;
-  top: 17px;
+  /* open: 17 from the top; folded, the two lines (title 22 + line 17 + gap 2.5) are centred on the
+     64 px capsule, level with the round button, which moves with --k the same way */
+  top: calc((11.25 + 5.75 * var(--k)) * 1px);
   margin: 0;
   font: var(--type-heading);
   letter-spacing: var(--track-1);
@@ -106,7 +108,7 @@
 .pickSub {
   position: absolute;
   left: 18px;
-  top: 41.5px;
+  top: calc((35.75 + 5.75 * var(--k)) * 1px);
   margin: 0;
   font: var(--fw-r) var(--fs-12p5) / normal var(--font-sans);
   color: var(--c-muted);

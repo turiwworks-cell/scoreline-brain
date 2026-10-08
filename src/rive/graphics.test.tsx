@@ -55,6 +55,40 @@ describe('Live icon binding and hit target', () => {
     expect(button.classList.contains('m-glass')).toBe(true);
     expect(view.getByText('8')).toBeTruthy(); expect(view.getByText('Live')).toBeTruthy();
   });
+  it('shows the supplied OFF art once Live is off at rest, Rive for every move, and the count in it', async () => {
+    mock.source = '/rive/live-icon.riv';
+    const icon = (live: boolean, count = 4) => <LiveIcon live={live} count={count} onChange={vi.fn()} fallback={<span>Live</span>} />;
+    const view = render(icon(false));
+    const button = view.getByRole('button', { name: 'Live, 4 in play' });
+    const off = () => button.querySelector('[data-live-off]');
+    await waitFor(() => expect(view.container.querySelector('canvas')).not.toBeNull());
+    act(() => mock.canvas!.onReady?.());
+    // Rive's first frame plays the closing timeline behind nothing; then the supplied art is the art
+    expect(off()).toBeNull();
+    await waitFor(() => expect(button.getAttribute('data-rive-live')).toBe('true'), { timeout: 1500 });
+    expect(off()).not.toBeNull();
+    expect(mock.canvas!.style?.opacity).toBe(0);
+    expect([...off()!.querySelectorAll('[data-digit]')].map((d) => d.getAttribute('data-digit'))).toEqual(['4']);
+    // the count moves with the matches in play
+    view.rerender(icon(false, 12));
+    expect([...off()!.querySelectorAll('[data-digit]')].map((d) => d.getAttribute('data-digit'))).toEqual(['1', '2']);
+    // Live on: Rive is the art in the same frame, so it plays its opening from where the art stood
+    view.rerender(icon(true, 12));
+    expect(off()).toBeNull();
+    expect(mock.canvas!.style?.opacity).toBe(1);
+    // Live off again: Rive's closing timeline plays; the supplied art comes back when it has
+    view.rerender(icon(false, 12));
+    expect(off()).toBeNull();
+    expect(mock.canvas!.style?.opacity).toBe(1);
+    await waitFor(() => expect(off()).not.toBeNull(), { timeout: 1500 });
+    expect(mock.canvas!.style?.opacity).toBe(0);
+    // the same button throughout: its box never changes with the art
+    expect(button.style.width).not.toBe('');
+    expect(parseFloat(button.style.height)).toBe(40);
+    // and no OFF art when the renderer fails
+    act(() => mock.canvas!.onError?.(new Error('renderer failed')));
+    expect(off()).toBeNull();
+  });
   it('is an empty button until the shell lets Rive start, and the same button after', async () => {
     mock.source = '/rive/live-icon.riv';
     const icon = (start: boolean) => (

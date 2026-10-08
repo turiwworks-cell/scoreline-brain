@@ -33,9 +33,12 @@ function sizeLight(el: HTMLElement) {
   el.style.setProperty('--spot-r', `${spotRadius(el.offsetWidth, el.offsetHeight)}px`);
 }
 
-// a click rolls the label (hovering never does). A roll in progress is not restarted.
+// a click rolls the label (hovering never does), unless the control is already the chosen one.
+// A roll in progress is not restarted.
 // On a control, only the labels that belong to it roll, never those of controls nested inside.
 export function roll(el: Element) {
+  // the chosen tab or side already says what it is: pressing it again does not replay its letters
+  if (el.matches('[aria-selected="true"], [aria-checked="true"]')) return;
   const scope = el.matches('.m-feel') ? el : null;
   const labels = el.matches('[data-roll]') ? [el] : Array.from(el.querySelectorAll('[data-roll]'));
   for (const label of labels) {

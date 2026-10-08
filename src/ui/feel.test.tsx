@@ -39,6 +39,40 @@ describe('feel', () => {
   });
 });
 
+describe('the letter roll of a chosen control', () => {
+  const rolling = (el: HTMLElement) => el.querySelector('[data-roll]')?.hasAttribute('data-rolling');
+
+  test('pressing the tab that is already chosen does not replay its title; pressing another one rolls it', () => {
+    const items = [
+      { id: 'a', label: 'Facts' },
+      { id: 'b', label: 'Squad' },
+    ];
+    render(<Tabs aria-label="Match" items={items} value="b" onChange={() => {}} />);
+    const [facts, squad] = screen.getAllByRole('tab') as [HTMLElement, HTMLElement];
+    fireEvent.pointerDown(squad, { button: 0, clientX: 1, clientY: 1 });
+    expect(squad.hasAttribute('data-pressed')).toBe(true);
+    expect(rolling(squad)).toBe(false);
+    fireEvent.pointerDown(facts, { button: 0, clientX: 1, clientY: 1 });
+    expect(rolling(facts)).toBe(true);
+  });
+
+  test('the same for the segment tabs and for the chosen side of a radio group', () => {
+    render(
+      <>
+        <Tabs aria-label="Pane" variant="segment" items={[{ id: 'a', label: 'List' }, { id: 'b', label: 'Match' }]} value="a" onChange={() => {}} />
+        <div role="radiogroup" aria-label="Team">
+          <Button label="France" role="radio" aria-checked />
+          <Button label="Argentina" role="radio" aria-checked={false} />
+        </div>
+      </>,
+    );
+    const [list, match] = screen.getAllByRole('tab') as [HTMLElement, HTMLElement];
+    const [fra, arg] = screen.getAllByRole('radio') as [HTMLElement, HTMLElement];
+    for (const el of [list, match, fra, arg]) fireEvent.pointerDown(el, { button: 0, clientX: 1, clientY: 1 });
+    expect([list, match, fra, arg].map(rolling)).toEqual([false, true, false, true]);
+  });
+});
+
 describe('Tabs', () => {
   const items = [
     { id: 'a', label: 'Facts' },

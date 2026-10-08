@@ -1,8 +1,10 @@
 // The player page's geometry (drawPlayerView, luau:5851–5858). The Lua draws on a 390-wide
 // artboard centred at x 195; here the same numbers hang from the page's centre.
 
+import { HERO_W } from './heroWidth';
+
 /** the whole bust cell, on the page */
-export const HERO = { x: 55, y: 90, w: 280, h: 350 } as const;
+export const HERO = { x: 55, y: 90, w: HERO_W, h: 350 } as const;
 /** the bust is cut sharp here, in the bust's 360 design units: its soft edge starts at 324 */
 export const CUT = 318;
 /** the bust's design size */

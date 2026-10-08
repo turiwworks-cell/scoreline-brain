@@ -386,10 +386,11 @@
   color: var(--c-muted);
 }
 
-/* the score after it, B 13 INK on the match's colours, right on W - 36 */
+/* the score after it, B 13 INK on the match's colours, right on the row's 16 px gutter (the chevron
+   that once stood beside it, W - 36, is gone: the row has no action behind it) */
 .chip {
   position: absolute;
-  right: 36px;
+  right: 16px;
   top: 13px;
   height: 24px;
   padding: 0 10px;
@@ -398,13 +399,6 @@
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
   color: var(--c-ink);
-}
-
-.chev {
-  position: absolute;
-  right: 19px;
-  top: 20.5px;
-  color: var(--c-muted);
 }
 
 .goalText {

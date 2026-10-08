@@ -10,7 +10,10 @@ test('full Live host renders native artwork, updates count, supports keyboard an
   const button = page.locator('#live-target button');
   const ready = async () => {
     await expect(button).toHaveAttribute('data-rive-live', 'true', { timeout: 30000 });
-    await expect(button.locator('canvas')).toHaveCSS('opacity', '1');
+    // Live off at rest: the supplied OFF art is the art, Rive's canvas is behind it; Live on, the canvas is
+    const off = (await button.getAttribute('aria-pressed')) === 'false';
+    await expect(button.locator('[data-live-off]')).toHaveCount(off ? 1 : 0);
+    await expect(button.locator('canvas')).toHaveCSS('opacity', off ? '0' : '1');
     await expect.poll(() => page.evaluate(() => window.liveHostProbe.slots)).toBe(1);
   };
   await ready();

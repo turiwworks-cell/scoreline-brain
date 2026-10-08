@@ -63,13 +63,13 @@
   outline-offset: -2px;
   border-radius: 23px;
 }
-/* crest 20, 6 px, the name; the whole label dips 4 % */
+/* crest 20, 6 px, the name. Pressing a side no longer dips the label (owner's review, SL-12): the
+   crest and the name stay their size; the letters roll and the thumb slides, which is the transition */
 .segLabel {
   display: flex;
   align-items: center;
   gap: 6px;
   min-width: 0;
-  transform: scale(calc(1 - var(--press-depth-segment) * var(--dip)));
 }
 .segName {
   white-space: nowrap;
