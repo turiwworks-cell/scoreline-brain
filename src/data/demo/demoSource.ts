@@ -164,7 +164,7 @@ export function createDemoSource(options: DemoSourceOptions = {}): DemoSource {
       return done;
     },
     follow(player) {
-      sim.followed = player;
+      sim.follow(player);
       actDue = player ? simMs + FIRST_ACT_MS : Infinity;
       if (handlers) schedule();
     },
@@ -189,7 +189,7 @@ export function createDemoSource(options: DemoSourceOptions = {}): DemoSource {
       const followed = sim.followed;
       sim = new DemoSim(options);
       readFeed = createFeedParser();
-      sim.followed = followed;
+      sim.follow(followed);
       simMs = 0;
       tickDue = TICK_MS;
       actDue = followed ? FIRST_ACT_MS : Infinity;

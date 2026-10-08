@@ -10,9 +10,11 @@
 //   ids (`round * 100 + n`). Re-using the ids would send each score back down, which the contract
 //   reads as goals taken back by VAR.
 // - The followed player's actions draw from their own random stream, so following someone
-//   doesn't change how the matches go. A player sent off stops acting.
+//   doesn't change how the matches go. A player sent off stops acting. What he is told doing is
+//   a running commentary: his touches and passes are counted once, from his minutes (./model), and
+//   his shots stay within what his line shoots in a match, since they land in the match's events.
 
-import { ACTS } from './data';
+import { ACTS, KEEPER_ACTS, PROFILE } from './data';
 import {
   applyToLineup,
   commentary,
@@ -20,6 +22,7 @@ import {
   genMinute,
   isOnPitch,
   keeperOf,
+  lineIn,
   makeGoal,
   makeMatches,
   mkEvent,
@@ -74,7 +77,7 @@ export interface DemoSimOptions {
 }
 
 // `luau:7562`: kinds during which the followed player has the ball.
-const BALL_ON = new Set(['touch', 'drib', 'fouled', 'pass', 'long', 'key', 'cross', 'shot', 'miss']);
+const BALL_ON = new Set(['touch', 'drib', 'fouled', 'pass', 'long', 'key', 'cross', 'shot', 'miss', 'claim', 'save']);
 
 export class DemoSim {
   readonly seed: number;
@@ -104,6 +107,12 @@ export class DemoSim {
   /** France – Argentina: the match the Home / Away triggers act on (`featured`, `luau:7103`). */
   featured(): SimMatch | undefined {
     return this.matches.find((m) => m.feat);
+  }
+
+  /** Follows a player, or nobody. What the last one was told doing no longer counts as just said. */
+  follow(player: Followed | null): void {
+    this.followed = player;
+    this.lastAct = '';
   }
 
   /** True once every match that was live has finished. */
@@ -187,9 +196,21 @@ export class DemoSim {
 
   /** A new minute of a live match: its corners, shots, fouls and momentum (`stepMinute`). */
   private stepMinute(out: Outgoing[], m: SimMatch): void {
-    for (const e of genMinute(m, m.min, this.rand)) this.send(out, m, e);
+    for (const e of genMinute(m, m.min, this.rand)) {
+      this.send(out, m, e);
+      this.noteSave(out, m, e);
+    }
     stepMomentum(m, m.min, this.rand);
     refreshStats(m);
+  }
+
+  /** A shot on target at the followed goalkeeper is a save, and the card tells it as it happens. */
+  private noteSave(out: Outgoing[], m: SimMatch, e: SimEvent): void {
+    const f = this.followed;
+    if (!f || (e.kind !== 'sot' && e.kind !== 'big') || e.on !== f.n) return;
+    const side = otherSide(e.side);
+    if (sideTeam(m, side) !== f.team || !isOnPitch(m, side, f.n)) return;
+    out.push({ type: 'action', match: m, side, player: f.n, text: `${e.kind === 'big' ? 'Big save' : 'Saves'} from ${e.p}`, act: 'save', onBall: true });
   }
 
   /** The followed player's match: live, then today, then tomorrow, then yesterday (`matchOf`). */
@@ -277,10 +298,12 @@ export class DemoSim {
     const [m, side] = found;
     if (m.status !== 'live' || !isOnPitch(m, side, f.n)) return next;
     const rnd = this.followRand;
-    const total = ACTS.reduce((s, a) => s + a[1], 0);
+    const line = lineIn(m, side, f.n);
+    const acts = line === 'GK' ? KEEPER_ACTS : ACTS;
+    const total = acts.reduce((s, a) => s + a[1], 0);
     let x = rnd() * total;
-    let pick = ACTS[0];
-    for (const a of ACTS) {
+    let pick = acts[0];
+    for (const a of acts) {
       x -= a[1];
       if (x <= 0) {
         pick = a;
@@ -288,6 +311,11 @@ export class DemoSim {
       }
     }
     if (!pick) return next;
+    // A shot lands in the match's events and its team stats, so it only happens while he is
+    // within what his line shoots in a match; otherwise he just keeps the ball.
+    const budget = Math.ceil(((PROFILE[line] ?? PROFILE.MF)?.[3] ?? 0) * Math.min(m.min, 90) / 90);
+    const had = m.events.filter((e) => e.side === side && e.pn === f.n && (e.kind === 'goal' || e.kind === 'sot' || e.kind === 'miss' || e.kind === 'block' || e.kind === 'big')).length;
+    if ((pick[0] === 'shot' || pick[0] === 'miss') && had >= budget) pick = acts[0] ?? pick;
     const [kind, , template] = pick;
     const os = otherSide(side);
     const team = sideTeam(m, side);
@@ -296,20 +324,7 @@ export class DemoSim {
     s = s.split('{M}').join(nameOf(team, pickPlayer(m, side, 'any', f.n, rnd)));
     s = s.split('{Q}').join(nameOf(oteam, pickPlayer(m, os, 'defend', -1, rnd)));
     s = s.split('{K}').join(nameOf(oteam, keeperOf(m, os)));
-    // His numbers move with every action: touches, passes, completed, key passes, dribbles.
-    const key = side + f.n;
-    const fx = m.fx.get(key) ?? [0, 0, 0, 0, 0];
-    m.fx.set(key, fx);
-    const inc = (i: number) => (fx[i] = (fx[i] ?? 0) + 1);
-    if (kind !== 'run' && kind !== 'press') inc(0);
-    if (kind === 'pass' || kind === 'long' || kind === 'key' || kind === 'cross') {
-      inc(1);
-      if (kind !== 'cross' || rnd() < 0.4) inc(2);
-    }
-    if (kind === 'key') inc(3);
-    if (kind === 'drib') inc(4);
     if (kind === 'shot' || kind === 'miss') {
-      // Shots are real: they land in the match's events and the team stats too.
       const e = mkEvent(m, kind === 'shot' ? 'sot' : 'miss', side, m.min, f.n, kind === 'shot' ? keeperOf(m, os) : 0, '');
       e.xg = kind === 'shot' ? 0.06 + rnd() * 0.12 : 0.03 + rnd() * 0.08;
       e.txt = sayLine(m, e, rnd);

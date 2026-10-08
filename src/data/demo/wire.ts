@@ -73,18 +73,18 @@ export function messageJson(o: Outgoing): Json | undefined {
 
 // ── Feed ─────────────────────────────────────────────────────────────────────
 
-function playersJson(m: SimMatch, side: LSide, seed: number): Json {
+function playersJson(m: SimMatch, side: LSide): Json {
   const lu = m.lu[side];
   const out: Json = {};
   for (const n of [...lu.xi, ...lu.bench]) {
-    const p = playerStats(m, side, n, seed);
+    const p = playerStats(m, side, n);
     if (!p.played) continue;
-    out[String(n)] = { rating: p.rating, minutes: p.minutes, touches: p.touches, passes: p.passes, passesOk: p.passesOk, shots: p.shots };
+    out[String(n)] = { rating: p.rating, minutes: p.minutes, touches: p.touches, passes: p.passes, passesOk: p.passesOk, shots: p.shots, ...(p.saves !== undefined ? { saves: p.saves } : {}) };
   }
   return out;
 }
 
-function matchJson(m: SimMatch, seed: number): Json {
+function matchJson(m: SimMatch): Json {
   const started = m.status !== 'ns';
   const venue = VENUES[m.h];
   return {
@@ -113,7 +113,7 @@ function matchJson(m: SimMatch, seed: number): Json {
       ? {
           stats: { possession: m.poss, ...Object.fromEntries(Object.entries(m.stats).map(([k, v]) => [k, [...v]])) },
           momentum: m.mom.slice(0, m.min + 1).map((v) => round(v ?? 0, 3)),
-          players: { home: playersJson(m, 'h', seed), away: playersJson(m, 'a', seed) },
+          players: { home: playersJson(m, 'h'), away: playersJson(m, 'a') },
         }
       : {}),
   };
@@ -174,7 +174,7 @@ export function feedJson(sim: DemoSim): Json {
     teams: TEAMS.map((t) => ({ id: t.id, name: t.name, short: t.short, colors: [hex(t.c1), hex(t.c2)] })),
     leagues,
     squads: squadsJson(),
-    matches: sim.matches.map((m) => matchJson(m, sim.seed)),
+    matches: sim.matches.map(matchJson),
     next: nextJson(sim.elapsed),
   };
   const counted = applyFeed(emptyState(), parseFeed(feed), 0).state;
