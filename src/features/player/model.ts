@@ -102,7 +102,7 @@ export function tagsOf(events: readonly MatchEvent[], side: Side, n: number, sta
 /** The note that stands in for the numbers of a player who has not played (luau:6064). */
 export function notPlayed(status: Match['status'], kickoff: string): { head: string; body: string } {
   if (status === 'scheduled') return { head: 'Not started', body: `Kick-off ${kickoff}. Line-ups are not out yet.` };
-  if (status === 'live') return { head: 'On the bench', body: "He hasn't come on yet. His numbers will appear the moment he does." };
+  if (status === 'live') return { head: 'On the bench', body: 'Not on the pitch.' };
   return { head: 'Unused substitute', body: "He didn't get on the pitch in this match." };
 }
 
