@@ -16,6 +16,14 @@ import { fileURLToPath } from 'node:url';
  * none; at most 2 s). A hidden page has no frame to wait for and starts at once. The module graph, the chunks and their sizes are
  * unchanged; scripts/size-budget.mjs counts the entry through its modulepreload.
  */
+/*
+ * Where the built app is served from. The site's root unless SCORELINE_BASE names a folder, e.g.
+ * `SCORELINE_BASE=/scoreline/app/ npm run build` for a copy that lives inside another site (the
+ * portfolio's case study shows it in a phone frame). The router, the photos and the Rive files all
+ * follow it through import.meta.env.BASE_URL.
+ */
+const base = process.env.SCORELINE_BASE ?? '/';
+
 function bootAfterFirstPaint(): Plugin {
   return {
     name: 'scoreline:boot-after-first-paint',
@@ -33,8 +41,8 @@ function bootAfterFirstPaint(): Plugin {
         const bundle = ctx.bundle ?? {};
         const walk = (file: string) => {
           const chunk = bundle[file];
-          if (chunk?.type !== 'chunk' || demo.includes(`/${file}`) || html.includes(`"/${file}"`)) return;
-          demo.push(`/${file}`);
+          if (chunk?.type !== 'chunk' || demo.includes(`${base}${file}`) || html.includes(`"${base}${file}"`)) return;
+          demo.push(`${base}${file}`);
           chunk.imports.forEach(walk);
         };
         const demoChunk = Object.values(bundle).find((c) => c.type === 'chunk' && c.facadeModuleId?.replace(/\\/g, '/').endsWith('/src/app/followBridge.ts'));
@@ -97,6 +105,7 @@ function bootAfterFirstPaint(): Plugin {
 const apiProxy = { '/api': { target: `http://127.0.0.1:${process.env.MOCK_API_PORT ?? 8787}`, changeOrigin: true } };
 
 export default defineConfig({
+  base,
   plugins: [react(), bootAfterFirstPaint()],
   server: { proxy: apiProxy },
   preview: { proxy: apiProxy },

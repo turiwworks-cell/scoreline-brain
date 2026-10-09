@@ -31,8 +31,11 @@ export function appRoutes(): RouteObject[] {
 
 let router: DataRouter | undefined;
 
+/** Where the app is served from, without the trailing slash; none at the site's root (vite.config.ts `base`). */
+const basename = import.meta.env.BASE_URL.replace(/\/+$/, '') || undefined;
+
 /** The app's one router, made on first use. */
 export function appRouter(): DataRouter {
-  router ??= createBrowserRouter(appRoutes());
+  router ??= createBrowserRouter(appRoutes(), { basename });
   return router;
 }

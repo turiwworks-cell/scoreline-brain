@@ -152,7 +152,7 @@ function NoData() {
     <p className={styles.nodata}>
       No matches yet.
       <br />
-      <a href="/?demo">Play the demo matchday</a>
+      <a href={`${import.meta.env.BASE_URL}?demo`}>Play the demo matchday</a>
     </p>
   );
 }

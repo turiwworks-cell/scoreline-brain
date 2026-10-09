@@ -8,7 +8,7 @@
 
 export type PhotoKind = 'bust' | 'head' | 'frost';
 
-export const PHOTO_ROOT = '/img/players';
+export const PHOTO_ROOT = `${import.meta.env.BASE_URL}img/players`;
 
 /**
  * Pixel sizes of each kind's files. @2x is the atlas's own pixels (2 per design unit,
