@@ -1,17 +1,15 @@
-# Latest Scoreline delivery — Sessions 1 through 4
+# Latest Scoreline — follow-up fixes, 2026-10-09
 
-Branch: `codex/scoreline-session-4-final`.
+Use this version for future work. Earlier releases are history.
 
-The current ready-to-upload Netlify file is:
+- Branch: [`codex/scoreline-session-4-final`](https://github.com/turiwworks-cell/scoreline-brain/tree/codex/scoreline-session-4-final).
+- Tested app source: [`354054a78fef1781d4354e4a2d31ba3b918196aa`](https://github.com/turiwworks-cell/scoreline-brain/commit/354054a78fef1781d4354e4a2d31ba3b918196aa).
+- Ready Netlify upload: **[Scoreline-NETLIFY-LATEST-2026-10-09.zip](releases/Scoreline-NETLIFY-LATEST-2026-10-09.zip)**.
+- ZIP SHA-256: `ca70c441677d829bd2a2c91d85321fc9c9c46f632c88724deaa813f13261e097`; 8,572,789 bytes, 698 verified build files.
+- ZIP root contains `index.html`, `review.html`, `_redirects`, `_headers` and assets.
 
-**[Scoreline-NETLIFY-SESSION-4-2026-10-09.zip](releases/Scoreline-NETLIFY-SESSION-4-2026-10-09.zip)**
+Upload this ZIP using [Netlify Drop](https://app.netlify.com/drop), then open `/review.html` for the existing phone review controls.
 
-- Built application source: `b5f4aca231e5995df9c543ee388b05763a429b02`.
-- ZIP SHA-256: `351c4e588b5cd04f03b70ceda127f8427e3d836b13a4eb377f9963f8e5fa187b`.
-- ZIP size: 8,572,065 bytes; 697 verified build files plus Netlify's `_redirects` file.
-- The ZIP has `index.html`, `review.html`, assets and `_redirects` at its root, ready for Netlify Drop.
-- `public/_redirects` retains the same routing rule for future builds.
+This version fixes the Account jump, synchronous Live ON/OFF fallback, match-tab swipes and unwanted swipe Back, and Goals Tonight's extra delay. It extends the Firefox-only table workaround, stabilizes letter hit targets and improves photo caching/priority. [Evidence and limitations](docs/followup-fixes-2026-10-09.md).
 
-Upload this ZIP at https://app.netlify.com/drop. The app runs its existing demo by default. Open `/review.html` on the deployed site for phone preview, goal/red-card triggers, Pause/Resume and Restart. No build or external API is needed for this demo upload.
-
-The final application passed 812 unit tests and 39 scoped Chromium browser cases. The prior Firefox motion correction is preserved. Physical-device testing and native Firefox zoom remain unverified; SL-06/08/17 were not reproduced and SL-24 remains unverified. Earlier delivery archives are history.
+All 814 unit tests and 31 distinct scoped Chromium cases pass; typecheck, build and size pass (179.84 KB gzip of 180 KB). Lint has zero errors and two existing warnings. Native Firefox and physical-phone behavior still require direct observation; a Firefox UA check is not that observation.
