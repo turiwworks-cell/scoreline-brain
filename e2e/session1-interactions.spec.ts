@@ -84,13 +84,14 @@ test('Account traps both Tab directions, blocks background panes and returns foc
     await menu.click();
     const dialog = page.getByRole('dialog');
     const first = dialog.getByRole('button', { name: 'Close', exact: true });
-    const last = dialog.getByRole('button', { name: 'Not now', exact: true });
+    // the review page's link closes the sheet's tab order (it is the one link in the dialog)
+    const last = dialog.getByRole('link', { name: 'Phone preview for review' });
     await expect(first).toBeFocused();
     await page.keyboard.press('Shift+Tab');
     await expect(last).toBeFocused();
     await page.keyboard.press('Tab');
     await expect(first).toBeFocused();
-    for (let i = 0; i < 3; i++) await page.keyboard.press('Tab');
+    for (let i = 0; i < 4; i++) await page.keyboard.press('Tab');
     await expect(last).toBeFocused();
     const backgroundGuarded = await page.locator('[data-screen][data-present="true"]').evaluateAll(screens => screens.every(el => !!el.closest('[inert]')));
     expect(backgroundGuarded).toBe(true);
