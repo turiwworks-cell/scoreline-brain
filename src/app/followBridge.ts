@@ -13,5 +13,7 @@ export function bridgeFollow(source: Pick<DemoSource, 'follow'>, pref: FollowPre
 export function createFollowedDemo(options: DemoSourceOptions): DemoSource {
   const source = createDemoSource(options);
   bridgeFollow(source);
+  // shown in the review page's phone frame (review.html), the app lets that page's controls act on this demo
+  if (window.parent !== window) void import('../review/frameApi').then((m) => m.connectReviewFrame(), () => {});
   return source;
 }

@@ -60,7 +60,7 @@ export function AccountSheet({ open, onClose }: AccountSheetProps) {
         e.stopPropagation();
         onClose();
       } else if (e.key === 'Tab') {
-        const buttons = dialog.querySelectorAll<HTMLButtonElement>('button:not(:disabled)');
+        const buttons = dialog.querySelectorAll<HTMLElement>('button:not(:disabled),a[href]');
         const first = buttons[0];
         const last = buttons[buttons.length - 1];
         if (document.activeElement === (e.shiftKey ? first : last)) {
@@ -127,6 +127,9 @@ export function AccountSheet({ open, onClose }: AccountSheetProps) {
           Not now
         </button>
         <p className={styles.note}>Prototype screen. Nothing is sent or stored.</p>
+        <a className={styles.review} href={`${import.meta.env.BASE_URL}review.html`}>
+          Phone preview for review
+        </a>
       </div>
     </div>
   );

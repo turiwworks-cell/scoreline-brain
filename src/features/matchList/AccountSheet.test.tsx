@@ -45,7 +45,9 @@ describe('account sheet (drawSheet, luau:6680)', () => {
     document.body.appendChild(outside);
     const view = render(<AccountSheet open onClose={vi.fn()} />);
     const first = screen.getByRole('button', { name: 'Close' });
-    const last = screen.getByRole('button', { name: 'Not now' });
+    // the last control is the way into the review page, a link: the wrap includes it
+    const last = screen.getByRole('link', { name: 'Phone preview for review' });
+    expect(last.getAttribute('href')).toBe('/review.html');
     first.focus();
     expect(fireEvent.keyDown(first, { key: 'Tab', shiftKey: true })).toBe(false);
     expect(document.activeElement).toBe(last);

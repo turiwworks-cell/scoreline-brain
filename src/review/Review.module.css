@@ -1,0 +1,144 @@
+/*
+ * The review page: a dark desk with the phone on it and a bar of controls above.
+ * It takes the app's colours and type (styles/tokens.css, global.css) by value rather than by import:
+ * a style sheet both pages shared would be a second one for the app to load before its first paint.
+ */
+
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/hanken-grotesk-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+:root {
+  --c-bg: #000000;
+  --c-text: #f3f2ef;
+  --c-muted: #85847f;
+  --c-hair: rgb(255 255 255 / 0.1);
+  --c-glass: #121212;
+  --fw-m: 500;
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  margin: 0;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+button {
+  font: inherit;
+}
+
+.page {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 16px 28px;
+  background: var(--c-bg);
+  color: var(--c-text);
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 20px;
+  max-width: 920px;
+}
+
+.title {
+  margin: 0;
+  font-weight: var(--fw-m);
+  font-size: 20px;
+  letter-spacing: -0.03em;
+}
+
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--c-hair);
+  border-radius: 20px;
+  background: var(--c-glass);
+  color: var(--c-text);
+  font-size: 14px;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn:hover:not(:disabled) {
+  border-color: rgb(255 255 255 / 0.28);
+}
+.btn:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 2px;
+}
+.btn[aria-pressed='true'] {
+  background: var(--c-text);
+  color: var(--c-bg);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.help {
+  flex: 1 1 100%;
+  margin: 0;
+  min-height: 1.4em;
+  text-align: center;
+  color: var(--c-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.help a {
+  color: var(--c-text);
+}
+
+/* the phone: its screen is the real 390 × 844 app; the stage takes the room it needs once scaled to fit */
+.stage {
+  flex: none;
+  position: relative;
+}
+.phone {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  border-radius: 54px;
+  background: #0b0b0b;
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.14),
+    0 30px 80px rgb(0 0 0 / 0.6);
+}
+.screen {
+  display: block;
+  width: 390px;
+  height: 844px;
+  border: 0;
+  border-radius: 44px;
+  background: var(--c-bg);
+}

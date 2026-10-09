@@ -170,9 +170,31 @@
   color: var(--c-dim);
 }
 
+/* the way into the review page (review.html): below the note, a quiet link */
+.review {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 176px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--fw-m);
+  font-size: 13px;
+  color: var(--c-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+/* in the review page's own frame it would only open the page again */
+:global(html[data-review-frame]) .review {
+  display: none;
+}
+
 .primary:focus-visible,
 .secondary:focus-visible,
-.later:focus-visible {
+.later:focus-visible,
+.review:focus-visible {
   outline: 2px solid var(--c-text);
   outline-offset: 2px;
 }

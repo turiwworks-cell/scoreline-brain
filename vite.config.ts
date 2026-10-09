@@ -2,6 +2,7 @@
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 /*
  * The app's entry runs once index.html's static first frame has been painted (Part 21, #4).
@@ -108,7 +109,13 @@ export default defineConfig({
   css: { modules: { localsConvention: 'camelCaseOnly' } },
   build: {
     target: 'es2022',
+    // With two pages Vite would move its modulepreload polyfill out of the app's entry into a script of its own,
+    // which the app would then load first. The target browsers support modulepreload (Firefox 115, Safari 17);
+    // where one does not, the hints are skipped and the modules load as they are imported.
+    modulePreload: { polyfill: false },
     rolldownOptions: {
+      // the app, and the review page (review.html: the app in a phone frame, with a few controls)
+      input: { index: fileURLToPath(new URL('./index.html', import.meta.url)), review: fileURLToPath(new URL('./review.html', import.meta.url)) },
       treeshake: {
         // Boundary schemas only construct validators: no listeners, timers or registrations.
         // Re-exporting them from domain/index must not eagerly ship Zod to the app shell.
