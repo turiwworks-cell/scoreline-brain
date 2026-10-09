@@ -1,0 +1,895 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#000000">
+<title>Scoreline — Turinoz</title>
+<meta name="description" content="Scoreline, a live football app. Product, design, motion, Rive and every decision by Turinoz; the code written by AI over hundreds of round trips. With the real demo running on the page.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scoreline — every decision mine, every line of code AI’s">
+<meta property="og:description" content="A live football app designed, animated and directed by Turinoz, built by AI. Ten curves, two Rive files, one demo you can play.">
+<meta property="og:image" content="assets/share-cover.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%236aaef0'/%3E%3Cstop offset='.34' stop-color='%23c9b8e0'/%3E%3Cstop offset='.58' stop-color='%23f2b3c9'/%3E%3Cstop offset='1' stop-color='%23b0243c'/%3E%3C/linearGradient%3E%3ClinearGradient id='b' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%236b58f5'/%3E%3Cstop offset='.4' stop-color='%23a58fe6'/%3E%3Cstop offset='.76' stop-color='%23e7c1d6'/%3E%3Cstop offset='1' stop-color='%23fff0e6'/%3E%3C/linearGradient%3E%3ClinearGradient id='c' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23a8c3ea'/%3E%3Cstop offset='.38' stop-color='%23e2e2e4'/%3E%3Cstop offset='.68' stop-color='%23c9c92a'/%3E%3Cstop offset='1' stop-color='%23f0eed0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='%23000'/%3E%3Crect x='7' y='12' width='6' height='13' fill='url(%23a)'/%3E%3Crect x='13' y='6' width='6' height='19' fill='url(%23b)'/%3E%3Crect x='19' y='10' width='6' height='10' fill='url(%23c)'/%3E%3C/svg%3E">
+<link rel="preload" href="../fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="case-study.css">
+<script src="case-study.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the case study</a>
+
+<!-- shared SVG: Turinoz's mark (the same one the portfolio uses) and a few icons -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="tzLogoGrad" x1="540" y1="193.81" x2="540" y2="932.28" gradientUnits="userSpaceOnUse">
+      <stop offset=".39" stop-color="#fff"/><stop offset=".4" stop-color="#faf9fd"/><stop offset=".5" stop-color="#c3bcea"/>
+      <stop offset=".59" stop-color="#9387d9"/><stop offset=".68" stop-color="#6d5ccc"/><stop offset=".77" stop-color="#4f3ac1"/>
+      <stop offset=".86" stop-color="#3922ba"/><stop offset=".93" stop-color="#2c14b5"/><stop offset="1" stop-color="#280fb4"/>
+    </linearGradient>
+  </defs>
+  <symbol id="tzLogo" viewBox="0 0 1080 1080">
+    <circle fill="#010008" cx="540" cy="540" r="530.68"/>
+    <path fill="url(#tzLogoGrad)" d="M410.74,658.22s162.29-48.52,309.91-40.22c-.76-81.38-4.62-158.07-7.74-191.11-.51-5.37-7.54-7.02-10.4-2.44-16.77,26.88-55.91,89.05-69.49,110.61-2.33,3.69-7.59,3.99-10.33.59l-80.01-103.79c-3.62-4.7-11.01-3.5-12.96,2.11l-43.78,119.94c-2.25,6.15-9.99,8.11-14.89,3.76l-104.34-90.05c-3.32-2.87-8.34.31-7.18,4.54l51.21,186.05Z"/>
+  </symbol>
+  <symbol id="icArrowOut" viewBox="0 0 12 12"><path d="M3.5 8.5l5-5M4.5 3.5h4v4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icArrowRight" viewBox="0 0 12 12"><path d="M2 6h8M6.8 2.8 10 6 6.8 9.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icPlay" viewBox="0 0 16 16"><path d="M4.5 2.8v10.4c0 .6.6.9 1.1.6l8-5.2c.4-.3.4-.9 0-1.2l-8-5.2c-.5-.3-1.1 0-1.1.6z" fill="currentColor"/></symbol>
+  <symbol id="icPause" viewBox="0 0 16 16"><rect x="4" y="3" width="2.8" height="10" rx="1" fill="currentColor"/><rect x="9.2" y="3" width="2.8" height="10" rx="1" fill="currentColor"/></symbol>
+  <symbol id="icRestart" viewBox="0 0 16 16"><path d="M3 8a5 5 0 1 0 1.6-3.7M3 2.5v2.8h2.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icHand" viewBox="0 0 16 16"><path d="M6 8.5V3.2a1.1 1.1 0 0 1 2.2 0V7m0-1.2a1.1 1.1 0 0 1 2.2 0V7.6m0-.8a1.1 1.1 0 0 1 2.2 0v3.1c0 2.4-1.7 4.3-4.1 4.3H8c-1.4 0-2.4-.6-3.2-1.7L3 10.1a1.1 1.1 0 0 1 1.7-1.4L6 10" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icCheck" viewBox="0 0 16 16"><path d="m3.5 8.4 2.9 2.8 6.1-6.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icDot" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.4" fill="currentColor"/></symbol>
+  <symbol id="icX" viewBox="0 0 12 12"><path d="M3 3l6 6M9 3 3 9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+</svg>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="back" href="../" aria-label="Back to the Turinoz portfolio" data-cursor="Back to work"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 6H2M5.2 2.8 2 6l3.2 3.2"/></svg></a>
+    <a class="brand" href="#top" aria-label="Scoreline, back to top">
+      <span class="slmark" aria-hidden="true"><i></i><i></i><i></i></span>
+      Scoreline <span>Case study</span>
+    </a>
+    <nav class="links" id="links" aria-label="Sections">
+      <i class="pill" aria-hidden="true"></i>
+      <a href="#roles">Roles</a><a href="#origin">Origin</a><a href="#decisions">Decisions</a><a href="#system">System</a><a href="#motion">Motion</a><a href="#rive">Rive</a><a href="#process">Process</a><a href="#build">Build</a>
+    </nav>
+    <div class="navr">
+      <button class="livelink" type="button" data-open-demo data-cursor="Open the phone"><span class="dot" aria-hidden="true"></span><span class="lbl">Live demo</span></button>
+      <span class="credit">Design <b>Turinoz</b> · Code <b>AI</b></span>
+      <button class="pp" id="pp" type="button" aria-pressed="false" aria-label="Pause the page's motion" title="Pause the page's motion">
+        <svg class="i-pause" aria-hidden="true"><use href="#icPause"/></svg><svg class="i-play" aria-hidden="true"><use href="#icPlay"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="progress" aria-hidden="true"><u></u></div>
+</header>
+
+<!-- ================= THE PHONE =================
+     One live copy of the app (app/, the real build), the whole way down the page. It sits beside the
+     sections marked data-dock="phone" and steps aside for the wide ones; the pill brings it back from
+     anywhere. The page drives it through the app's own review bridge (same origin): scenes, pause,
+     restart; it moves it between screens without adding history. -->
+<div class="dock-backdrop" id="dockBackdrop" aria-hidden="true"></div>
+<aside class="dock" id="dock" data-state="away" aria-label="The Scoreline demo, running">
+  <div class="dock-top">
+    <span class="dock-chip"><span class="dot" aria-hidden="true"></span><b>Live demo</b><span class="rt mono" id="dockRoute">Starting…</span></span>
+    <button class="dock-x" type="button" id="dockClose" aria-label="Put the phone away"><svg aria-hidden="true"><use href="#icX"/></svg></button>
+  </div>
+  <div class="device" id="device">
+    <div class="screen" id="screen">
+      <img class="poster" src="assets/home.webp" alt="" width="780" height="1688">
+      <iframe id="app" title="Scoreline, the real app running its demo evening" tabindex="-1" allow="autoplay"></iframe>
+      <div class="sbar" aria-hidden="true"><span>9:41</span><span class="ic"><i></i><i></i></span></div>
+      <button class="veil" type="button" id="veil" aria-label="Take control of the demo" data-cursor="Take control"><span><svg aria-hidden="true"><use href="#icHand"/></svg>Take control</span></button>
+      <div class="tcur" aria-hidden="true">
+        <span class="ring"></span>
+        <svg class="arrow" viewBox="0 0 25 25"><path d="M5 3v17.2l4.6-4.3 3.2 7.1 3.1-1.4-3.2-6.9 6.3-.3z"/></svg>
+        <span class="bub"><em><svg viewBox="0 0 1080 1080"><use href="#tzLogo"/></svg></em><b><span class="tx"></span><i class="caret"></i></b></span>
+      </div>
+    </div>
+    <span class="island" aria-hidden="true"></span>
+  </div>
+  <div class="dock-bar" role="group" aria-label="Demo controls">
+    <button class="chipbtn" type="button" data-scene="goal"><span class="gl" aria-hidden="true">⚽</span>Goal</button>
+    <button class="chipbtn" type="button" data-scene="red"><span class="rc" aria-hidden="true"></span>Red card</button>
+    <button class="chipbtn" type="button" id="dockPause"><svg aria-hidden="true"><use href="#icPause"/></svg><span>Pause</span></button>
+    <button class="chipbtn" type="button" id="dockRestart" aria-label="Restart the evening"><svg aria-hidden="true"><use href="#icRestart"/></svg></button>
+    <button class="chipbtn take" type="button" data-take><svg aria-hidden="true"><use href="#icHand"/></svg>Take control</button>
+    <button class="chipbtn give" type="button" id="dockGive"><svg aria-hidden="true"><use href="#icCheck"/></svg>Give it back</button>
+    <a class="chipbtn" id="dockFull" href="app/" target="_blank" rel="noopener" aria-label="Open the app full screen, in a new tab"><svg aria-hidden="true"><use href="#icArrowOut"/></svg></a>
+  </div>
+  <p class="dock-note" id="dockNote" aria-live="polite">The real app, not a video. Its evening runs on its own.</p>
+</aside>
+<button class="demo-pill" id="demoPill" type="button" data-open-demo aria-label="Open the live demo">
+  <span class="mini" aria-hidden="true"><span class="slmark"><i></i><i></i><i></i></span></span>
+  Try the demo <small>live</small>
+</button>
+
+<main id="main">
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="top" data-dock="phone">
+  <div class="aurora" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="wrap">
+    <div class="col">
+      <div class="kicker rv"><i class="live"></i>Scoreline · Live football app · 2026</div>
+      <h1 class="h1" aria-label="Every decision, mine. Every line of code, AI’s.">
+        <span class="ln" aria-hidden="true"><span class="mine">Every decision, mine.</span></span>
+        <span class="ln" aria-hidden="true"><span class="ais">Every line of code, <b>AI’s.</b></span></span>
+      </h1>
+      <p class="lede rv" style="--rd:.18s">Scoreline is a live football app for match nights: five games at once, one Live switch, and a goal that arrives the way it does in the stadium. It’s also the first product I made entirely through AI, over hundreds of round trips in which I designed, directed, rejected and approved, and the AI wrote the code. I wanted full control, so nothing went in until I had decided it: <em>the layout, the colours, every curve and every millisecond.</em></p>
+      <div class="proof rv" style="--rd:.26s">
+        <button class="btn" type="button" data-open-demo data-cursor="It’s the real app"><span class="dot" aria-hidden="true"></span>Play the live demo<span>real app</span></button>
+        <a class="ghost" href="app/" target="_blank" rel="noopener" data-cursor="Opens in a new tab">Full screen<svg aria-hidden="true"><use href="#icArrowOut"/></svg></a>
+      </div>
+      <dl class="facts rv" style="--rd:.32s">
+        <div class="fact"><dt><span class="count" data-to="10">10</span></dt><dd>curves, each one set by hand</dd></div>
+        <div class="fact"><dt><span class="count" data-to="14">14</span></dt><dd>sections, each with its own timing</dd></div>
+        <div class="fact"><dt><span class="count" data-to="2">2</span></dt><dd>Rive files, made in the editor</dd></div>
+        <div class="fact"><dt><span class="count" data-to="125">125</span></dt><dd>commits by AI, reviewed by me</dd></div>
+      </dl>
+      <div class="byline rv" style="--rd:.38s"><span class="ava"><svg viewBox="0 0 1080 1080" aria-hidden="true"><use href="#tzLogo"/></svg></span><span>Product, design, motion and every decision by <b>Turinoz</b>. Code and execution by AI.</span></div>
+    </div>
+  </div>
+  <div class="scrollcue" aria-hidden="true"><i></i>Scroll</div>
+</section>
+
+<!-- ================= 01 ROLES ================= -->
+<section class="sec" id="roles" data-dock="phone">
+  <div class="wrap">
+    <div class="col">
+      <div class="kicker rv"><i></i>01 — Roles</div>
+      <h2 class="rv">I directed. The AI built.</h2>
+      <p class="statement" id="statement" style="margin-top:34px">I’m a motion designer. Deciding how a thing looks, moves and behaves, and why, is the job. On Scoreline I did that job for a whole product and handed the typing to AI: <span class="hl">Claude and Codex wrote 39,545 lines across 125 commits,</span> and every one of them answered to a decision of mine.</p>
+
+      <div class="ledger">
+        <div class="side side--me rv">
+          <div class="side-h"><h3>Mine</h3><span>Design &amp; decisions</span></div>
+          <ul>
+            <li><svg aria-hidden="true"><use href="#icCheck"/></svg><span><b>The product.</b> What it shows, what it leaves out, and in what order.</span></li>
+            <li><svg aria-hidden="true"><use href="#icCheck"/></svg><span><b>The look.</b> Pure black, five spectrum gradients, one grotesk, light numerals.</span></li>
+            <li><svg aria-hidden="true"><use href="#icCheck"/></svg><span><b>Every screen</b> on phone, tablet and desktop.</span></li>
+            <li><svg aria-hidden="true"><use href="#icCheck"/></svg><span><b>Motion.</b> Ten curves, fourteen section timings, the feel of every touch.</span></li>
+            <li><svg aria-hidden="true"><use href="#icCheck"/></svg><span><b>Rive.</b> The Live switch and the goal and red-card words, built in the editor.</span></li>
+            <li><svg aria-hidden="true"><use href="#icCheck"/></svg><span><b>The rules.</b> Nothing bounces. One word plays the headline. Nothing flies between screens.</span></li>
+            <li><svg aria-hidden="true"><use href="#icCheck"/></svg><span><b>Every review</b>, on a phone, frame by frame. And what ships, what waits, what gets reverted.</span></li>
+          </ul>
+        </div>
+        <div class="side side--ai rv" style="--rd:.08s">
+          <div class="side-h"><h3>AI’s</h3><span>Code &amp; execution</span></div>
+          <ul>
+            <li><svg aria-hidden="true"><use href="#icDot"/></svg><span><b>The app</b> in React and TypeScript, ported from my Rive prototype value for value.</span></li>
+            <li><svg aria-hidden="true"><use href="#icDot"/></svg><span><b>The demo evening:</b> twelve fixtures, a live clock, goals, cards and subs.</span></li>
+            <li><svg aria-hidden="true"><use href="#icDot"/></svg><span><b>The data contract</b> and a stand-in backend for a real API.</span></li>
+            <li><svg aria-hidden="true"><use href="#icDot"/></svg><span><b>815 unit tests</b> and the browser checks that hold my numbers in place.</span></li>
+            <li><svg aria-hidden="true"><use href="#icDot"/></svg><span><b>Performance:</b> the first paint, the script budget, when Rive loads.</span></li>
+            <li><svg aria-hidden="true"><use href="#icDot"/></svg><span><b>A fix for every note</b>, until I said yes.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="loop rv" id="loop">
+        <div class="loop-h"><h3>How one round went</h3><span class="loop-n mono"><b class="count" data-to="125">125</b>commits · 25+ AI sessions · 32 branches</span></div>
+        <ol class="steps">
+          <li class="step"><span class="who me">Me</span><h4>Decide</h4><p>The look, the timing, the rule. Written down so it can’t drift.</p></li>
+          <li class="step"><span class="who">AI</span><h4>Build</h4><p>The code, and a test that fails if my number changes.</p></li>
+          <li class="step"><span class="who me">Me</span><h4>Review</h4><p>On a phone, frame by frame. Screenshots, videos, notes.</p></li>
+          <li class="step"><span class="who me">Me → AI</span><h4>Ship or redo</h4><p>Back to build until I approve. Some things I reverted the next day.</p></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 02 ORIGIN ================= -->
+<section class="sec" id="origin">
+  <div class="wrap">
+    <div class="shead rv">
+      <div><div class="kicker"><i></i>02 — Origin</div><h2>It started as one Rive file.</h2>
+        <p class="sub">Before Scoreline was a web app, I designed the whole thing in Rive, running: every screen, the live simulation and the goal scene, drawn by one script on one canvas. That prototype is where every number on this page was set. Then I made the call to rebuild it.</p></div>
+      <p class="aside">My first product made through hundreds of AI round trips. I wanted full control over it, so every value lived where I could see it and tune it myself.</p>
+    </div>
+    <div class="origin">
+      <div class="era era--then rv">
+        <div class="kicker"><i></i>Then · Rive prototype</div>
+        <h3>The whole app on one canvas.</h3>
+        <p>One Rive file and one Luau script drawing everything: its own text, layout, scrolling, tweens and a match simulator. Every section exposed its timing as inputs in the editor, duration, delay, stagger and the four bezier handles, so I could tune the motion right there in Rive.</p>
+        <dl class="vs">
+          <div><dt>Script</dt><dd>8,925 lines of Luau</dd></div>
+          <div><dt>Rive file</dt><dd>824 KB, one artboard</dd></div>
+          <div><dt>Motion inputs I could tune</dt><dd>98</dd></div>
+          <div><dt>Before the first frame</dt><dd>≈ 3 MB</dd></div>
+          <div><dt>When idle</dt><dd>redraws every frame</dd></div>
+        </dl>
+      </div>
+      <div class="era era--now rv" style="--rd:.08s">
+        <div class="kicker"><i class="live"></i>Now · Web app</div>
+        <h3>The same app, made of real parts.</h3>
+        <p>React and TypeScript, with real text, links, a keyboard and a screen reader. Rive stays only where it earns its place: the Live switch, and the word that announces a goal.</p>
+        <dl class="vs">
+          <div><dt>Source</dt><dd>39,545 lines</dd></div>
+          <div><dt>Rive files</dt><dd>2 · 24.9 KB + 22.5 KB</dd></div>
+          <div><dt>First script</dt><dd>179.9 KB of a 180 KB budget</dd></div>
+          <div><dt>First frame</dt><dd>before any script runs</dd></div>
+          <div><dt>Rive</dt><dd>loads after the first data</dd></div>
+        </dl>
+      </div>
+    </div>
+    <div class="why">
+      <div class="rv"><b>No keyboard, no screen reader.</b><span>A canvas is a picture. Nobody could tab to a match.</span></div>
+      <div class="rv" style="--rd:.05s"><b>No links.</b><span>You couldn’t send someone a match, or come back to one.</span></div>
+      <div class="rv" style="--rd:.1s"><b>Text you can’t select.</b><span>And names outside the baked glyphs simply didn’t draw.</span></div>
+      <div class="rv" style="--rd:.15s"><b>Three megabytes first.</b><span>Before the first frame, on a phone, on a match night.</span></div>
+    </div>
+    <div class="decision rv">
+      <span class="stamp">2 October 2026<br>My call</span>
+      <p>Rebuild it as a web app, and keep Rive for the moments it’s best at. <span>Port, don’t redesign: every colour, size and timing comes over exactly, and a test fails if one ever drifts.</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 03 DECISIONS ================= -->
+<section class="sec" id="decisions" data-dock="phone">
+  <div class="wrap">
+    <div class="col">
+      <div class="kicker rv"><i></i>03 — Decisions</div>
+      <h2 class="rv">Every decision has a reason.</h2>
+      <p class="sub rv">Twelve of them, one at a time. The phone beside you is the real app, and it goes where each decision lives. Take control whenever you like.</p>
+      <ol class="dlist" id="dlist">
+        <li class="dcard" data-route="/" data-point="label:Live" data-say="what’s on, first">
+          <span class="dn"><b>01</b>Product · Rive</span>
+          <h3>Open on what’s happening now.</h3>
+          <p>The app opens on Live, not on a calendar. The switch in the corner counts the matches in play, and one tap turns it off to show the whole day.</p>
+          <dl class="dgoal"><dt>Goal</dt><dd>Answer “what’s on right now?” before anyone has to ask.</dd></dl>
+          <div class="dshot"><img src="assets/home.webp" alt="The Scoreline list on Live: five live matches as tall cards of light." loading="lazy" width="780" height="1688"></div>
+          <div class="drow"><button class="chipbtn dshow" type="button" data-show>Show me in the demo</button></div>
+        </li>
+        <li class="dcard" data-route="/" data-point="live-card" data-say="taller as the match goes on">
+          <span class="dn"><b>02</b>Visual · Layout</span>
+          <h3>Five matches, read at a glance.</h3>
+          <p>Each live match is a card of light: the home side’s colour at the top, the away side’s at the bottom, both mixed toward warm white until black type reads on them. The card grows a pixel at a time as the minute climbs, and the minute is set big and light.</p>
+          <dl class="dgoal"><dt>Goal</dt><dd>Show the state of five matches without anyone reading a single row.</dd></dl>
+          <div class="drow"><button class="chipbtn dshow" type="button" data-show>Show me in the demo</button></div>
+        </li>
+        <li class="dcard" data-route="/" data-scroll="Following" data-point="h:Following" data-dx="248" data-dy="96" data-say="one player, every touch">
+          <span class="dn"><b>03</b>Product</span>
+          <h3>Follow one player.</h3>
+          <p>Pick a player and the list gives him a card of his own: what he’s doing right now, his rating, touches, passes and shots, and a moment of his own when he scores. The demo follows Argentina’s number 10.</p>
+          <dl class="dgoal"><dt>Goal</dt><dd>Give people a reason to stay with a match they can’t watch.</dd></dl>
+          <div class="dshot"><img src="assets/follow.webp" alt="The follow card: Messi, his rating, touches, passes and shots, and what he is doing now." loading="lazy" width="600" height="1298"></div>
+          <div class="drow"><button class="chipbtn dshow" type="button" data-show>Show me in the demo</button></div>
+        </li>
+        <li class="dcard" data-route="/match/1/facts" data-point="h:France on top" data-dx="40" data-dy="10" data-say="the sentence comes first">
+          <span class="dn"><b>04</b>Data · Writing</span>
+          <h3>A sentence before the chart.</h3>
+          <p>Momentum is a wave in both teams’ colours, but it starts with a plain line: <em>France on top, 89% of the pressure in the last 10 minutes.</em> The goals sit on the wave as small balls that pop in one after another.</p>
+          <dl class="dgoal"><dt>Goal</dt><dd>Say what the chart means before asking anyone to read it.</dd></dl>
+          <div class="dshot"><img src="assets/facts.webp" alt="The match screen: France 2, Argentina 1, and the momentum wave under the line France on top." loading="lazy" width="600" height="1298"></div>
+          <div class="drow"><button class="chipbtn dshow" type="button" data-show>Show me in the demo</button></div>
+        </li>
+        <li class="dcard" data-route="/match/1/facts" data-point="score" data-say="big, and still calm">
+          <span class="dn"><b>05</b>Type</span>
+          <h3>Big numbers, light weight.</h3>
+          <p>The score is 86 pixels tall in Hanken Grotesk Light, tracked tight. The winning side’s number is white; the other one drops back to grey. It’s the biggest thing on the screen and it never shouts.</p>
+          <dl class="dgoal"><dt>Goal</dt><dd>Make the score readable from across the room without making it heavy.</dd></dl>
+          <div class="drow"><button class="chipbtn dshow" type="button" data-show>Show me in the demo</button></div>
+        </li>
+        <li class="dcard" data-route="/match/1/facts" data-scroll="goal-row" data-point="goal-row" data-say="his face, not a disc">
+          <span class="dn"><b>06</b>Review note · SL-15</span>
+          <h3>The scorer’s face, and no false promise.</h3>
+          <p>A goal in the events shows the scorer’s photo. It used to show a kit disc and a chevron that promised a replay that didn’t exist. I asked for the face and no chevron. The photo now waits until it’s ready, so a disc never swaps for a face in front of you.</p>
+          <dl class="dgoal"><dt>Goal</dt><dd>Only show what’s true, and never change it under the eye.</dd></dl>
+          <div class="dshot"><img src="assets/events.webp" alt="The events feed: Mbappé’s goal row with his photo and the score 2–1." loading="lazy" width="600" height="1298"></div>
+          <div class="drow"><button class="chipbtn dshow" type="button" data-show>Show me in the demo</button></div>
+        </li>
+        <li class="dcard" data-route="/match/1/lineup" data-point="h:Formation" data-dx="170" data-dy="70" data-say="forwards first">
+          <span class="dn"><b>07</b>Motion</span>
+          <h3>The line-up rises line by line.</h3>
+          <p>Forwards first, then midfield, defence and the keeper: 140 ms between lines, 35 ms between players in a line, each rising 26 px on GLIDE. You read a formation the way you’d point at it.</p>
+          <dl class="dgoal"><dt>Goal</dt><dd>Make the shape of a team readable in the time it takes to appear.</dd></dl>
+          <div class="dshot"><img src="assets/lineup.webp" alt="The line-up on a pitch, with photos, ratings and glass name plates." loading="lazy" width="600" height="1298"></div>
+          <div class="drow"><button class="chipbtn dshow" type="button" data-show>Show me in the demo</button></div>
+        </li>
+        <li class="dcard" data-route="/match/1/stats" data-point="h:Possession" data-dx="20" data-dy="80" data-say="counts out from 50">
+          <span class="dn"><b>08</b>Motion · Data</span>
+          <h3>Stats that start from the middle.</h3>
+          <p>Possession counts out from 50, and each bar opens from the centre a beat after the one above. Nothing starts from zero, because no match does.</p>
+          <dl class="dgoal"><dt>Goal</dt><dd>Show the balance first, then how far it has tipped.</dd></dl>
+          <div class="dshot"><img src="assets/stats.webp" alt="Stats: possession 58 to 42 and the top stats bars." loading="lazy" width="600" height="1298"></div>
+          <div class="drow"><button class="chipbtn dshow" type="button" data-show>Show me in the demo</button></div>
+        </li>
+        <li class="dcard" data-route="/player/arg/10" data-point="pct:50,32" data-say="it grows where it is">
+          <span class="dn"><b>09</b>Motion · Review 4 Oct</span>
+          <h3>Nothing flies between screens.</h3>
+          <p>The first build flew logos and faces from the card you tapped to the next screen. On a phone they seemed to come from the middle of nowhere, so after my review on 4 October they went. A match slides in from the right; a player grows in place from 90%, the same way from everywhere.</p>
+          <dl class="dgoal"><dt>Goal</dt><dd>Keep people oriented. Motion should explain where you are, not perform.</dd></dl>
+          <div class="dshot"><img src="assets/player.webp" alt="The player view: Messi on a line of light, his number behind him." loading="lazy" width="600" height="1298"></div>
+          <div class="drow"><button class="chipbtn dshow" type="button" data-show>Show me in the demo</button></div>
+        </li>
+        <li class="dcard" data-route="/" data-moment="goal" data-say="">
+          <span class="dn"><b>10</b>Moments · Rive</span>
+          <h3>A goal is a scene, only where you’re looking.</h3>
+          <p>If the goal is in the match you have open, or your player scores, it takes the whole screen: GOAAAL lands letter by letter in the team’s colours, a wall of light rises, the scorer comes up and the commentary writes itself in. Anywhere else it’s a quiet toast, and three at once fold into one summary.</p>
+          <dl class="dgoal"><dt>Goal</dt><dd>Celebrate the moment without punishing people for looking elsewhere.</dd></dl>
+          <div class="dshot"><img src="assets/goal-c.webp" alt="The goal scene: GOAAAL over a wall of light, the scorer in front of it." loading="lazy" width="600" height="1298"></div>
+          <div class="drow"><button class="chipbtn" type="button" data-scene="goal"><span aria-hidden="true">⚽</span>Score a goal</button><button class="chipbtn" type="button" data-scene="red"><span class="rc" style="width:8px;height:11px;border-radius:2px;background:var(--red);transform:rotate(8deg)" aria-hidden="true"></span>Show a red card</button></div>
+        </li>
+        <li class="dcard" data-route="/" data-point="label:Menu" data-say="light under your cursor only">
+          <span class="dn"><b>11</b>Material · Touch</span>
+          <h3>Light only where you touch.</h3>
+          <p>Controls are dark glass with a one-pixel rim that’s brighter at the bottom. Hovering lights a small spot under the cursor, never the whole button, and a press dips it by 5%. Live cards never lift, and there’s no blur anywhere: frosted photos are files, blurred once.</p>
+          <dl class="dgoal"><dt>Goal</dt><dd>Make it feel physical, and keep it fast on a phone.</dd></dl>
+          <div class="drow"><button class="chipbtn dshow" type="button" data-show>Show me in the demo</button></div>
+        </li>
+        <li class="dcard" data-route="/" data-say="">
+          <span class="dn"><b>12</b>Layout</span>
+          <h3>Three panes on a desktop, not a stretched phone.</h3>
+          <p>From 1200 px the app becomes three panes: the list, the match, and a third for the player, the tables or tonight’s leaders. From 768 px it’s two. Each pane scrolls on its own, and the list never loses its place.</p>
+          <dl class="dgoal"><dt>Goal</dt><dd>Use the space to show more at once, not the same things bigger.</dd></dl>
+          <figure class="dvisual desk rv"><img src="assets/desktop.webp" alt="Scoreline on a desktop: the list, France against Argentina, and Messi in the third pane." loading="lazy" width="1600" height="1115"></figure>
+          <div class="drow"><a class="chipbtn" href="app/" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#icArrowOut"/></svg>Open it full width</a></div>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 04 SYSTEM ================= -->
+<section class="sec" id="system">
+  <div class="wrap">
+    <div class="shead rv">
+      <div><div class="kicker"><i></i>04 — System</div><h2>Black, five spectra, one typeface.</h2>
+        <p class="sub">The look is small on purpose. Pure black for the night, five gradients for everything that’s alive, and one grotesk in five weights. Every value came from my prototype and lives in one tokens file.</p></div>
+    </div>
+    <div class="sys">
+      <div class="panel p-spec rv">
+        <div class="kicker"><i></i>Spectrum</div>
+        <h3>Five gradients, four stops each.</h3>
+        <div class="specs" id="specs">
+          <div class="spec" style="--stops:var(--sp2);--h:74%;--p:.64"><span class="lbl">FRA 2<br>ARG 1</span><span class="min">58</span><span class="bar"><u></u></span></div>
+          <div class="spec" style="--stops:var(--sp5);--h:82%;--p:.7"><span class="lbl">ENG 0<br>BRA 1</span><span class="min">63</span><span class="bar"><u></u></span></div>
+          <div class="spec" style="--stops:var(--sp1);--h:96%;--p:.84"><span class="lbl">GER 1<br>NED 1</span><span class="min">76</span><span class="bar"><u></u></span></div>
+          <div class="spec" style="--stops:var(--sp3);--h:62%;--p:.52"><span class="lbl">BEL 0<br>AUT 2</span><span class="min">47</span><span class="bar"><u></u></span></div>
+          <div class="spec" style="--stops:var(--sp4);--h:88%;--p:.73"><span class="lbl">IRL 2<br>POL 1</span><span class="min">66</span><span class="bar"><u></u></span></div>
+        </div>
+        <div class="stops"><span>Spectrum 2</span><span>Spectrum 5</span><span>Spectrum 1</span><span>Spectrum 3 · accent</span><span>Spectrum 4</span></div>
+        <p class="pc">The third one is the accent: the tab line, the chosen segment, and this page’s progress bar. In the app, live cards take the two teams’ own colours on the same recipe.</p>
+      </div>
+      <div class="panel p-ink rv" style="--rd:.06s">
+        <div class="kicker"><i></i>Inks</div>
+        <h3>Ten colours, and a rule for the rest.</h3>
+        <div class="inks">
+          <div class="ink"><i style="background:#000"></i><div><b>Background</b><span>#000000</span></div></div>
+          <div class="ink"><i style="background:#161616"></i><div><b>Surface</b><span>#161616</span></div></div>
+          <div class="ink"><i style="background:#121212"></i><div><b>Glass</b><span>#121212</span></div></div>
+          <div class="ink"><i style="background:#F3F2EF"></i><div><b>Text</b><span>#F3F2EF</span></div></div>
+          <div class="ink"><i style="background:#85847F"></i><div><b>Muted</b><span>#85847F</span></div></div>
+          <div class="ink"><i style="background:#43423F"></i><div><b>Dim</b><span>#43423F</span></div></div>
+          <div class="ink"><i style="background:#34E39A"></i><div><b>Live</b><span>#34E39A</span></div></div>
+          <div class="ink"><i style="background:#E7C94A"></i><div><b>Yellow card</b><span>#E7C94A</span></div></div>
+          <div class="ink"><i style="background:#FF5A5A"></i><div><b>Red</b><span>#FF5A5A</span></div></div>
+          <div class="ink"><i style="background:#F7F2EA"></i><div><b>Pastel base</b><span>#F7F2EA</span></div></div>
+        </div>
+        <p class="pc">Team colours are mixed toward the pastel base until black text on them passes WCAG AA comfortably. That one rule lets any two teams share a card.</p>
+      </div>
+      <div class="panel p-type rv">
+        <div class="kicker"><i></i>Type</div>
+        <h3>Light for numbers, bold only for GOAAAL.</h3>
+        <div class="typerow">
+          <figure><span class="t1" id="wghtSample">58’</span><figcaption>Light 300 · 86 px · −0.05 em · the score</figcaption></figure>
+          <figure><span class="t2">Messi</span><figcaption>Medium 500 · 26 · names</figcaption></figure>
+          <figure><span class="t3">GOAAAL</span><figcaption>Bold 700 · 46 · one word</figcaption></figure>
+          <figure><span class="t4">Live now</span><figcaption>500 · 10.5 · +0.16 em · labels</figcaption></figure>
+        </div>
+        <div class="wght"><span class="mono" style="font-size:11px;color:var(--muted)">Weight</span><input type="range" min="100" max="900" value="300" id="wght" aria-label="Weight of the sample numeral"><output class="mono" id="wghtOut">300 · Light</output></div>
+        <p class="pc">Hanken Grotesk, self-hosted. Twenty-one sizes, from 8 to 86 px, every one from the prototype, so text sits on the same baselines it did in Rive.</p>
+      </div>
+      <div class="panel p-glass rv" style="--rd:.06s">
+        <div class="kicker"><i></i>Material</div>
+        <h3>Dark glass, lit from where you point.</h3>
+        <div class="glassdemo">
+          <span class="gbtn" data-glass><span class="ld"></span>Live</span>
+          <span class="gbtn round" data-glass data-dip aria-hidden="true"><span class="bars"><i></i><i></i></span></span>
+          <span class="gbtn" data-glass data-dip>Continue with email</span>
+        </div>
+        <p class="pc">An opaque pane at 96%, a whisper of sheen, and a one-pixel rim at 0.22, 0.13, 0.15 and 0.28 white from top to bottom. Point at them: the light rises in 280 ms and fades in 550, where you left it. Press: a 5% dip in 120 ms, back in 500.</p>
+        <div class="matnote"><span>no backdrop-filter</span><span>·</span><span>light only with a real pointer</span><span>·</span><span>a quick tap still shows the whole dip</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 05 MOTION ================= -->
+<section class="sec" id="motion">
+  <div class="wrap">
+    <div class="shead rv">
+      <div><div class="kicker"><i></i>05 — Motion</div><h2>Every curve, set by hand.</h2>
+        <p class="sub">Ten curves run the whole app. I set them in the Rive prototype, where every section had its own duration, delay, stagger and four bezier handles to tune. The web app carries them over number for number. Here they all are, next to their four numbers, each against the browser’s default in grey.</p></div>
+    </div>
+    <div class="law rv">
+      <svg viewBox="0 0 86 56" aria-hidden="true"><path d="M4 52 C 18 52, 22 4, 82 4" fill="none" stroke="url(#lawg)" stroke-width="2.5" stroke-linecap="round"/><defs><linearGradient id="lawg" x1="0" x2="1"><stop offset="0" stop-color="#6b58f5"/><stop offset=".5" stop-color="#e7c1d6"/><stop offset="1" stop-color="#fff0e6"/></linearGradient></defs></svg>
+      <q>No curve overshoots. Movement settles, it never bounces.</q>
+      <span class="src">My one rule for motion<br>written at the top of the tokens</span>
+    </div>
+
+    <div class="curves" id="curves">
+      <article class="cv rv" data-v="0.16,1,0.3,1" data-dur="750">
+        <div class="cv-h"><span class="cv-name">Glide</span><span class="cv-tok">--ease-glide</span></div>
+        <div class="cv-plot"><canvas></canvas><span class="ghost-l"><i></i>ease</span></div>
+        <div class="four"><span><small>X1</small><b>0.16</b></span><span><small>Y1</small><b>1</b></span><span><small>X2</small><b>0.3</b></span><span><small>Y2</small><b>1</b></span></div>
+        <div class="cv-track" aria-hidden="true"><u></u><i></i></div>
+        <p class="cv-p"><em>The landing.</em> Out of the gate at once, then a long quiet arrival. It’s the expo-out shape, chosen on purpose, and 11 of the 14 sections land on it.</p>
+        <div class="cv-uses"><span>cards</span><span>live</span><span>screen</span><span>momentum</span><span>events</span><span>stats</span><span>lineup</span><span>toast</span><span>goal</span><span>follow</span><span>hover light</span></div>
+      </article>
+      <article class="cv rv" style="--rd:.05s" data-v="0.2,0.8,0.2,1" data-dur="500">
+        <div class="cv-h"><span class="cv-name">Ease</span><span class="cv-tok">--ease</span></div>
+        <div class="cv-plot"><canvas></canvas><span class="ghost-l"><i></i>ease</span></div>
+        <div class="four"><span><small>X1</small><b>0.2</b></span><span><small>Y1</small><b>0.8</b></span><span><small>X2</small><b>0.2</b></span><span><small>Y2</small><b>1</b></span></div>
+        <div class="cv-track" aria-hidden="true"><u></u><i></i></div>
+        <p class="cv-p"><em>The quick one.</em> A steep start and a shorter tail, for what follows your finger: the day tabs, the tab line, a press going down.</p>
+        <div class="cv-uses"><span>list</span><span>tabs</span><span>press dip</span><span>sheet closing</span><span>flashes</span></div>
+      </article>
+      <article class="cv rv" style="--rd:.1s" data-v="0.32,0,0.1,1" data-dur="720">
+        <div class="cv-h"><span class="cv-name">Player</span><span class="cv-tok">--t-player-ease</span></div>
+        <div class="cv-plot"><canvas></canvas><span class="ghost-l"><i></i>ease</span></div>
+        <div class="four"><span><small>X1</small><b>0.32</b></span><span><small>Y1</small><b>0</b></span><span><small>X2</small><b>0.1</b></span><span><small>Y2</small><b>1</b></span></div>
+        <div class="cv-track" aria-hidden="true"><u></u><i></i></div>
+        <p class="cv-p"><em>The focus pull.</em> A slow start and a soft, sudden finish, so a player grows in from 90% like a camera finding him.</p>
+        <div class="cv-uses"><span>player view</span><span>bust 0.9 → 1</span><span>player sheet</span></div>
+      </article>
+      <article class="cv rv" data-v="0.12,1,0.3,1" data-dur="504">
+        <div class="cv-h"><span class="cv-name">Land</span><span class="cv-tok">moments</span></div>
+        <div class="cv-plot"><canvas></canvas><span class="ghost-l"><i></i>ease</span></div>
+        <div class="four"><span><small>X1</small><b>0.12</b></span><span><small>Y1</small><b>1</b></span><span><small>X2</small><b>0.3</b></span><span><small>Y2</small><b>1</b></span></div>
+        <div class="cv-track" aria-hidden="true"><u></u><i></i></div>
+        <p class="cv-p"><em>The goal word.</em> Each letter of GOAAAL comes in big and soft and lands sharp. LAND gets there sooner than GLIDE, so the letters feel thrown.</p>
+        <div class="cv-uses"><span>GOAAAL letters</span><span>word settle</span><span>wall of light</span></div>
+      </article>
+      <article class="cv rv" style="--rd:.05s" data-v="0.5,0,0.9,0.6" data-dur="300">
+        <div class="cv-h"><span class="cv-name">Slam</span><span class="cv-tok">moments</span></div>
+        <div class="cv-plot"><canvas></canvas><span class="ghost-l"><i></i>ease</span></div>
+        <div class="four"><span><small>X1</small><b>0.5</b></span><span><small>Y1</small><b>0</b></span><span><small>X2</small><b>0.9</b></span><span><small>Y2</small><b>0.6</b></span></div>
+        <div class="cv-track" aria-hidden="true"><u></u><i></i></div>
+        <p class="cv-p"><em>The red card.</em> All in, no landing. It hits and stops dead at 2.8× to 1×, and the shake does the rest.</p>
+        <div class="cv-uses"><span>red card slam</span></div>
+      </article>
+      <article class="cv rv" style="--rd:.1s" data-v="0.7,0,0.2,1" data-dur="420">
+        <div class="cv-h"><span class="cv-name">Roll</span><span class="cv-tok">--ease-roll</span></div>
+        <div class="cv-plot"><canvas></canvas><span class="ghost-l"><i></i>ease</span></div>
+        <div class="four"><span><small>X1</small><b>0.7</b></span><span><small>Y1</small><b>0</b></span><span><small>X2</small><b>0.2</b></span><span><small>Y2</small><b>1</b></span></div>
+        <div class="cv-track" aria-hidden="true"><u></u><i></i></div>
+        <p class="cv-p"><em>The letter roll.</em> A hard pull and a clean drop. Each letter of a pressed label rolls up and comes back from below, 420 ms each, 11 ms apart.</p>
+        <div class="cv-uses"><span>letter roll</span><span>pressed labels</span></div>
+      </article>
+      <article class="cv rv" data-v="0.42,0,0.58,1" data-dur="550">
+        <div class="cv-h"><span class="cv-name">In-out</span><span class="cv-tok">--ease-inout</span></div>
+        <div class="cv-plot"><canvas></canvas><span class="ghost-l"><i></i>ease</span></div>
+        <div class="four"><span><small>X1</small><b>0.42</b></span><span><small>Y1</small><b>0</b></span><span><small>X2</small><b>0.58</b></span><span><small>Y2</small><b>1</b></span></div>
+        <div class="cv-track" aria-hidden="true"><u></u><i></i></div>
+        <p class="cv-p"><em>The classic, kept on purpose</em> for things that come and go on their own: a flood of team colour fading out, a countdown digit rolling over.</p>
+        <div class="cv-uses"><span>colour floods</span><span>countdown digit</span><span>flare fading</span></div>
+      </article>
+      <article class="cv rv" style="--rd:.05s" data-v="0.5,0,0.75,0" data-dur="320">
+        <div class="cv-h"><span class="cv-name">In</span><span class="cv-tok">--ease-in</span></div>
+        <div class="cv-plot"><canvas></canvas><span class="ghost-l"><i></i>ease</span></div>
+        <div class="four"><span><small>X1</small><b>0.5</b></span><span><small>Y1</small><b>0</b></span><span><small>X2</small><b>0.75</b></span><span><small>Y2</small><b>0</b></span></div>
+        <div class="cv-track" aria-hidden="true"><u></u><i></i></div>
+        <p class="cv-p"><em>The exit.</em> Only one thing leaves on it: a goal toast flying up past the top, in 0.32 s.</p>
+        <div class="cv-uses"><span>toast leaving</span></div>
+      </article>
+      <article class="cv rv" style="--rd:.1s" data-v="0.37,0,0.63,1" data-dur="785">
+        <div class="cv-h"><span class="cv-name">Breath</span><span class="cv-tok">live dots</span></div>
+        <div class="cv-plot"><canvas></canvas><span class="ghost-l"><i></i>ease</span></div>
+        <div class="four"><span><small>X1</small><b>0.37</b></span><span><small>Y1</small><b>0</b></span><span><small>X2</small><b>0.63</b></span><span><small>Y2</small><b>1</b></span></div>
+        <div class="cv-track" aria-hidden="true"><u></u><i></i></div>
+        <p class="cv-p"><em>The pulse of a live dot.</em> It stands in for the prototype’s ½ + ½·cos 4t, so a ring breathes instead of blinking, 785 ms each way.</p>
+        <div class="cv-uses"><span>minute dot</span><span>facts dot</span><span>playing now</span></div>
+      </article>
+      <article class="cv extra rv" data-v="0,0,1,1" data-dur="1800">
+        <div class="cv-h"><span class="cv-name">Linear</span><span class="cv-tok">--ease-linear</span></div>
+        <div class="cv-plot"><canvas></canvas><span class="ghost-l"><i></i>ease</span></div>
+        <div class="four"><span><small>X1</small><b>0</b></span><span><small>Y1</small><b>0</b></span><span><small>X2</small><b>1</b></span><span><small>Y2</small><b>1</b></span></div>
+        <div class="cv-track" aria-hidden="true"><u></u><i></i></div>
+        <p class="cv-p"><em>Honest motion for things that aren’t easing:</em> the Live dot’s ring growing over 1.8 s, and keyframes already shaped frame by frame.</p>
+        <div class="cv-uses"><span>Live ring</span><span>baked keyframes</span></div>
+      </article>
+    </div>
+
+    <div class="subhead rv">
+      <h3>Fourteen sections, fourteen rhythms.</h3>
+      <p>Each part of the app has its own duration, delay and stagger. Pick one and it plays here with its exact numbers. Most share a curve; none share a rhythm.</p>
+    </div>
+    <div class="sheet">
+      <div class="tbl rv" role="listbox" aria-label="Section timings" id="tbl">
+        <div class="tr th" aria-hidden="true"><span>Section</span><span>Dur</span><span>Delay</span><span class="st">Stagger</span><span>Curve</span></div>
+        <button class="tr" type="button" role="option" data-k="cards" data-l="bars" data-n="5" data-dur="750" data-delay="100" data-stagger="60" data-v="0.16,1,0.3,1"><span class="nm">Cards<small>Live cards rising in</small></span><span>750</span><span>100</span><span class="st">60</span><span class="cvm"><canvas></canvas><span>0.16, 1, 0.3, 1</span></span></button>
+        <button class="tr" type="button" role="option" data-k="live" data-l="fade" data-n="5" data-dur="600" data-delay="0" data-stagger="40" data-v="0.16,1,0.3,1"><span class="nm">Live<small>The Live section closing</small></span><span>600</span><span>0</span><span class="st">40</span><span class="cvm"><canvas></canvas><span>0.16, 1, 0.3, 1</span></span></button>
+        <button class="tr" type="button" role="option" data-k="list" data-l="rows" data-n="8" data-dur="500" data-delay="50" data-stagger="30" data-v="0.2,0.8,0.2,1"><span class="nm">List<small>Rows after a day change</small></span><span>500</span><span>50</span><span class="st">30</span><span class="cvm"><canvas></canvas><span>0.2, 0.8, 0.2, 1</span></span></button>
+        <button class="tr" type="button" role="option" data-k="screen" data-l="blocks" data-n="5" data-dur="550" data-delay="0" data-stagger="50" data-v="0.16,1,0.3,1"><span class="nm">Screen<small>Opening a match</small></span><span>550</span><span>0</span><span class="st">50</span><span class="cvm"><canvas></canvas><span>0.16, 1, 0.3, 1</span></span></button>
+        <button class="tr" type="button" role="option" data-k="tabs" data-l="tabs" data-n="2" data-dur="450" data-delay="0" data-stagger="60" data-v="0.2,0.8,0.2,1"><span class="nm">Tabs<small>Indicator, then content</small></span><span>450</span><span>0</span><span class="st">60</span><span class="cvm"><canvas></canvas><span>0.2, 0.8, 0.2, 1</span></span></button>
+        <button class="tr" type="button" role="option" data-k="momentum" data-l="wave" data-n="3" data-dur="900" data-delay="100" data-stagger="60" data-v="0.16,1,0.3,1"><span class="nm">Momentum<small>The wave draws on</small></span><span>900</span><span>100</span><span class="st">60</span><span class="cvm"><canvas></canvas><span>0.16, 1, 0.3, 1</span></span></button>
+        <button class="tr" type="button" role="option" data-k="events" data-l="drop" data-n="7" data-dur="500" data-delay="150" data-stagger="40" data-v="0.16,1,0.3,1"><span class="nm">Events<small>Rows from 12 px above</small></span><span>500</span><span>150</span><span class="st">40</span><span class="cvm"><canvas></canvas><span>0.16, 1, 0.3, 1</span></span></button>
+        <button class="tr" type="button" role="option" data-k="stats" data-l="split" data-n="6" data-dur="900" data-delay="150" data-stagger="60" data-v="0.16,1,0.3,1"><span class="nm">Stats<small>Bars open from the middle</small></span><span>900</span><span>150</span><span class="st">60</span><span class="cvm"><canvas></canvas><span>0.16, 1, 0.3, 1</span></span></button>
+        <button class="tr" type="button" role="option" data-k="lineup" data-l="lines" data-n="11" data-dur="600" data-delay="100" data-stagger="140" data-v="0.16,1,0.3,1"><span class="nm">Lineup<small>Line by line, forwards first</small></span><span>600</span><span>100</span><span class="st">140</span><span class="cvm"><canvas></canvas><span>0.16, 1, 0.3, 1</span></span></button>
+        <button class="tr" type="button" role="option" data-k="squad" data-l="rows" data-n="8" data-dur="500" data-delay="300" data-stagger="30" data-v="0.16,1,0.3,1"><span class="nm">Squad<small>Substitutes, after the pitch</small></span><span>500</span><span>300</span><span class="st">30</span><span class="cvm"><canvas></canvas><span>0.16, 1, 0.3, 1</span></span></button>
+        <button class="tr" type="button" role="option" data-k="player" data-l="zoom" data-n="4" data-dur="720" data-delay="120" data-stagger="50" data-v="0.32,0,0.1,1"><span class="nm">Player<small>Face to bust, then the sheet</small></span><span>720</span><span>120</span><span class="st">50</span><span class="cvm"><canvas></canvas><span>0.32, 0, 0.1, 1</span></span></button>
+        <button class="tr" type="button" role="option" data-k="toast" data-l="toast" data-n="3" data-dur="600" data-delay="450" data-stagger="200" data-v="0.16,1,0.3,1"><span class="nm">Toast<small>Flag, then photo, then name</small></span><span>600</span><span>450</span><span class="st">200</span><span class="cvm"><canvas></canvas><span>0.16, 1, 0.3, 1</span></span></button>
+        <button class="tr" type="button" role="option" data-k="goal" data-l="word" data-n="6" data-dur="700" data-delay="100" data-stagger="550" data-v="0.16,1,0.3,1"><span class="nm">Goal<small>Headline, player, commentary</small></span><span>700</span><span>100</span><span class="st">550</span><span class="cvm"><canvas></canvas><span>0.16, 1, 0.3, 1</span></span></button>
+        <button class="tr" type="button" role="option" data-k="follow" data-l="tiles" data-n="4" data-dur="500" data-delay="0" data-stagger="60" data-v="0.16,1,0.3,1"><span class="nm">Follow<small>Your player’s stat tiles</small></span><span>500</span><span>0</span><span class="st">60</span><span class="cvm"><canvas></canvas><span>0.16, 1, 0.3, 1</span></span></button>
+      </div>
+      <div class="stage rv" style="--rd:.08s" id="stage">
+        <div class="stage-h"><b id="stageName">Cards</b><div class="stage-ctl"><button class="chipbtn" type="button" id="stageSlow" aria-pressed="false">Slow ×4</button><button class="chipbtn" type="button" id="stagePlay"><svg aria-hidden="true"><use href="#icRestart"/></svg>Replay</button></div></div>
+        <div class="stage-box" id="stageBox" aria-hidden="true"></div>
+        <div class="stage-tl" id="stageTl" aria-hidden="true"></div>
+        <div class="stage-read" id="stageRead"></div>
+      </div>
+    </div>
+
+    <div class="subhead rv">
+      <h3>Touch, at the scale of a finger.</h3>
+      <p>The smallest tier of motion is the one you feel most. These three run on the app’s exact values. Try them.</p>
+    </div>
+    <div class="micro">
+      <div class="mc rv">
+        <span class="tag tag--me">Hover light</span>
+        <h4>A spot, not a glow.</h4>
+        <p>The light rises under the cursor and stays where you left it as it fades. Never the whole button.</p>
+        <div class="demo"><span class="gbtn" data-glass style="height:48px;padding:0 22px;font-size:15px">Point here</span></div>
+        <div class="vals"><div><span>rise</span><b>280 ms · Glide</b></div><div><span>fade</span><b>550 ms · Glide</b></div><div><span>spot radius</span><b>26 px</b></div></div>
+      </div>
+      <div class="mc rv" style="--rd:.05s">
+        <span class="tag tag--me">Press</span>
+        <h4>A dip you can see, even on a quick tap.</h4>
+        <p>Down in 120 ms, back in 500. The release waits for the dip to reach the bottom, so even a flick shows the whole press.</p>
+        <div class="demo"><span class="gbtn round" data-glass data-dip style="width:56px;height:56px;border-radius:28px"><span class="bars" style="width:20px;gap:8px"><i></i><i></i></span></span><span class="gbtn" data-glass data-dip style="height:48px;padding:0 20px">Press me</span></div>
+        <div class="vals"><div><span>down</span><b>120 ms · Ease</b></div><div><span>back</span><b>500 ms · Glide</b></div><div><span>depth</span><b>5% · labels 4%</b></div></div>
+      </div>
+      <div class="mc rv" style="--rd:.1s">
+        <span class="tag tag--me">Letter roll</span>
+        <h4>Labels roll, one letter after another.</h4>
+        <p>On a press, never on hover. And a tab you’re already on doesn’t roll again (review note SL-11).</p>
+        <div class="demo" style="padding:0 14px"><div class="daytabs" id="daytabs" role="tablist" aria-label="Day tabs, as in the app"><button type="button" role="tab" aria-selected="false">Yesterday</button><button type="button" role="tab" class="on" aria-selected="true">Ongoing</button><button type="button" role="tab" aria-selected="false">Tomorrow</button><span class="ul" aria-hidden="true"></span></div></div>
+        <div class="vals"><div><span>each letter</span><b>420 ms · Roll</b></div><div><span>between letters</span><b>11 ms</b></div><div><span>indicator</span><b>500 ms · Ease</b></div></div>
+      </div>
+    </div>
+
+    <div class="subhead rv">
+      <h3>Mine against the default.</h3>
+      <p>The browser’s <code>ease</code> is a fine curve, and it’s nobody’s decision. Race any of mine against it at the same duration.</p>
+    </div>
+    <div class="race rv" id="race">
+      <div class="race-lanes">
+        <div class="lane def"><span class="ln-n">Default<small>CSS ease</small></span><span class="ln-t"><i></i></span><span class="ln-c">0.25, 0.1, 0.25, 1</span></div>
+        <div class="lane" id="raceMine"><span class="ln-n" id="raceName">Glide<small>mine</small></span><span class="ln-t"><i></i></span><span class="ln-c" id="raceVal">0.16, 1, 0.3, 1</span></div>
+      </div>
+      <div class="race-ctl">
+        <div class="chipset" id="raceSet" role="group" aria-label="Choose a curve">
+          <button class="chipbtn" type="button" data-v="0.16,1,0.3,1" aria-pressed="true">Glide</button>
+          <button class="chipbtn" type="button" data-v="0.2,0.8,0.2,1" aria-pressed="false">Ease</button>
+          <button class="chipbtn" type="button" data-v="0.32,0,0.1,1" aria-pressed="false">Player</button>
+          <button class="chipbtn" type="button" data-v="0.12,1,0.3,1" aria-pressed="false">Land</button>
+          <button class="chipbtn" type="button" data-v="0.7,0,0.2,1" aria-pressed="false">Roll</button>
+          <button class="chipbtn" type="button" data-v="0.5,0,0.9,0.6" aria-pressed="false">Slam</button>
+        </div>
+        <div class="chipset"><button class="chipbtn" type="button" id="raceSlow" aria-pressed="false">Slow ×4</button><button class="btn" type="button" id="raceGo" style="height:34px;font-size:13px"><svg aria-hidden="true" style="width:11px;height:11px"><use href="#icPlay"/></svg>Race</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 06 RIVE ================= -->
+<section class="sec" id="rive">
+  <div class="wrap">
+    <div class="shead rv">
+      <div><div class="kicker"><i></i>06 — Rive</div><h2>Two Rive files, built by me in the editor.</h2>
+        <p class="sub">Rive draws only what it’s best at. Both files are mine, from the editor, and the app talks to them through view-model properties and nothing else. Here they are running live, outside the app. Play with them.</p></div>
+      <p class="aside">Same runtime as the rest of this portfolio. The canvases sleep when they’re off screen.</p>
+    </div>
+    <div class="rv-grid">
+      <article class="rcard rv" id="rLive">
+        <div class="rstage" id="rLiveStage">
+          <span class="tag tag--live rchip">Rive · live-icon.riv</span><span class="rnum" id="rLiveState">islive = true · count = "5"</span>
+          <canvas id="rLiveCanvas" width="1120" height="384" aria-label="The Live switch, drawn by Rive"></canvas>
+          <div class="fallback">The Live switch needs WebGL 2 to draw here. It runs inside the demo phone either way.</div>
+          <div class="rhint">
+            <button class="chipbtn" type="button" id="rLiveToggle" aria-pressed="true"><span class="dot" aria-hidden="true"></span>Live on</button>
+            <span class="stepper"><button type="button" id="rCountDown" aria-label="One match fewer">−</button><output id="rCount" class="mono">5 live</output><button type="button" id="rCountUp" aria-label="One match more">+</button></span>
+          </div>
+        </div>
+        <div class="rtext">
+          <div class="kicker"><i></i>Rive 01 · The Live switch</div>
+          <h3>A switch that gathers itself.</h3>
+          <p>Turning Live on, the capsule first draws in a little, opens past its mark and settles back. Turning it off, it swells first, then closes. It’s the only thing in the app allowed to overshoot: I animated it by hand in the editor, and wanted it to breathe rather than snap.</p>
+          <dl class="rfacts">
+            <div><dt>State machine</dt><dd>idle → live 633 ms · live → idle 783 ms</dd></div>
+            <div><dt>View model</dt><dd>islive · count</dd></div>
+            <div><dt>Size</dt><dd>capsule 40 px, the menu button’s height</dd></div>
+            <div><dt>Off, at rest</dt><dd>my OFF artwork</dd></div>
+          </dl>
+          <div class="track">
+            <div class="track-h"><span>The capsule, measured from my timeline</span><span id="rTrackLbl">opening · 633 ms</span></div>
+            <canvas id="rTrack" aria-label="The capsule's opening amount over time: it dips to −6%, peaks at 108% at 433 ms and settles at 100%."></canvas>
+          </div>
+          <p style="font-size:13.5px;color:var(--muted);margin-top:12px">Read from the export frame by frame. The hover light in the app replays this exact track, so its rim never runs ahead of the capsule.</p>
+          <div class="exports" aria-label="Four exports of the Live file">
+            <div class="no" style="--h:76px"><i style="--h:76px"></i><span><b>243.7 KB</b><br>whole font inside</span></div>
+            <div class="no"><i style="--h:8px"></i><span><b>23.6 KB</b><br>helper artboard only</span></div>
+            <div class="ok" style="opacity:.55"><i style="--h:9px"></i><span><b>26.8 KB</b><br>accepted, then replaced</span></div>
+            <div class="ok"><i style="--h:8px"></i><span><b>24.9 KB</b><br>shipped</span></div>
+          </div>
+        </div>
+      </article>
+      <article class="rcard rv" id="rWord">
+        <div class="rstage rstage--goal" id="rWordStage">
+          <span class="tag tag--me rchip">Rive · moments.riv</span><span class="rnum" id="rWordState">phase 0</span>
+          <canvas id="rWordCanvas" width="1040" height="906" aria-label="The goal word, drawn by Rive"></canvas>
+          <div class="fallback">The goal word needs WebGL 2 to draw here. Score a goal in the demo phone to see it in the app.</div>
+          <div class="rhint">
+            <div class="teams" id="rTeams" role="group" aria-label="Scoring team">
+              <button type="button" style="--a:#0055a4;--b:#ef4135" data-c="#0055a4,#ef4135" aria-pressed="true"><i></i>France</button>
+              <button type="button" style="--a:#74acdf;--b:#f6b40e" data-c="#74acdf,#f6b40e" aria-pressed="false"><i></i>Argentina</button>
+              <button type="button" style="--a:#ffdf00;--b:#009c3b" data-c="#ffdf00,#009c3b" aria-pressed="false"><i></i>Brazil</button>
+              <button type="button" style="--a:#f36c21;--b:#21468b" data-c="#f36c21,#21468b" aria-pressed="false"><i></i>Netherlands</button>
+              <button type="button" style="--a:#1c3f94;--b:#bc002d" data-c="#1c3f94,#bc002d" aria-pressed="false"><i></i>Japan</button>
+            </div>
+          </div>
+        </div>
+        <div class="rtext">
+          <div class="kicker"><i></i>Rive 02 · Moments</div>
+          <h3>GOAAAL, letter by letter.</h3>
+          <p>Each letter comes in big and out of focus and lands sharp, one after another, while the word settles from a touch larger. When the last one lands, a soft flare blooms and a glint crosses it. The colours are the scoring team’s, made pastel. A red card slams in instead, in fixed reds.</p>
+          <div class="drow" style="margin-top:18px"><button class="chipbtn" type="button" id="rGoal"><span aria-hidden="true">⚽</span>GOAAAL</button><button class="chipbtn" type="button" id="rRed"><span style="width:8px;height:11px;border-radius:2px;background:var(--red);transform:rotate(8deg)" aria-hidden="true"></span>Red card</button><button class="chipbtn" type="button" data-scene="goal" data-open-demo><svg aria-hidden="true"><use href="#icArrowRight"/></svg>See it in the app</button></div>
+          <div class="phase" id="rPhase" aria-hidden="true">
+            <span class="rail"></span><span class="fill"></span>
+            <span class="mk" data-at="0" style="left:0%"><i></i><span>play<br>0 s</span></span>
+            <span class="mk" data-at="0.854" style="left:50.9%"><i></i><span>last letter lands<br>0.854 s · phase 1</span></span>
+            <span class="mk" data-at="1.6772" style="left:100%"><i></i><span>flare and glint done<br>1.677 s · phase 2</span></span>
+          </div>
+          <p class="phase-note" id="rPhaseNote">Six letters, 70 ms apart, each landing in 504 ms on Land.</p>
+          <dl class="rfacts" style="margin-top:26px">
+            <div><dt>Artboard</dt><dd>390 × 340, one Node Script</dd></div>
+            <div><dt>View model</dt><dd>kind · color1 · color2 · play · phase</dd></div>
+            <div><dt>Letters</dt><dd>1.85× → 1 on Land, 70 ms apart</dd></div>
+            <div><dt>Red card</dt><dd>1.4× → 1, 60 ms apart · phase 1 at 1.12 s</dd></div>
+            <div><dt>In the app</dt><dd>one warm copy, lent to every scene</dd></div>
+          </dl>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 07 PROCESS ================= -->
+<section class="sec" id="process">
+  <div class="hz" id="hz">
+    <div class="hz-pin">
+      <div class="wrap" style="width:100%">
+        <div class="hz-head">
+          <div><div class="kicker"><i></i>07 — Process</div><h2>Seven days, four review sessions, one decider.</h2></div>
+          <span class="hz-count mono"><b id="hzN">01</b> / 08</span>
+        </div>
+      </div>
+      <div class="hz-track" id="hzTrack">
+        <article class="hz-card me">
+          <span class="when">2 Oct · Me</span>
+          <h3>The prototype goes in.</h3>
+          <p>I hand over the Rive app: the script, the file, the data binding notes. The look is approved. The platform isn’t.</p>
+          <div class="big">8,925<small>lines of Luau, one canvas, all of it mine to tune</small></div>
+        </article>
+        <article class="hz-card">
+          <span class="when">2 Oct · AI</span>
+          <h3>A plan in twenty-two parts.</h3>
+          <p>The architecture and a build plan, ten minutes after the upload. My rule sits at the top of it: port, don’t redesign.</p>
+          <div class="notes"><span><b>Rule 2</b> · Copy the numbers: sizes, radii, colours, timings.</span><span><b>Rule</b> · Don’t reopen its decisions.</span></div>
+        </article>
+        <article class="hz-card">
+          <span class="when">2–5 Oct · AI, in parallel</span>
+          <h3>Parts 1 to 21.</h3>
+          <p>One AI session per part, often several at once: the larger model where a wrong call is expensive, faster ones for porting with a clear spec. Each part ends with a report and waits for my review.</p>
+          <div class="big">21<small>parts built, each one checked before it merged</small></div>
+        </article>
+        <article class="hz-card me">
+          <span class="when">4 Oct · Me</span>
+          <h3>My review.</h3>
+          <p>Fifteen annotated screenshots and three videos. The flights between screens go. The goal word stops shaking. The Live capsule matches the menu button.</p>
+          <div class="notes"><span>“the logos come from the middle of the page”</span><span>“GOAAAL shook”</span><span>“the capsule, not the artboard, is 40 px”</span></div>
+        </article>
+        <article class="hz-card me">
+          <span class="when">3–6 Oct · Me, in the editor</span>
+          <h3>Back in Rive.</h3>
+          <p>I rebuild the moments file and re-export the Live switch until it fits the budget and the app: four exports, two of them rejected.</p>
+          <div class="big">243 → 25<small>KB for the Live switch, the font cut to the glyphs it uses</small></div>
+        </article>
+        <article class="hz-card">
+          <span class="when">5–6 Oct · AI</span>
+          <h3>The audit.</h3>
+          <p>Every budget I set, measured. Eleven issues filed against its own work. The first frame now paints before any script runs.</p>
+          <div class="big">0.76 s<small>first paint, simulated mobile (was 2.26 s)</small></div>
+        </article>
+        <article class="hz-card me">
+          <span class="when">8–9 Oct · Me → AI</span>
+          <h3>Sessions 1 to 4.</h3>
+          <p>Four polish rounds against my review notes, each one a ticket with a number.</p>
+          <div class="notes"><span><b>SL-15</b> · the scorer’s photo, no chevron</span><span><b>SL-16</b> · centre the folded copy</span><span><b>SL-11</b> · a chosen tab doesn’t roll again</span><span><b>SL-10</b> · swipe back, and between days</span><span><b>SL-18</b> · a review page for clients</span></div>
+        </article>
+        <article class="hz-card now">
+          <span class="when">9 Oct · Today</span>
+          <h3>A demo you can open anywhere.</h3>
+          <p>Ready for a real data feed, honest about what isn’t done. It’s running on this page.</p>
+          <div class="big">815<small>unit tests holding it in place</small></div>
+        </article>
+      </div>
+      <div class="hz-bar" aria-hidden="true"><u></u></div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="notesbelt" aria-label="Commit titles from the project">
+      <div class="belt" style="--bd:110s">
+        <span><i class="f"></i>fix(motion): no more one-pixel jumps when cards grow and blocks land</span>
+        <span><i class="f"></i>fix(moments): the goal word never swaps mid-flight</span>
+        <span><i class="f"></i>fix(rive): hover light rides the capsule</span>
+        <span><i class="f"></i>fix(motion): slides drawn between pixels, no hold and no jump when they land</span>
+        <span><i class="f"></i>fix(scroll): hold the hover while the wheel moves a page</span>
+        <span><i class="f"></i>fix(moments): Rive word draws its own rise, no jitter at the top</span>
+        <span><i class="f"></i>fix(match): goal row shows the scorer’s photo and no chevron <code>SL-15</code></span>
+        <span><i class="f"></i>fix(ui): collapsed Your player copy centred <code>SL-16</code></span>
+        <span><i class="f"></i>fix(moments): the goal flag keeps its distance from the word on shorter phones <code>SL-09</code></span>
+        <span><i class="f"></i>fix(motion): no more one-pixel jumps when cards grow and blocks land</span>
+        <span><i class="f"></i>fix(moments): the goal word never swaps mid-flight</span>
+        <span><i class="f"></i>fix(rive): hover light rides the capsule</span>
+        <span><i class="f"></i>fix(motion): slides drawn between pixels, no hold and no jump when they land</span>
+        <span><i class="f"></i>fix(scroll): hold the hover while the wheel moves a page</span>
+        <span><i class="f"></i>fix(moments): Rive word draws its own rise, no jitter at the top</span>
+        <span><i class="f"></i>fix(match): goal row shows the scorer’s photo and no chevron <code>SL-15</code></span>
+        <span><i class="f"></i>fix(ui): collapsed Your player copy centred <code>SL-16</code></span>
+        <span><i class="f"></i>fix(moments): the goal flag keeps its distance from the word on shorter phones <code>SL-09</code></span>
+      </div>
+      <div class="belt rev" style="--bd:130s">
+        <span><i></i>feat(live): the supplied OFF artwork is the Live button with Live off <code>SL-19</code></span>
+        <span><i class="m"></i>feat(motion): no shared-element flights; the player grows in at the centre</span>
+        <span><i class="m"></i>feat(layout): pages pull past their edges under a finger, as in the Lua</span>
+        <span><i></i>perf(feel): a tap paints the screen’s shell first</span>
+        <span><i></i>fix(demo): player and team statistics agree <code>SL-20</code></span>
+        <span><i class="m"></i>SL-10: swipe back from the match screen and between adjacent days</span>
+        <span><i></i>SL-18: client review page with a phone preview of the running demo</span>
+        <span><i></i>fix(live): open on Live, no second Live design before the art</span>
+        <span><i></i>perf(moments): one warm Rive goal word, borrowed by every scene</span>
+        <span><i></i>feat(live): the supplied OFF artwork is the Live button with Live off <code>SL-19</code></span>
+        <span><i class="m"></i>feat(motion): no shared-element flights; the player grows in at the centre</span>
+        <span><i class="m"></i>feat(layout): pages pull past their edges under a finger, as in the Lua</span>
+        <span><i></i>perf(feel): a tap paints the screen’s shell first</span>
+        <span><i></i>fix(demo): player and team statistics agree <code>SL-20</code></span>
+        <span><i class="m"></i>SL-10: swipe back from the match screen and between adjacent days</span>
+        <span><i></i>SL-18: client review page with a phone preview of the running demo</span>
+        <span><i></i>fix(live): open on Live, no second Live design before the art</span>
+        <span><i></i>perf(moments): one warm Rive goal word, borrowed by every scene</span>
+      </div>
+    </div>
+    <p class="beltnote rv">Real commit titles from the project. Each one is a round trip: a note from me, a change from the AI, a check from me.</p>
+  </div>
+</section>
+
+<!-- ================= 08 BUILD ================= -->
+<section class="sec" id="build">
+  <div class="wrap">
+    <div class="shead rv">
+      <div><div class="kicker"><i></i>08 — Build</div><h2>A working demo. Not finished, and honest about it.</h2>
+        <p class="sub">The technical version: the demo runs a whole simulated evening, and the app is built to plug into a real data API. It isn’t a finished product yet. Here is exactly where it stands.</p></div>
+    </div>
+    <div class="build">
+      <div class="term rv" id="term">
+        <div class="term-top"><i></i><i></i><i></i><span class="mono">scoreline / status</span></div>
+<pre class="term-body mono" aria-label="Project status"><span class="ln"><span class="pr">&gt;&gt;</span> scoreline status</span>
+<span class="ln"><span class="tr2">├─</span> <b>demo</b>          <span class="dim">a whole matchday, simulated</span>     <span class="ok">✓ runs anywhere</span></span>
+<span class="ln"><span class="tr2">├─</span> <b>?api</b>          <span class="dim">real feed + live events (SSE)</span>   <span class="ok">✓ wired, tested</span></span>
+<span class="ln"><span class="tr2">├─</span> <b>stand-in api</b>  <span class="dim">the same evening, as an API</span>     <span class="ok">✓ local</span></span>
+<span class="ln"><span class="tr2">├─</span> <b>contract</b>      <span class="dim">v2, validated on arrival</span>        <span class="ok">✓</span></span>
+<span class="ln"><span class="tr2">├─</span> <b>tests</b>         <span class="dim">815 unit · 39 browser cases</span>     <span class="ok">✓ passing</span></span>
+<span class="ln"><span class="tr2">├─</span> <b>first script</b>  <span class="dim">179.9 of 180 KB</span>                 <span class="ok">✓ in budget</span></span>
+<span class="ln"><span class="tr2">├─</span> <b>load (LCP)</b>    <span class="dim">2.2 s, target 2.0 s</span>             <span class="wip">~ close</span></span>
+<span class="ln"><span class="tr2">├─</span> <b>provider</b>      <span class="dim">not chosen yet</span>                  <span class="wip">○ next</span></span>
+<span class="ln"><span class="tr2">└─</span> <b>devices</b>       <span class="dim">no physical-phone pass yet</span>      <span class="wip">○ next</span></span>
+<span class="ln"><span class="ok">// demo: ready. product: not yet.</span><i class="caret"></i></span></pre>
+      </div>
+      <div class="status">
+        <div class="stbox rv">
+          <h3>Works today</h3>
+          <ul>
+            <li><span><b>The whole demo evening:</b> live clocks, goals, cards, subs, goal scenes and toasts.</span></li>
+            <li><span><b>Real-API mode:</b> polls the feed, follows live events over SSE, backs off and catches up after a gap.</span></li>
+            <li><span><b>A stand-in backend</b> that serves the demo as an API, to prove the wiring end to end.</span></li>
+            <li><span><b>Phone, tablet and desktop</b> layouts, a keyboard path, reduced motion.</span></li>
+          </ul>
+        </div>
+        <div class="stbox wip rv" style="--rd:.06s">
+          <h3>Not yet</h3>
+          <ul>
+            <li><span><b>A real data provider</b>, and the small server that keeps its keys.</span></li>
+            <li><span><b>Accounts.</b> The sign-in sheet is a mock-up; nothing is sent.</span></li>
+            <li><span><b>Speed on a mid-range phone:</b> load is 2.2 s against 2.0, and not every tap is under 200 ms.</span></li>
+            <li><span><b>Physical phones and screen readers.</b> Everything so far ran in browsers.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="nums">
+      <div class="num rv"><b><span class="count" data-to="39545">39,545</span></b><span>lines of source, all written by AI</span></div>
+      <div class="num rv" style="--rd:.05s"><b><span class="count" data-to="815">815</span></b><span>unit tests, passing</span></div>
+      <div class="num rv" style="--rd:.1s"><b><span class="count" data-to="125">125</span></b><span>commits across 32 branches</span></div>
+      <div class="num rv" style="--rd:.15s"><b><span class="count" data-to="7">7</span></b><span>days from the prototype to this demo</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 09 TRY IT ================= -->
+<section class="sec" id="try" data-dock="phone">
+  <div class="wrap">
+    <div class="col">
+      <div class="kicker rv"><i class="live"></i>09 — Try it</div>
+      <h2 class="rv">It’s all live. Try it.</h2>
+      <p class="sub rv">The phone on this page is the real app, running its demo evening. Score a goal, show a red card, open a match, follow someone else.</p>
+      <div class="try" style="margin-top:34px">
+        <button class="try-row rv" type="button" data-take><span class="ic"><svg aria-hidden="true"><use href="#icHand"/></svg></span><span><b>Take control of the phone</b><span>Scroll it, tap it, swipe back. It’s yours until you give it back.</span></span><svg class="go" aria-hidden="true"><use href="#icArrowRight"/></svg></button>
+        <button class="try-row rv" type="button" data-scene="goal"><span class="ic">⚽</span><span><b>Score a goal</b><span>France scores in the featured match, and the scene plays.</span></span><svg class="go" aria-hidden="true"><use href="#icArrowRight"/></svg></button>
+        <button class="try-row rv" type="button" data-scene="red"><span class="ic"><span style="width:12px;height:16px;border-radius:3px;background:var(--red);transform:rotate(8deg)"></span></span><span><b>Show a red card</b><span>RED CARD slams in; France are down to ten.</span></span><svg class="go" aria-hidden="true"><use href="#icArrowRight"/></svg></button>
+        <a class="try-row rv" href="app/" target="_blank" rel="noopener"><span class="ic"><svg aria-hidden="true"><use href="#icArrowOut"/></svg></span><span><b>Open the app full screen</b><span>The same demo in its own tab. Make the window wide for two or three panes.</span></span><svg class="go" aria-hidden="true"><use href="#icArrowOut"/></svg></a>
+        <a class="try-row rv" href="app/review.html" target="_blank" rel="noopener"><span class="ic"><span class="slmark" style="transform:scale(.7)"><i></i><i></i><i></i></span></span><span><b>Open the client review page</b><span>A phone preview with the same triggers, made for reviews.</span></span><svg class="go" aria-hidden="true"><use href="#icArrowOut"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CREDITS ================= -->
+<section class="sec" id="credits">
+  <div class="wrap">
+    <div class="shead rv">
+      <div><div class="kicker"><i></i>10 — Credits</div><h2>Design by a person. Code by AI.</h2></div>
+    </div>
+    <div class="creds">
+      <div>
+        <div class="cr-split rv">
+          <div><span class="who">Human · Design &amp; decisions</span><span class="big">Turinoz</span><p>Product, design, motion, Rive, every review and every yes.</p></div>
+          <div><span class="who">AI · Code &amp; execution</span><span class="big">Claude &amp; Codex</span><p>The app, the tests and the performance work, written to my brief and changed until approved.</p></div>
+        </div>
+        <blockquote class="sign rv">
+          <p>What I’d keep from this one: AI can write the code, fast and well. Deciding what it should feel like, and saying no until it does, is still the job. On Scoreline it was mine.</p>
+          <footer><span class="ava"><svg viewBox="0 0 1080 1080" aria-hidden="true"><use href="#tzLogo"/></svg></span><b>Turinoz</b><span>Motion designer</span></footer>
+        </blockquote>
+      </div>
+      <dl class="cr-list rv" style="--rd:.06s">
+        <div><dt>Product &amp; UX</dt><dd>Turinoz</dd></div>
+        <div><dt>Visual design</dt><dd>Turinoz</dd></div>
+        <div><dt>Motion design</dt><dd>Turinoz<small>10 curves, 14 section timings</small></dd></div>
+        <div><dt>Rive</dt><dd>Turinoz<small>the Live switch and Moments, in the editor</small></dd></div>
+        <div><dt>Direction &amp; review</dt><dd>Turinoz<small>one full review, four polish sessions</small></dd></div>
+        <div><dt>Code &amp; tests</dt><dd>AI<small>Claude (Opus, Sonnet) and Codex</small></dd></div>
+        <div><dt>Stack</dt><dd>React 19, TypeScript, Vite<small>Motion, Zustand, Zod, Rive</small></dd></div>
+        <div><dt>Typeface</dt><dd>Hanken Grotesk<small>SIL Open Font License</small></dd></div>
+        <div><dt>Demo data</dt><dd>Simulated<small>an invented evening; no real results</small></dd></div>
+      </dl>
+    </div>
+    <a class="next rv" href="../sitemate/" data-cursor="Next project">
+      <span class="next-k mono">Next project</span>
+      <span class="next-t">Storm motion system<svg aria-hidden="true"><use href="#icArrowRight"/></svg></span>
+      <span class="next-d">Sitemate’s AI agent icon: six states, live in their iOS, Android and web apps.</span>
+    </a>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span>Scoreline · <b>Design, motion and decisions by Turinoz</b> · code by AI · this page moves on Scoreline’s own curves</span>
+    <a class="tz" href="../"><svg viewBox="0 0 1080 1080" aria-hidden="true"><use href="#tzLogo"/></svg>Turinoz</a>
+    <a class="totop" href="#top">Back to top <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 10V2M2.5 5.5 6 2l3.5 3.5"/></svg></a>
+  </div>
+</footer>
+
+<div class="lcur" aria-hidden="true"><span></span></div>
+<p class="sr-only" aria-live="polite" id="status"></p>
+<noscript><style>.rv{opacity:1!important;transform:none!important}.h1 .ln>span{transform:none!important}.dock,.demo-pill{display:none}.dshot{display:block!important}</style></noscript>
+</body>
+</html>
