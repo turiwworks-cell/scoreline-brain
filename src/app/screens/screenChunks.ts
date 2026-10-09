@@ -36,7 +36,12 @@ export const loadPlayerScreen = player.load;
 /** Background fetches swallow network failures; a later render retries and owns the error. */
 export function preloadMatchScreen(): void { void match.preload().catch(() => {}); }
 export function preloadPlayerScreen(): void { void player.preload().catch(() => {}); }
-export function preloadScreens(): void { preloadMatchScreen(); preloadPlayerScreen(); }
+/** What the first paint can wait for: the two screens, and where there is a touchscreen the gestures (nav/swipe.ts). */
+export function preloadScreens(): void {
+  preloadMatchScreen();
+  preloadPlayerScreen();
+  if (navigator.maxTouchPoints > 0) void import('../nav/swipe').then((m) => m.attachSwipes(), () => {});
+}
 
 /** Pointer/focus preparation belongs in the app layer, keeping features independent of routing. */
 export function prepareScreen(target: EventTarget | null): void {
