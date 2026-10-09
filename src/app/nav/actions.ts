@@ -1,4 +1,5 @@
 import type { DataRouter } from 'react-router';
+import { appPathname } from './base';
 import { rememberTrigger } from './focusMemory';
 import { scrollMemory, type ScrollPane } from './scrollMemory';
 import { revealCurrentPlayer } from './playerReveal';
@@ -38,13 +39,15 @@ export interface NavActions {
 export function createNavActions(router: DataRouter): NavActions {
   const here = () => {
     const loc = router.state.location;
-    return { loc, href: loc.pathname + loc.search, nav: parseNav(loc.pathname, loc.search, loc.state) };
+    // the router's own location keeps the folder the app is served from; the routes don't
+    const path = appPathname(loc.pathname);
+    return { loc, path, href: path + loc.search, nav: parseNav(path, loc.search, loc.state) };
   };
   // a push still on its way (route loaders make navigations async) counts too: a second tap on
   // the same card before the first lands doesn't cancel and restart it
   const pending = () => {
     const n = router.state.navigation.location;
-    return n ? n.pathname + n.search : null;
+    return n ? appPathname(n.pathname) + n.search : null;
   };
   const pressed = (from: Element | null | undefined) => {
     if (from !== undefined) return from;
@@ -69,7 +72,7 @@ export function createNavActions(router: DataRouter): NavActions {
       void router.navigate(to, NOW);
     },
     setTab(id, tab) {
-      const { loc, href, nav } = here();
+      const { path, href, nav } = here();
       if (nav.player) {
         // the match pane beside a player: its tab is part of the player's history state
         if (nav.under?.id === id && nav.under.tab === tab) return;
@@ -77,7 +80,7 @@ export function createNavActions(router: DataRouter): NavActions {
         void router.navigate(href, { ...NOW, replace: true, state });
         return;
       }
-      const to = matchPath({ id, tab }) + href.slice(loc.pathname.length);
+      const to = matchPath({ id, tab }) + href.slice(path.length);
       if (to !== href) void router.navigate(to, { ...NOW, replace: true });
     },
     openPlayer(player, opts = {}) {

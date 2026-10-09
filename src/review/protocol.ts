@@ -1,3 +1,5 @@
+import { appPathname, BASE_URL } from '../app/nav/base';
+
 /*
  * What the review page (review.html, Review.tsx) and the app it shows in its phone frame say to each
  * other (SL-18). Both sit on the same origin: the page keeps `scorelineReviewHost` on its window, and
@@ -37,12 +39,12 @@ export type ReviewWindow = Window & { scorelineReviewHost?: ReviewHost };
 
 /** The app's own route: a path from the root, never another site, never the review page itself. */
 export function appRoute(raw: string | null | undefined, origin: string): string {
-  if (!raw) return '/';
+  if (!raw) return BASE_URL;
   try {
     const url = new URL(raw, origin);
-    if (url.origin !== origin || /^\/review(\.html)?\/?$/.test(url.pathname)) return '/';
+    if (url.origin !== origin || /^\/review(\.html)?\/?$/.test(appPathname(url.pathname))) return BASE_URL;
     return url.pathname + url.search + url.hash;
   } catch {
-    return '/';
+    return BASE_URL;
   }
 }

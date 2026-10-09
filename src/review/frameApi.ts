@@ -2,6 +2,7 @@ import { activeDemoSource, subscribeActiveDemoSource } from '../data/demo';
 import { followPref } from '../features/matchList/follow/pref';
 import { demoFollowed } from '../app/followed';
 import { createNavActions } from '../app/nav/actions';
+import { appPathname } from '../app/nav/base';
 import { parseNav } from '../app/nav/url';
 import { appRouter } from '../app/router';
 import { liveMinute } from '../domain';
@@ -48,7 +49,7 @@ async function bring(): Promise<void> {
   const followed = followPref(demoFollowed()).get();
   if (followed && selectMatchIdOfTeam(followed.team)(state) === id) return;
   const router = appRouter();
-  const here = parseNav(router.state.location.pathname, router.state.location.search, router.state.location.state);
+  const here = parseNav(appPathname(router.state.location.pathname), router.state.location.search, router.state.location.state);
   if (here.match?.id === id && !here.player) return;
   createNavActions(router).openMatch(id);
   await nap(SETTLE_MS);

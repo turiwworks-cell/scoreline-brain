@@ -1,3 +1,4 @@
+import { BASE_URL } from '../app/nav/base';
 import { appRoute } from './protocol';
 
 /* How the review page lays out its phone, and where it starts: the parts that are plain calculation. */
@@ -12,7 +13,7 @@ export const FEATURED_HELP = 'Goal and red card happen in the featured match, Fr
 export function startRoute(search: string, referrer: string, origin: string): string {
   const to = new URLSearchParams(search).get('to');
   if (to) return appRoute(to, origin);
-  return referrer.startsWith(origin) ? appRoute(referrer, origin) : '/';
+  return referrer.startsWith(origin) ? appRoute(referrer, origin) : BASE_URL;
 }
 
 /** How far to shrink the phone so it fits the window whole (never beyond its true size). */
