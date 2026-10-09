@@ -1,0 +1,2 @@
+/img/players/*
+  Cache-Control: public, max-age=3600

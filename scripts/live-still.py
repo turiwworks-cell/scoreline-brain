@@ -77,7 +77,7 @@ html, n = re.subn(r'<svg id="live-sprite".*?</svg>', lambda _: sprite, html, fla
 assert n == 1, 'index.html needs one <svg id="live-sprite"> to replace'
 # the first frame's still shows the count before any data: 0
 zero = '<use href="#live-still"/><use href="#ld0" x="%.2f" y="%.2f"/>' % (centre - adv['0'] / 2, base)
-html, n = re.subn(r'(<svg class="sf-still"[^>]*>).*?(</svg>)', lambda g: g.group(1) + zero + g.group(2), html, flags=re.S)
+html, n = re.subn(r'(<svg class="sf-still sf-live-on"[^>]*>).*?(</svg>)', lambda g: g.group(1) + zero + g.group(2), html, flags=re.S)
 assert n == 1, 'index.html needs the first frame\'s <svg class="sf-still">'
 open(ROOT + '/index.html', 'w').write(html)
 
@@ -92,7 +92,7 @@ open(ROOT + '/src/rive/liveStill.ts', 'w').write(ts)
 f = m[0]
 viewbox = '%s 0 %s %s' % tuple(short('%.3f' % v) for v in (-5 * f, 443 * f, 152 * f))
 html = open(ROOT + '/index.html').read()
-html, n = re.subn(r'(<svg class="sf-still" viewBox=")[^"]*(")', lambda g: g.group(1) + viewbox + g.group(2), html)
+html, n = re.subn(r'(<svg class="sf-still sf-live-on" viewBox=")[^"]*(")', lambda g: g.group(1) + viewbox + g.group(2), html)
 assert n == 1
 open(ROOT + '/index.html', 'w').write(html)
 ts = open(ROOT + '/src/rive/liveStill.ts').read()
@@ -100,3 +100,8 @@ ts, n = re.subn(r"export const LIVE_STILL_VIEWBOX = '[^']*';", "export const LIV
 assert n == 1
 open(ROOT + '/src/rive/liveStill.ts', 'w').write(ts)
 print('sprite', len(sprite), 'bytes;', data, 'viewBox', viewbox)
+
+# Restore the second state after regenerating the shared sprite.
+import subprocess
+from pathlib import Path
+subprocess.run([sys.executable, str(Path(__file__).with_name('live-off-still.py'))], check=True)

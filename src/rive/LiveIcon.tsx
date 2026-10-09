@@ -7,7 +7,6 @@ import { LIVE_BUTTON_W, LIVE_CANVAS_STYLE, LIVE_CAPSULE_PX, LIVE_OFF_W, livePx a
 import { LIVE_DIGITS, LIVE_STILL_VIEWBOX, liveDigits } from './liveStill';
 
 const Graphic = lazy(() => import('./LiveGraphic'));
-const Off = lazy(() => import('./LiveOff'));
 // The capsule uses the same fixed hover-light dimensions on every render.
 const light = { '--cap-on': px(LIVE_BUTTON_W), '--cap-off': px(LIVE_OFF_W), '--spot-r': px(spotRadius(LIVE_CAPSULE_PX, LIVE_CAPSULE_PX)) } as CSSProperties;
 
@@ -22,22 +21,21 @@ export type LiveIconProps = {
   children?: ReactNode;
 };
 
-/** The art as it stands with Live on, `count` in the calendar: Rive's own drawing until Rive draws (liveStill.ts). */
-function LiveStill({ count }: { count: number }) {
+/** Both exported states are in the HTML sprite, available before any renderer download. */
+function LiveStill({ live, count }: { live: boolean; count: number }) {
   return (
-    <svg viewBox={LIVE_STILL_VIEWBOX} style={LIVE_CANVAS_STYLE} aria-hidden="true" data-live-still="">
-      <use href="#live-still" />
-      {liveDigits(count).map(({ digit, x }, i) => <use key={i} href={`#ld${digit}`} x={x} y={LIVE_DIGITS.baseline} />)}
+    <svg viewBox={LIVE_STILL_VIEWBOX} style={{ ...LIVE_CANVAS_STYLE, pointerEvents: 'none' }} aria-hidden="true" focusable="false" data-live-still="" data-live-off={!live ? '' : undefined}>
+      <use href={live ? '#live-still' : '#live-off-still'} />
+      {!live && count === 0 ? <use href="#live-off-zero" /> : liveDigits(count).map(({ digit, x }, i) => <use key={i} href={`#ld${digit}`} x={x} y={LIVE_DIGITS.baseline} />)}
     </svg>
   );
 }
 
 /**
  * DOM owns the hit target, URL, accessibility and hover light. Rive owns the artwork. The DOM
- * button (`fallback`, `children`) is drawn only without the artwork, when there is no asset or it
- * failed. While the artwork is on its way the button keeps the art's box and shows the art's still
- * with Live on, nothing with it off, so the page never shows another Live design before Rive's
- * (index.html's first frame shows the same still). Rive takes its place in the same frame.
+ * button (`fallback`, `children`) is drawn only when there is no artwork asset. Until Rive is
+ * ready, or if its renderer fails, the selected ON/OFF SVG stays in the same fixed box.
+ * index.html's first frame uses these same stills. Rive takes their place in the same frame.
  * Reduced motion uses the same ON/OFF stills and count without mounting Rive or its hover light.
  */
 export function LiveIcon({ live, count, onChange, className, lightClassName, fallback, children }: LiveIconProps) {
@@ -48,7 +46,7 @@ export function LiveIcon({ live, count, onChange, className, lightClassName, fal
   // the artwork is fetched and started only once the shell lets Rive start (startGate.ts)
   const start = useRiveStart();
   const ready = !reduce && art === 'shown';
-  const dom = !liveIconSource || art === 'failed';
+  const dom = !liveIconSource;
   const artworkReady = useCallback((value: boolean) => setArt((a) => (a === 'failed' ? a : value ? 'shown' : 'coming')), []);
   const artworkFailed = useCallback(() => setArt('failed'), []);
   const staticButton = <>{fallback}{children}</>;
@@ -61,12 +59,10 @@ export function LiveIcon({ live, count, onChange, className, lightClassName, fal
   return (
     <button type="button" className={`m-feel ${buttonClass ?? ''}`} data-rive-live={ready || undefined}
       style={style} aria-pressed={live} aria-label={`Live, ${count} in play`} onClick={() => onChange(!live)} {...feel}>
-      {!dom && !ready && live && <LiveStill count={count} />}
-      {dom || !liveIconSource ? staticButton : reduce ? (
-        !live && <Suspense fallback={null}><Off count={count} /></Suspense>
-      ) : start && (
+      {!dom && !ready && <LiveStill live={live} count={count} />}
+      {dom ? staticButton : !reduce && art !== 'failed' && start && (
         <Suspense fallback={null}>
-          <Graphic source={liveIconSource} live={live} count={count} onReady={artworkReady} onFailed={artworkFailed} fallback={staticButton} light={lightClassName ? lightRef : undefined} />
+          <Graphic source={liveIconSource!} live={live} count={count} onReady={artworkReady} onFailed={artworkFailed} fallback={staticButton} light={lightClassName ? lightRef : undefined} />
         </Suspense>
       )}
       {ready && lightClassName && <span ref={lightRef} className={`m-light ${lightClassName}`} style={light} data-on={live || undefined} aria-hidden="true" />}

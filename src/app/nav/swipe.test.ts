@@ -25,7 +25,7 @@ describe('what counts as a swipe', () => {
 function page(screen: 'list' | 'match', extra = '', back = true) {
   document.body.innerHTML = `
     <section data-screen="${screen}" data-present="true">${back ? '<button aria-label="Back" id="back">Back</button>' : ''}
-      <div role="tablist" aria-label="Day">
+      <div role="tablist" aria-label="${screen === 'list' ? 'Day' : 'Match'}">
         <button role="tab" aria-selected="false" id="d-1">Yesterday</button>
         <button role="tab" aria-selected="true" id="d0">Today</button>
         <button role="tab" aria-selected="false" id="d1">Tomorrow</button>
@@ -69,34 +69,39 @@ describe('the swipe gestures', () => {
   });
 
   describe('on the match screen', () => {
-    it('goes back once for one swipe to the right', () => {
-      const { card } = page('match');
+    it('selects the preceding match tab without going back', () => {
+      const { card, clicks } = page('match');
       drag(card, [120, 400], [260, 410]);
-      expect(back).toHaveBeenCalledTimes(1);
+      expect(back).not.toHaveBeenCalled();
+      expect(clicks).toEqual(['d-1']);
     });
-    it('does nothing for a swipe to the left, a short one, a vertical one or a cancelled one', () => {
-      const { card } = page('match');
+    it('selects the next match tab once; short, vertical and cancelled touches do nothing', () => {
+      const { card, clicks } = page('match');
       drag(card, [260, 400], [120, 400]);
+      expect(clicks).toEqual(['d1']);
       drag(card, [120, 400], [150, 400]);
       drag(card, [120, 300], [160, 600]);
       touch(card, 'touchstart', [[120, 400]]);
       touch(card, 'touchcancel', []);
       touch(card, 'touchend', [], [[260, 400]], 100);
       expect(back).not.toHaveBeenCalled();
+      expect(clicks).toEqual(['d1']);
     });
     it('does nothing when the finger turns vertical on the way, and scrolls on', () => {
-      const { card } = page('match');
+      const { card, clicks } = page('match');
       drag(card, [120, 400], [260, 410], 300, [[130, 560]]);
       expect(back).not.toHaveBeenCalled();
+      expect(clicks).toEqual([]);
     });
     it('does nothing from the edge of the screen', () => {
-      const { card } = page('match');
+      const { card, clicks } = page('match');
       drag(card, [10, 400], [200, 400]);
       drag(card, [380, 400], [200, 400]);
       expect(back).not.toHaveBeenCalled();
+      expect(clicks).toEqual([]);
     });
     it('does nothing on a screen that is on its way out or covered, and with a second finger', () => {
-      const { card } = page('match');
+      const { card, clicks } = page('match');
       const screen = card.closest<HTMLElement>('[data-screen]') as HTMLElement;
       screen.dataset.present = 'false';
       drag(card, [120, 400], [260, 400]);
@@ -107,9 +112,10 @@ describe('the swipe gestures', () => {
       touch(card, 'touchstart', [[120, 400], [180, 400]], [[120, 400], [180, 400]]);
       touch(card, 'touchend', [], [[260, 400]], 100);
       expect(back).not.toHaveBeenCalled();
+      expect(clicks).toEqual([]);
     });
     it('leaves a control that takes horizontal movement itself, and a scroller that scrolls across', () => {
-      const { card } = page('match', '<input id="range" type="range"><div id="strip" style="overflow-x:auto"><i id="chip">x</i></div>');
+      const { card, clicks } = page('match', '<input id="range" type="range"><div id="strip" style="overflow-x:auto"><i id="chip">x</i></div>');
       const range = document.getElementById('range') as HTMLElement;
       const strip = document.getElementById('strip') as HTMLElement;
       Object.defineProperties(strip, { scrollWidth: { value: 900 }, clientWidth: { value: 300 } });
@@ -117,13 +123,30 @@ describe('the swipe gestures', () => {
       drag(document.getElementById('chip') as HTMLElement, [120, 400], [260, 400]);
       expect(back).not.toHaveBeenCalled();
       drag(card, [120, 400], [260, 400]);
-      expect(back).toHaveBeenCalledTimes(1);
-    });
-    it('does not go back where the match has no Back button: a wide layout’s pane has nothing under it', () => {
-      const { card } = page('match', '', false);
-      drag(card, [200, 400], [400, 400]);
       expect(back).not.toHaveBeenCalled();
+      expect(clicks).toEqual(['d-1']);
     });
+    it('also switches tabs in a pane without a Back button', () => {
+      const { card, clicks } = page('match', '', false);
+      drag(card, [120, 400], [260, 400]);
+      expect(back).not.toHaveBeenCalled();
+      expect(clicks).toEqual(['d-1']);
+    });
+  });
+
+  it('does not wrap match tabs or affect covered screens', () => {
+    const { card, clicks } = page('match');
+    document.getElementById('d0')!.setAttribute('aria-selected', 'false');
+    document.getElementById('d-1')!.setAttribute('aria-selected', 'true');
+    drag(card, [120, 400], [260, 400]);
+    document.getElementById('d-1')!.setAttribute('aria-selected', 'false');
+    document.getElementById('d1')!.setAttribute('aria-selected', 'true');
+    drag(card, [260, 400], [120, 400]);
+    document.body.setAttribute('inert', '');
+    drag(card, [120, 400], [260, 400]);
+    document.body.removeAttribute('inert');
+    expect(clicks).toEqual([]);
+    expect(back).not.toHaveBeenCalled();
   });
 
   describe('on the day list', () => {
@@ -162,14 +185,16 @@ describe('the swipe gestures', () => {
 
   it('is armed once: a second attach replaces the first, so a gesture is one action', () => {
     off = attachSwipes();
-    const { card } = page('match');
+    const { card, clicks } = page('match');
     drag(card, [120, 400], [260, 400]);
-    expect(back).toHaveBeenCalledTimes(1);
+    expect(back).not.toHaveBeenCalled();
+    expect(clicks).toEqual(['d-1']);
   });
   it('stops when told to', () => {
     off();
-    const { card } = page('match');
+    const { card, clicks } = page('match');
     drag(card, [120, 400], [260, 400]);
     expect(back).not.toHaveBeenCalled();
+    expect(clicks).toEqual([]);
   });
 });

@@ -53,7 +53,9 @@ export function AccountSheet({ open, onClose }: AccountSheetProps) {
         }
       }
     }
-    close.current?.focus();
+    // Focusing a control while its sheet is still below the viewport must not scroll
+    // the clipped shell to it, cancelling the glide and making the entire page jump.
+    close.current?.focus({ preventScroll: true });
     const key = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
@@ -65,7 +67,7 @@ export function AccountSheet({ open, onClose }: AccountSheetProps) {
         const last = buttons[buttons.length - 1];
         if (document.activeElement === (e.shiftKey ? first : last)) {
           e.preventDefault();
-          (e.shiftKey ? last : first)?.focus();
+          (e.shiftKey ? last : first)?.focus({ preventScroll: true });
         }
       }
     };

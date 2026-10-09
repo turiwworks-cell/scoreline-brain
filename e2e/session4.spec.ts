@@ -16,7 +16,7 @@ async function swipe(page: Page, from: Point, to: Point, cancel = false) {
 }
 
 for (const reducedMotion of ['no-preference', 'reduce'] as const) {
-  test(`phone browser touch swipes change one day or go Back once (${reducedMotion})`, async ({ page }, info) => {
+  test(`phone browser swipes change days and match tabs; Back remains explicit (${reducedMotion})`, async ({ page }, info) => {
     test.skip(info.project.name !== 'phone', 'phone touch input');
     await page.emulateMedia({ reducedMotion });
     await page.goto('/?demo&live=0');
@@ -48,6 +48,18 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
     await swipe(page, [110, 300], [270, 300], true);
     await expect(match).toBeVisible();
     await swipe(page, [110, 300], [270, 300]);
+    await expect(match).toBeVisible(); // Facts boundary never returns to the list
+    for (const tab of ['Stats', 'Lineup', 'Table']) {
+      await swipe(page, [270, 300], [110, 300]);
+      await expect(match.getByRole('tab', { name: tab, exact: true })).toHaveAttribute('aria-selected', 'true');
+    }
+    await swipe(page, [270, 300], [110, 300]);
+    await expect(match.getByRole('tab', { name: 'Table', exact: true })).toHaveAttribute('aria-selected', 'true');
+    for (const tab of ['Lineup', 'Stats', 'Facts']) {
+      await swipe(page, [110, 300], [270, 300]);
+      await expect(match.getByRole('tab', { name: tab, exact: true })).toHaveAttribute('aria-selected', 'true');
+    }
+    await match.getByRole('button', { name: 'Back', exact: true }).tap();
     await expect(page).toHaveURL(url);
     await expect(match).toHaveCount(0);
     await expect.poll(() => list.evaluate(el => el.scrollTop)).toBeCloseTo(scroll, 0);

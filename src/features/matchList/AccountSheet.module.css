@@ -205,6 +205,8 @@
   .bar,
   .sheet[data-open] .bar {
     transition-duration: 1ms;
+    /* Visibility must be immediate so the opening effect can focus the Close button. */
+    transition-property: transform;
     transition-delay: 0s;
   }
 }
