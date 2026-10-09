@@ -2,7 +2,10 @@ import { createMemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { DemoSource } from '../data/demo';
 import { clearActiveDemoSource, setActiveDemoSource } from '../data/demo/active';
-import { parseFeed } from '../domain';
+import { liveMinute, parseFeed } from '../domain';
+import { createDemoSource } from '../data/demo/demoSource';
+import { connectSource } from '../data/sync';
+import { FakeScheduler } from '../data/testing/fakes';
 import { demoFeedJson } from '../domain/testing/demo';
 import { scorelineStore } from '../store';
 import type { ReviewFrame, ReviewHost } from './protocol';
@@ -130,6 +133,37 @@ describe('the app’s side of the review page', () => {
     frame.resume();
     frame.restart();
     expect([s.pause, s.resume, s.restart].map((f) => vi.mocked(f).mock.calls.length)).toEqual([1, 1, 1]);
+  });
+
+  it('holds all displayed live clocks through paused triggers and restart, then releases them on resume', async () => {
+    const scheduler = new FakeScheduler();
+    const clock = vi.spyOn(Date, 'now').mockImplementation(() => scheduler.now());
+    const demo = createDemoSource({ scheduler, autoGoals: false });
+    const connection = connectSource(demo, scorelineStore.getState().actions, () => scheduler.now());
+    const times = () => Object.values(scorelineStore.getState().domain.matches)
+      .filter(match => match.status === 'live').map(match => liveMinute(match, scheduler.now()));
+    try {
+      scheduler.advance(2000);
+      frame.pause();
+      const held = times();
+      scheduler.advance(120000);
+      expect(times()).toEqual(held);
+      await frame.scene('goal');
+      const afterGoal = times();
+      scheduler.advance(120000);
+      expect(times()).toEqual(afterGoal);
+      frame.restart();
+      const restarted = times();
+      scheduler.advance(120000);
+      expect(times()).toEqual(restarted);
+      frame.resume();
+      scheduler.advance(2000);
+      expect(times()).not.toEqual(restarted);
+      expect(Object.values(scorelineStore.getState().domain.matches).some(match => match.clock.paused)).toBe(false);
+    } finally {
+      connection.disconnect();
+      clock.mockRestore();
+    }
   });
 
   it('tells its listener about the demo, the demo’s changes and the route, and stops when asked', async () => {

@@ -10,7 +10,7 @@ export interface MatchTime {
 /** The clock right now. Only a live match's clock runs. */
 export function liveMinute(match: Pick<Match, 'status' | 'clock'>, now: number): MatchTime {
   const { minute, second, at } = match.clock;
-  if (match.status !== 'live') return { minute, second };
+  if (match.status !== 'live' || match.clock.paused) return { minute, second };
   const total = minute * 60 + second + Math.max(0, Math.floor((now - at) / 1000));
   return { minute: Math.floor(total / 60), second: total % 60 };
 }
@@ -32,7 +32,7 @@ export function syncClock(
   now: number,
 ): Clock {
   // A clock that wasn't running can't be projected forward: start it from the report.
-  if (prev && (status !== 'live' || prevStatus === 'live')) {
+  if (prev && !prev.paused && (status !== 'live' || prevStatus === 'live')) {
     if (status !== 'live') {
       if (prev.minute === minute && prev.second === second) return prev;
     } else {

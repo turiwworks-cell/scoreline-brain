@@ -19,4 +19,3 @@ export function startRoute(search: string, referrer: string, origin: string): st
 export function fitScale(width: number, height: number): number {
   return Math.max(0.3, Math.min(1, (width - ROOM.x) / (PHONE.w + 2 * BEZEL), (height - ROOM.y) / (PHONE.h + 2 * BEZEL)));
 }
-

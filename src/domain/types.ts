@@ -126,6 +126,8 @@ export interface Clock {
   readonly second: number;
   /** Epoch ms at which `minute:second` was true. */
   readonly at: number;
+  /** Local review control: hold this live clock until the next source sync. */
+  readonly paused?: boolean;
 }
 
 export interface PlayerAction {

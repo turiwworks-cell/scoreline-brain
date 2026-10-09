@@ -4,6 +4,7 @@ import { demoFollowed } from '../app/followed';
 import { createNavActions } from '../app/nav/actions';
 import { parseNav } from '../app/nav/url';
 import { appRouter } from '../app/router';
+import { liveMinute } from '../domain';
 import { scorelineStore, selectFeaturedMatchId, selectMatch, selectMatchIdOfTeam, selectTeam } from '../store';
 import type { ReviewFrame, ReviewHost, ReviewScene, ReviewWindow } from './protocol';
 
@@ -19,6 +20,20 @@ import type { ReviewFrame, ReviewHost, ReviewScene, ReviewWindow } from './proto
 const nap = (ms: number) => new Promise<void>((done) => setTimeout(done, ms));
 /** A beat for the screen to take the match in front before the moment is sent (the shell renders a navigation at once). */
 const SETTLE_MS = 120;
+
+/** Hold every live match's displayed time as well as the simulation, including after a manual trigger or restart. */
+function holdClocks(): void {
+  if (!activeDemoSource()?.paused) return;
+  const { domain } = scorelineStore.getState();
+  const matches = { ...domain.matches };
+  const now = Date.now();
+  for (const match of Object.values(matches)) {
+    if (match.status === 'live' && !match.clock.paused) {
+      matches[match.id] = { ...match, clock: { ...liveMinute(match, now), at: now, paused: true } };
+    }
+  }
+  scorelineStore.setState({ domain: { ...domain, matches } });
+}
 
 function route(): string {
   const { pathname, search, hash } = appRouter().state.location;
@@ -72,6 +87,7 @@ export const frameApi: ReviewFrame = {
         await bring();
         done = source.trigger(trigger);
       }
+      holdClocks();
       if (!done) return 'Nothing to act on right now.';
       const notes = [
         restarted ? 'The evening had finished, so it was started again.' : '',
@@ -84,9 +100,15 @@ export const frameApi: ReviewFrame = {
     queue = result.catch(() => {});
     return result;
   },
-  pause: () => activeDemoSource()?.pause(),
+  pause() {
+    activeDemoSource()?.pause();
+    holdClocks();
+  },
   resume: () => activeDemoSource()?.resume(),
-  restart: () => activeDemoSource()?.restart(),
+  restart() {
+    activeDemoSource()?.restart();
+    holdClocks();
+  },
   subscribe(listener) {
     let offSource = () => {};
     const wire = () => {
