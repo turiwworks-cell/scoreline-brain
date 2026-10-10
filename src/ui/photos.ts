@@ -55,8 +55,18 @@ export function photoSources(path: string, kind: PhotoKind = 'bust', face?: Face
  * browser takes it, the WebP otherwise, at the screen's density) before that picture is on the page,
  * by building the same picture off the page. The request is the picture's own, so it is not repeated.
  */
+// Keep a small number of selected pictures alive so recent profiles retain decoded images.
+// This is bounded; visiting every player cannot retain an entire atlas in memory.
+const warmPictures = new Map<string, HTMLPictureElement>();
 export function warmPhoto(photo: PhotoSources, sizes: string): void {
   if (typeof document === 'undefined') return;
+  const key = `${photo.srcSet}|${sizes}`;
+  const cached = warmPictures.get(key);
+  if (cached) {
+    warmPictures.delete(key);
+    warmPictures.set(key, cached);
+    return;
+  }
   const picture = document.createElement('picture');
   for (const s of photo.sources) {
     const source = document.createElement('source');
@@ -69,9 +79,12 @@ export function warmPhoto(photo: PhotoSources, sizes: string): void {
   img.decoding = 'async';
   img.fetchPriority = 'high';
   img.alt = '';
+  img.onerror = () => { if (warmPictures.get(key) === picture) warmPictures.delete(key); };
   img.sizes = sizes;
   img.srcset = photo.srcSet;
   picture.append(img);
   img.src = photo.src;
+  warmPictures.set(key, picture);
+  if (warmPictures.size > 8) warmPictures.delete(warmPictures.keys().next().value!);
 }
 

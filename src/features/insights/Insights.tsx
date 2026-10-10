@@ -214,8 +214,8 @@ const GoalRow = memo(function GoalRow({
       data-insight-goal={`${it.matchId}:${e.id}`}
       data-focus-key={`insight-goal-${it.matchId}-${e.id}`}
       aria-label={`Open ${home?.name ?? match.home} versus ${away?.name ?? match.away}, ${name}, ${minText(e.minute)}, ${score}`}
-      variants={cascade('squad', { lift: 8 })}
-      custom={index + 8}
+      variants={cascade('squad', { lift: 8, withDelay: false })}
+      custom={index}
       {...CASCADE}
       {...withFeel({ onClick: (ev: MouseEvent<HTMLButtonElement>) => onOpen(it.matchId, e, ev.currentTarget) })}
     >

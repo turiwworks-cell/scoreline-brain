@@ -67,6 +67,7 @@
    crest and the name stay their size; the letters roll and the thumb slides, which is the transition */
 .segLabel {
   display: flex;
+  pointer-events: none;
   align-items: center;
   gap: 6px;
   min-width: 0;

@@ -28,7 +28,7 @@ function fixture() {
 }
 afterEach(() => { cleanup(); mock.canvas = null; mock.source = null; vi.restoreAllMocks(); });
 describe('Live icon binding and hit target', () => {
-  it('shows no second Live design: nothing until the art has drawn and settled, the DOM button only if it fails', async () => {
+  it('keeps the exported SVG until Rive settles, including renderer failure', async () => {
     mock.source = '/rive/live-icon.riv';
     const view = render(<LiveIcon live count={8} onChange={vi.fn()} className="m-glass live" fallback={<span>Live</span>}><span>8</span></LiveIcon>);
     const button = view.getByRole('button', { name: 'Live, 8 in play' });
@@ -52,8 +52,10 @@ describe('Live icon binding and hit target', () => {
     expect(still()).toBeNull();
     expect(view.queryByText('8')).toBeNull(); expect(view.queryByText('Live')).toBeNull();
     act(() => mock.canvas!.onError?.(new Error('renderer failed')));
-    expect(button.classList.contains('m-glass')).toBe(true);
-    expect(view.getByText('8')).toBeTruthy(); expect(view.getByText('Live')).toBeTruthy();
+    expect(button.classList.contains('m-glass')).toBe(false);
+    expect(still()).not.toBeNull();
+    expect(button.querySelector('canvas')).toBeNull();
+    expect(view.queryByText('8')).toBeNull(); expect(view.queryByText('Live')).toBeNull();
   });
   it('shows the supplied OFF art once Live is off at rest, Rive for every move, and the count in it', async () => {
     mock.source = '/rive/live-icon.riv';
@@ -63,8 +65,8 @@ describe('Live icon binding and hit target', () => {
     const off = () => button.querySelector('[data-live-off]');
     await waitFor(() => expect(view.container.querySelector('canvas')).not.toBeNull());
     act(() => mock.canvas!.onReady?.());
-    // Rive's first frame plays the closing timeline behind nothing; then the supplied art is the art
-    expect(off()).toBeNull();
+    // The same supplied OFF art is visible while Rive settles.
+    expect(off()).not.toBeNull();
     await waitFor(() => expect(button.getAttribute('data-rive-live')).toBe('true'), { timeout: 1500 });
     expect(off()).not.toBeNull();
     expect(mock.canvas!.style?.opacity).toBe(0);
@@ -85,11 +87,11 @@ describe('Live icon binding and hit target', () => {
     // the same button throughout: its box never changes with the art
     expect(button.style.width).not.toBe('');
     expect(parseFloat(button.style.height)).toBe(40);
-    // and no OFF art when the renderer fails
+    // Renderer failure returns to the synchronous OFF sprite.
     act(() => mock.canvas!.onError?.(new Error('renderer failed')));
-    expect(off()).toBeNull();
+    expect(off()!.querySelector('use')!.getAttribute('href')).toBe('#live-off-still');
   });
-  it('is an empty button until the shell lets Rive start, and the same button after', async () => {
+  it('shows OFF synchronously before the start gate and preserves the focused button', async () => {
     mock.source = '/rive/live-icon.riv';
     const icon = (start: boolean) => (
       <RiveStartContext.Provider value={start}>
@@ -99,13 +101,12 @@ describe('Live icon binding and hit target', () => {
     const view = render(icon(false));
     const button = view.getByRole('button', { name: 'Live, 4 in play' });
     button.focus();
-    // nothing of Rive has been asked for: no graphic chunk, no canvas; and no DOM pill, and with
-    // Live off no still either (the still is the art with Live on)
+    // The OFF sprite needs no renderer or lazy chunk.
     await new Promise((resolve) => setTimeout(resolve, 20));
     expect(view.container.querySelector('canvas')).toBeNull();
     expect(mock.canvas).toBeNull();
     expect(view.queryByText('Live')).toBeNull(); expect(view.queryByText('4')).toBeNull();
-    expect(button.querySelector('[data-live-still]')).toBeNull();
+    expect([...button.querySelectorAll('use')].map(u => u.getAttribute('href'))).toEqual(['#live-off-still', '#ld4']);
     view.rerender(icon(true));
     await waitFor(() => expect(view.container.querySelector('canvas')).not.toBeNull());
     // the artwork starts in the button that was there, still focused

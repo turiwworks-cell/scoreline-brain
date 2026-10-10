@@ -1,6 +1,8 @@
 .label {
   display: inline-block;
   position: relative;
+  /* The animated letters are decoration; a touch must keep hitting their control. */
+  pointer-events: none;
 }
 
 .sr {

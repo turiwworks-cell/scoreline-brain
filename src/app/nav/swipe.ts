@@ -2,12 +2,11 @@
  * Two touch gestures (SL-10), kept out of the first script: loaded after the first paint, on a
  * device that has a touchscreen (layout/Shell → screens/screenChunks).
  *
- *   on the match screen (phone)   a swipe to the right goes back, as the Back button does
+ *   on the match screen          a swipe selects the adjacent Facts/Stats/Lineup/Table tab
  *   on the day list               a swipe to the left shows the next day, to the right the day before
  *
- * Both are the app's own actions, not new ones: a click on the match screen's own Back button (which
- * is `nav.back`, and is there on the phone's stack only) and on the neighbouring day tab (so the back
- * and the day cascade, the URL and the tab all move exactly as a tap on that control moves them).
+ * Both use the existing tab buttons, so the URL and content change as they do for a tap.
+ * A match swipe never leaves that screen; the Back button owns returning to the list.
  * Nothing is dragged: a gesture is judged when the finger lifts, and the browser's scrolling is never
  * prevented, so a scroll is a scroll. A finger that is not clearly horizontal, not far enough, too slow,
  * or a second finger, does nothing.
@@ -57,8 +56,8 @@ function scrollsAcross(el: Element | null, stop: Element): boolean {
 }
 
 /** The day tab beside the chosen one, in the direction the content moves: left shows the next day. */
-function neighbourDay(dir: SwipeDirection): HTMLElement | null {
-  const chosen = document.querySelector('[role="tablist"][aria-label="Day"] [role="tab"][aria-selected="true"]');
+function neighbour(screen: HTMLElement, label: 'Day' | 'Match', dir: SwipeDirection): HTMLElement | null {
+  const chosen = screen.querySelector(`[role="tablist"][aria-label="${label}"] [role="tab"][aria-selected="true"]`);
   const next = dir === 'left' ? chosen?.nextElementSibling : chosen?.previousElementSibling;
   return next instanceof HTMLElement && next.getAttribute('role') === 'tab' ? next : null;
 }
@@ -66,10 +65,9 @@ function neighbourDay(dir: SwipeDirection): HTMLElement | null {
 /** What a swipe does on `screen`; nothing where it has no control to press. */
 function act(screen: HTMLElement, dir: SwipeDirection): void {
   if (screen.dataset.screen === 'match') {
-    // the phone's match is a layer over the list, with a Back button; a wider layout's pane has none
-    if (dir === 'right') screen.querySelector<HTMLElement>('[aria-label="Back"]')?.click();
+    neighbour(screen, 'Match', dir)?.click();
   } else if (screen.dataset.screen === 'list') {
-    neighbourDay(dir)?.click();
+    neighbour(screen, 'Day', dir)?.click();
   }
 }
 
@@ -90,7 +88,7 @@ export function attachSwipes(root: Document = document): () => void {
     // one finger, on a screen that is in front (not on its way out), and not where the finger itself moves across
     if (e.touches.length !== 1 || !t || !(e.target instanceof Element)) return;
     const screen = e.target.closest<HTMLElement>('[data-screen]');
-    if (!screen || screen.dataset.present !== 'true' || screen.hasAttribute('inert')) return;
+    if (!screen || screen.dataset.present !== 'true' || e.target.closest('[inert]')) return;
     if (e.target.closest(OWN_MOVEMENT) || scrollsAcross(e.target, screen)) return;
     start = { ...point(t, e.timeStamp), screen };
   };

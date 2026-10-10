@@ -111,7 +111,7 @@ test('reduced motion keeps Follow, groups, live scores and player counters curre
   await expect(live).toHaveAttribute('aria-pressed', 'false');
   await expect(live.locator('[data-live-off]')).toHaveCount(1);
   const count = (await live.getAttribute('aria-label'))!.match(/Live, (\d+)/)![1]!;
-  if (count !== '0') expect(await live.locator('[data-digit]').evaluateAll(els => els.map(el => el.getAttribute('data-digit')).join(''))).toBe(count);
+  if (count !== '0') expect(await live.locator('use[href^="#ld"]').evaluateAll(els => els.map(el => el.getAttribute('href')!.slice(3)).join(''))).toBe(count);
   const liveBox = await live.boundingBox();
   expect(Math.abs(liveBox!.width - 110)).toBeLessThan(0.1);
   expect(liveBox!.height).toBe(40);
