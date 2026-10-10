@@ -12,7 +12,7 @@ const restrict = (patterns) => ({
 });
 
 export default tseslint.config(
-  { ignores: ['dist', 'legacy', 'node_modules', 'playwright-report', 'test-results'] },
+  { ignores: ['dist', 'legacy', 'case-study', 'node_modules', 'playwright-report', 'test-results'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

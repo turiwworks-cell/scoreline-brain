@@ -2,7 +2,7 @@
 
 The source of the portfolio's `scoreline/` folder: the case study page, its styles, its script and the
 stills it uses. The ready-to-upload portfolio, with this page, the app and the grid tile in place, is
-[`releases/Turinoz-Portfolio-Scoreline-site-2026-10-09.zip`](../releases/Turinoz-Portfolio-Scoreline-site-2026-10-09.zip)
+[`releases/Turinoz-Portfolio-Scoreline-site-2026-10-10.zip`](../releases/Turinoz-Portfolio-Scoreline-site-2026-10-10.zip)
 (drag the whole `turinoz-portfolio` folder onto https://app.netlify.com/drop).
 
 ```

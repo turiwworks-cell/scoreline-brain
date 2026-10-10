@@ -13,3 +13,16 @@ Upload this ZIP using [Netlify Drop](https://app.netlify.com/drop), then open `/
 This version fixes the Account jump, synchronous Live ON/OFF fallback, match-tab swipes and unwanted swipe Back, and Goals Tonight's extra delay. It extends the Firefox-only table workaround, stabilizes letter hit targets and improves photo caching/priority. [Evidence and limitations](docs/followup-fixes-2026-10-09.md).
 
 All 814 unit tests and 31 distinct scoped Chromium cases pass; typecheck, build and size pass (179.84 KB gzip of 180 KB). Lint has zero errors and two existing warnings. Native Firefox and physical-phone behavior still require direct observation; a Firefox UA check is not that observation.
+
+## Portfolio case study (2026-10-10)
+
+Branch: `claude/serene-ride-v3q14v` = this follow-up version (`af9e5c4`) plus folder support
+(`SCORELINE_BASE`) and the case study. 817 unit tests pass; initial JS 179.98 KB of 180 KB.
+
+- **[Turinoz-Portfolio-Scoreline-site-2026-10-10.zip](releases/Turinoz-Portfolio-Scoreline-site-2026-10-10.zip)**:
+  the whole Turinoz portfolio with the Scoreline case study (`scoreline/`), this app inside it
+  (`scoreline/app/`) and the Scoreline grid tile. Drag `turinoz-portfolio` onto Netlify Drop.
+- **[Scoreline-CaseStudy-and-App-2026-10-10.zip](releases/Scoreline-CaseStudy-and-App-2026-10-10.zip)**:
+  the case study and the app on their own, with the fonts and Rive runtime they share with the
+  portfolio. Publish the folder as a site's root.
+- Source of the page: [`case-study/`](case-study/README.md).
