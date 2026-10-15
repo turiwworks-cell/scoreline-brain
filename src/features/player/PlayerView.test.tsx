@@ -59,6 +59,16 @@ describe('the player view', () => {
     expect(container.querySelector('[data-pv="number"]')).toBeNull();
   });
 
+  it('the bust waits for its file: one that is there as the page opens takes part in the entrance', () => {
+    const { container } = setup();
+    const hero = container.querySelector<HTMLElement>('[data-pv="hero"]')!;
+    const art = hero.firstElementChild as HTMLElement;
+    expect(hero.dataset.photo).toBe('waiting');
+    expect(Number(art.style.opacity)).toBe(0);
+    fireEvent.load(container.querySelector('[data-pv="bust"] img')!);
+    expect(hero.dataset.photo).toBe('ready');
+  });
+
   it('a photo that fails to load falls back to the kit disc', () => {
     const { container } = setup();
     fireEvent.error(container.querySelector('[data-pv="bust"] img')!);
