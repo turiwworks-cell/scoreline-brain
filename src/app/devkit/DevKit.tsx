@@ -110,7 +110,7 @@ export function DevKit() {
           </div>
         </Section>
 
-        <Section title="Colours" note="luau:1025-1030">
+        <Section title="Colors" note="luau:1025-1030">
           <ul className={styles.swatches}>
             {COLOURS.map(([name, token, hex]) => (
               <li key={name}>
@@ -236,8 +236,8 @@ export function DevKit() {
 
         <Section title="Pill" note="Glass capsules at the Lua's sizes: label 24, sm 24, md 28, lg 30. Live and spectrum tones.">
           <div className={styles.row}>
-            <Pill size="label">Kick-off</Pill>
-            <Pill size="label">Half-time · 1–0</Pill>
+            <Pill size="label">Kickoff</Pill>
+            <Pill size="label">Halftime · 1–0</Pill>
           </div>
           <div className={styles.row}>
             <Pill size="sm" icon={<Tag kind="goal" size={14} />}>

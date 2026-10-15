@@ -19,7 +19,7 @@ export const KIND_LABEL: Readonly<Record<StoredKind, string>> = {
   red: 'Red card',
   sub: 'Substitution',
   goal: 'Goal',
-  goalCancelled: 'Goal cancelled',
+  goalCancelled: 'Goal canceled',
 };
 
 /** One commentary row as the screen draws it (the Lua's Event: p, o, s, txt). */
@@ -125,5 +125,5 @@ export function feedRows(items: readonly FeedItem[], shown: number, matchMinute:
   return rows;
 }
 
-/** The marker's words: "Half-time · 1–0" or "Kick-off" (luau:5160). */
-export const markerLabel = (kind: 'ht' | 'ko', items: readonly FeedItem[]) => (kind === 'ht' ? `Half-time · ${scoreAt(items, 45)}` : 'Kick-off');
+/** The marker's words: "Halftime · 1–0" or "Kickoff" (luau:5160). */
+export const markerLabel = (kind: 'ht' | 'ko', items: readonly FeedItem[]) => (kind === 'ht' ? `Halftime · ${scoreAt(items, 45)}` : 'Kickoff');

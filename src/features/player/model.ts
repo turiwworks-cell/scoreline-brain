@@ -26,7 +26,7 @@ export function ageOf(born: string, now: Date): number {
 }
 
 const LINE_NAME: Readonly<Record<string, string>> = { GK: 'Goalkeeper', DF: 'Defender', MF: 'Midfielder', FW: 'Forward' };
-const LINE_SHORT: Readonly<Record<string, string>> = { GK: 'Keeper', DF: 'Defence', MF: 'Midfield', FW: 'Attack' };
+const LINE_SHORT: Readonly<Record<string, string>> = { GK: 'Keeper', DF: 'Defense', MF: 'Midfield', FW: 'Attack' };
 
 /** His role: the squad's own, else the one his line gives, else "Player" (luau:6003). */
 export function roleLabel(p: Player | undefined): string {
@@ -101,9 +101,9 @@ export function tagsOf(events: readonly MatchEvent[], side: Side, n: number, sta
 
 /** The note that stands in for the numbers of a player who has not played (luau:6064). */
 export function notPlayed(status: Match['status'], kickoff: string): { head: string; body: string } {
-  if (status === 'scheduled') return { head: 'Not started', body: `Kick-off ${kickoff}. Line-ups are not out yet.` };
-  if (status === 'live') return { head: 'On the bench', body: 'Not on the pitch.' };
-  return { head: 'Unused substitute', body: "He didn't get on the pitch in this match." };
+  if (status === 'scheduled') return { head: 'Not started', body: `Kickoff ${kickoff}. Lineups are not out yet.` };
+  if (status === 'live') return { head: 'On the bench', body: 'Not on the field.' };
+  return { head: 'Unused substitute', body: "He didn't get on the field in this match." };
 }
 
 export interface Bar {

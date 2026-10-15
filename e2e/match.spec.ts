@@ -181,7 +181,7 @@ test('before kick-off, after full time and a friendly', async ({ page }) => {
   await open(page, '/match/11/facts?demo');
   const s = screen(page);
   await expect(s.getByRole('tab', { name: 'Squad' })).toBeVisible();
-  await expect(s.getByText('Kick-off 20:45')).toBeVisible();
+  await expect(s.getByText('Kickoff 20:45')).toBeVisible();
   const form = s.getByRole('region', { name: 'Form' });
   await expect(form.locator('[data-r]')).toHaveCount(10);
   // the Lua's letters for Italy and Japan in match 11

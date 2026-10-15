@@ -45,7 +45,7 @@ export const LeagueGroup = memo(function LeagueGroup({ groupKey, ids, index, col
           {fav ? (
             <>
               <Star className={styles.star} />
-              <span className={`${styles.label} ${styles.name} ${styles.favTitle}`}>Favourites</span>
+              <span className={`${styles.label} ${styles.name} ${styles.favTitle}`}>Favorites</span>
             </>
           ) : (
             <Titles country={league?.country ?? ''} name={league?.name ?? groupKey} />

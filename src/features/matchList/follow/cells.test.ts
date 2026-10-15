@@ -40,7 +40,7 @@ describe('the stats band', () => {
   it('before kick-off: when, and against whom', () => {
     const st = playerStats(state, upcoming, 'home', 1, DEMO_T0);
     expect(bandCells(st, 'pre', upcoming, 'Senegal', 1)).toEqual([
-      { label: 'Kick-off', value: '21:00', kind: 's' },
+      { label: 'Kickoff', value: '21:00', kind: 's' },
       { label: 'Opponent', value: 'Senegal', kind: 's' },
     ]);
   });

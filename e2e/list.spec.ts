@@ -89,7 +89,7 @@ test.describe('Today', () => {
     const third = await box(page, rows(page).nth(2));
     const fourth = await box(page, rows(page).nth(3));
     near({ d: fourth.y - third.y }, { d: 76 });
-    await expect(pane(page).getByText('Favourites')).toBeVisible();
+    await expect(pane(page).getByText('Favorites')).toBeVisible();
     await expect(pane(page).getByText('Nations Series')).toBeVisible();
   });
 

@@ -27,7 +27,7 @@ export const Facts = memo(function Facts({ match, home, away, league, width, onR
   if (match.status === 'scheduled') {
     return (
       <div className={styles.facts}>
-        <H4 left="Kick-off" right={`Matchday ${matchday}`} />
+        <H4 left="Kickoff" right={`Matchday ${matchday}`} />
         <p className={styles.bigTime}>{match.kickoff}</p>
         <Form match={match} home={home} away={away} />
         <div className={styles.gap34} />
@@ -94,7 +94,7 @@ export function MatchInfo({ match, league, width }: { match: Match; league: Leag
   // the Lua knew no kick-off time for a match under way and showed 20:45 for the featured one,
   // 20:00 for the rest; a feed that sends one shows it
   const ko = match.kickoff !== '' ? match.kickoff : match.featured ? '20:45' : '20:00';
-  tiles.push(['Kick-off', match.status === 'scheduled' ? match.kickoff : ko, 'Local time']);
+  tiles.push(['Kickoff', match.status === 'scheduled' ? match.kickoff : ko, 'Local time']);
   if (tiles.length % 2 === 1) tiles.push(['Competition', league?.name ?? match.league, `Matchday ${league?.matchday ?? 1}`]);
   const tileW = (width - 36 - 8) / 2;
   return (
