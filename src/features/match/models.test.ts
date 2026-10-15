@@ -109,7 +109,7 @@ describe('the commentary', () => {
     expect(ht).toBeGreaterThan(-1);
     const next = rows[ht + 1];
     expect(next?.kind === 'e' && next.item.minute <= 45).toBe(true);
-    expect(markerLabel('ht', items)).toBe(`Half-time · ${scoreAt(items, 45)}`);
+    expect(markerLabel('ht', items)).toBe(`Halftime · ${scoreAt(items, 45)}`);
     // before half-time there is no marker; with rows still hidden there is no kick-off
     expect(feedRows(items, items.length, 40).some((r) => r.kind === 'ht')).toBe(false);
     expect(feedRows(items, 2, 58).some((r) => r.kind === 'ko')).toBe(false);

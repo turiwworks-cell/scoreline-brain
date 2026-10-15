@@ -111,7 +111,7 @@ export function MatchDetail({ id, tab, chrome, onBack, onTab, onOpenPlayer, onFa
         </h1>
         <p className={styles.league}>{league ? `${league.country} · ${league.name}` : match.league}</p>
         <RoundButton
-          aria-label="Favourite"
+          aria-label="Favorite"
           aria-pressed={match.favourite}
           aria-disabled={onFavourite ? undefined : true}
           className={styles.fav}

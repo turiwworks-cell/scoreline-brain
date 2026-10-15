@@ -44,7 +44,7 @@ describe('player model', () => {
   });
   it('the note for a player who has not played', () => {
     expect(notPlayed('scheduled', '20:00').body).toContain('20:00');
-    expect(notPlayed('live', '')).toEqual({ head: 'On the bench', body: 'Not on the pitch.' });
+    expect(notPlayed('live', '')).toEqual({ head: 'On the bench', body: 'Not on the field.' });
     expect(notPlayed('finished', '').head).toBe('Unused substitute');
   });
   it('bars carry only what the provider sends', () => {

@@ -281,13 +281,13 @@ test('before kick-off the tab is the squad, line by line', async ({ page }, info
   await open(page, '/match/11/lineup?demo');
   const s = screen(page);
   await expect(s.getByRole('tab', { name: 'Squad', selected: true })).toBeVisible();
-  await expect(s.getByText('Line-ups are not out yet')).toBeVisible();
-  await expect(s.getByText('They are confirmed about an hour before kick-off.')).toBeVisible();
+  await expect(s.getByText('Lineups are not out yet')).toBeVisible();
+  await expect(s.getByText('They are confirmed about an hour before kickoff.')).toBeVisible();
   await expect(pitch(page)).toHaveCount(0);
   for (const name of ['Goalkeepers', 'Defenders', 'Midfielders', 'Forwards']) await expect(s.getByRole('region', { name })).toBeVisible();
   // the note is 52 tall, 22 under the switch, the first heading 30 under it
   const sw = await box(page, s.getByRole('radiogroup', { name: 'Team' }));
-  const note = await box(page, s.getByText('Line-ups are not out yet').locator('..'));
+  const note = await box(page, s.getByText('Lineups are not out yet').locator('..'));
   near(note, { y: sw.y + 68, h: 52, x: 18, r: 18 });
   near(await box(page, s.getByRole('heading', { name: 'Goalkeepers' })), { y: note.y + 52 + 30 });
   await s.getByRole('radio', { name: 'Japan' }).click();

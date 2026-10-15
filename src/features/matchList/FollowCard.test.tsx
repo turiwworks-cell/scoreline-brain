@@ -74,7 +74,7 @@ describe('before kick-off', () => {
     card();
     expect(root().dataset.phase).toBe('pre');
     expect(full()).toBe('200');
-    expect(screen.getByText('Kick-off')).toBeTruthy();
+    expect(screen.getByText('Kickoff')).toBeTruthy();
     expect(screen.getByText('20:45')).toBeTruthy();
     expect(screen.getByText('Opponent')).toBeTruthy();
     expect(screen.getAllByText('France').length).toBeGreaterThan(0);
@@ -149,7 +149,7 @@ describe('after his match', () => {
     expect(screen.getByText('Next match')).toBeTruthy();
     expect(screen.getByText('vs Spain')).toBeTruthy();
     expect(screen.getByText('Sat 26 Sep · 20:45')).toBeTruthy();
-    expect(screen.getByText('Kick-off in')).toBeTruthy();
+    expect(screen.getByText('Kickoff in')).toBeTruthy();
     const units = Array.from(document.querySelectorAll('[class*="unit"]:not([class*="unitName"])')).map((u) => u.textContent);
     expect(units).toEqual(['03D', '04H', '05M']);
   });
@@ -174,7 +174,7 @@ describe('after his match', () => {
     card();
     expect(screen.getByText('Friendly · TBC')).toBeTruthy();
     expect(screen.getAllByText('Date to be confirmed').length).toBeGreaterThan(0);
-    expect(screen.queryByText('Kick-off in')).toBeNull();
+    expect(screen.queryByText('Kickoff in')).toBeNull();
   });
 });
 

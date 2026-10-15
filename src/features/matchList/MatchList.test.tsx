@@ -45,7 +45,7 @@ describe('the day', () => {
   it('groups the day’s matches: Favourites, then each league, with a count', () => {
     setup();
     const groups = screen.getAllByRole('button', { expanded: true }).filter((b) => b.className.includes('toggle') && b.closest('[data-group]'));
-    expect(groups.map((g) => g.textContent)).toEqual(['Favourites1', 'WorldNations Series1', 'EuropeNations League A2', 'EuropeNations League B1', 'AfricaAFCON Qualifiers2']);
+    expect(groups.map((g) => g.textContent)).toEqual(['Favorites1', 'WorldNations Series1', 'EuropeNations League A2', 'EuropeNations League B1', 'AfricaAFCON Qualifiers2']);
     expect(screen.getByRole('button', { name: 'France 2–1 Argentina' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Nigeria v Senegal' })).toBeTruthy();
   });

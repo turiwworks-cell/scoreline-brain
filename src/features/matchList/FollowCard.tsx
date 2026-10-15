@@ -338,7 +338,7 @@ function NextMatch({ next, opp, nowMs }: { next: NextFixture | undefined; opp: T
       <span className={styles.nextWhen}>{v.clock ? `${v.day} · ${v.clock}` : v.day}</span>
       {v.at !== undefined && (
         <span className={styles.count}>
-          <span className={`${styles.label} ${styles.countLabel}`}>Kick-off in</span>
+          <span className={`${styles.label} ${styles.countLabel}`}>Kickoff in</span>
           <Unit index={0} value={d} name="D" />
           <span className={styles.colon} style={{ '--i': 0 } as CSSProperties}>
             :

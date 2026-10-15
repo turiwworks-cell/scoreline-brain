@@ -112,7 +112,7 @@ export function ThreePane({ r }: { r: Resolved }) {
                   <h1 tabIndex={-1} data-screen-heading="">
                     Pick a player.
                   </h1>
-                  <p>Tap anyone in a line-up</p>
+                  <p>Tap anyone in a lineup</p>
                 </div>
               </Screen>
             ) : null}

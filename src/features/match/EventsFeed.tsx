@@ -172,7 +172,7 @@ export const EventsFeed = memo(function EventsFeed({ match, home, away, onReplay
   if (items.length === 0) {
     return (
       <>
-        <p className={styles.kickoffSoon}>Kick-off soon</p>
+        <p className={styles.kickoffSoon}>Kickoff soon</p>
         {children}
       </>
     );

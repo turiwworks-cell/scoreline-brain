@@ -244,7 +244,7 @@ describe('before kick-off', () => {
   it('shows the note, the squad by line and the coach, with no pitch', () => {
     const { container } = setup(11);
     expect(container.querySelector('[data-pitch]')).toBeNull();
-    expect(screen.getByText('Line-ups are not out yet')).toBeTruthy();
+    expect(screen.getByText('Lineups are not out yet')).toBeTruthy();
     for (const name of ['Goalkeepers', 'Defenders', 'Midfielders', 'Forwards']) expect(screen.getByRole('region', { name })).toBeTruthy();
     expect(screen.queryByText('Unused')).toBeNull();
   });

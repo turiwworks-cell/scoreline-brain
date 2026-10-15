@@ -1,10 +1,10 @@
-import { useMemo, useRef, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
 import { m, useTransform } from 'motion/react';
 import { isKeeper, nameOf, playerKey, playerStats, type Team } from '../../domain';
 import { selectMatch, selectPlayer, selectPlayers, selectTeam, useScoreline } from '../../store';
-import { frostPhoto, Icon, playerPhoto, RoundButton, SoftLight, subscribeSecond, usePhotoManifest } from '../../ui';
+import { frostPhoto, Icon, playerPhoto, RoundButton, SoftLight, subscribeSecond, usePhotoManifest, warmPlayerPhoto } from '../../ui';
 import { Bar } from './Bar';
-import { BACKDROP } from './layout';
+import { BACKDROP, HERO } from './layout';
 import { sideIn, squadOrder, stepOf, substitutionOf, tagsOf } from './model';
 import { useOpening, useScrollVars } from './motion';
 import { Hero, Horizon } from './Scene';
@@ -78,6 +78,26 @@ function Page({ team, n, matchId, following, onFollow, chrome, onBack, enter = 0
   const sub = useMemo(() => (match && side ? substitutionOf(match.events, side, n) : undefined), [match, side, n]);
   const order = useMemo(() => (match && side ? squadOrder({ players }, match, side) : []), [players, match, side]);
 
+  // the arrows' two players, once his own bust can be drawn and the page is idle: a step then slides
+  // in a picture that is already there. Only those two; a squad's worth would be most of a megabyte.
+  const me = `${team.id}:${n}`;
+  const [drawn, setDrawn] = useState<string | null>(null);
+  const onReady = useCallback(() => setDrawn(me), [me]);
+  const prev = stepOf(order, n, -1);
+  const next = stepOf(order, n, 1);
+  useEffect(() => {
+    if (drawn !== me) return;
+    const go = () => {
+      for (const to of [prev, next]) if (to !== undefined) warmPlayerPhoto(team.id, to, `${HERO.w}px`);
+    };
+    if (typeof requestIdleCallback === 'function') {
+      const id = requestIdleCallback(go, { timeout: 2000 });
+      return () => cancelIdleCallback(id);
+    }
+    const id = setTimeout(go, 300);
+    return () => clearTimeout(id);
+  }, [drawn, me, team.id, prev, next]);
+
   const dir = enter;
   const step = (d: 1 | -1) => {
     const to = stepOf(order, n, d);
@@ -94,7 +114,7 @@ function Page({ team, n, matchId, following, onFollow, chrome, onBack, enter = 0
         <SoftLight color={team.colors[0]} alpha={0.5} cx="50%" cy={BACKDROP.cy} rx={BACKDROP.rx / 2} ry={BACKDROP.ry / 2} />
       </div>
       <div className={styles.scene}>
-        {!hold && <Hero team={team} n={n} photo={photo} opening={opening} dir={dir} />}
+        {!hold && <Hero team={team} n={n} photo={photo} opening={opening} dir={dir} onReady={onReady} />}
         <Horizon colour={team.colors[0]} e={opening.e} step={opening.step} dir={dir} />
         {sub && <SubTag sub={sub} />}
         {order.length > 1 && (

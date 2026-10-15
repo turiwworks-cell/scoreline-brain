@@ -164,8 +164,8 @@ function Squad({ team, players, lineup, mine, photoOf, nameFor, hold, open, coac
   return (
     <>
       <Glass radius={16} className={styles.note}>
-        <p className={styles.noteTitle}>Line-ups are not out yet</p>
-        <p className={styles.noteBody}>They are confirmed about an hour before kick-off.</p>
+        <p className={styles.noteTitle}>Lineups are not out yet</p>
+        <p className={styles.noteBody}>They are confirmed about an hour before kickoff.</p>
       </Glass>
       {groups.map((g) => (
         <section key={g.pos} aria-label={g.label}>

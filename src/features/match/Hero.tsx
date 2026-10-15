@@ -62,7 +62,7 @@ export const Hero = memo(function Hero({ match, home, away, matchday, width, onO
     <div className={styles.hero} style={{ height }}>
       <m.div className={styles.meta} variants={c} custom={0} {...CASCADE}>
         <span className={styles.matchday}>Matchday {matchday}</span>
-        {match.status === 'live' ? <HeroClock match={match} /> : <span className={styles.state}>{match.status === 'finished' ? 'Full time' : `Kick-off ${match.kickoff}`}</span>}
+        {match.status === 'live' ? <HeroClock match={match} /> : <span className={styles.state}>{match.status === 'finished' ? 'Full time' : `Kickoff ${match.kickoff}`}</span>}
       </m.div>
       <span className={styles.rule} style={{ top: rule }} />
       {sides.map(({ side, lines, rowH, blockH }, i) => {

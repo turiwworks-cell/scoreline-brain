@@ -6,6 +6,8 @@ import { demoFollowed } from '../followed';
 import { useNav } from '../nav/useNav';
 import type { MatchRef, PlayerRef, PlayerStep } from '../nav/url';
 import { Missing } from './Missing';
+// a player's bust starts from the tap that opens him, once this chunk is in (playerWarm.ts)
+import './playerWarm';
 
 /**
  * The player screen: the feature for the player in the URL, with the navigation. His numbers come

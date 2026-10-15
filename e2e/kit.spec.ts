@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test('dev kit renders every material', async ({ page }, info) => {
   await page.goto('/dev/kit');
   await expect(page.getByTestId('dev-kit')).toBeVisible();
-  for (const name of ['Colours', 'Spectrum', 'Type scale', 'Glass', 'SoftLight', 'Hover light', 'Button', 'Pill', 'Tabs', 'Icons', 'Tags', 'RatingBadge', 'MatchClock', 'PlayerPhoto', 'Feed crests', 'Teams', 'Squad photos', 'Photos in place', 'Bust, head, frost']) {
+  for (const name of ['Colors', 'Spectrum', 'Type scale', 'Glass', 'SoftLight', 'Hover light', 'Button', 'Pill', 'Tabs', 'Icons', 'Tags', 'RatingBadge', 'MatchClock', 'PlayerPhoto', 'Feed crests', 'Teams', 'Squad photos', 'Photos in place', 'Bust, head, frost']) {
     await expect(page.getByRole('region', { name, exact: true })).toBeVisible();
   }
   await page.evaluate(() => document.fonts.ready);

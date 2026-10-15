@@ -115,7 +115,7 @@ export function AccountSheet({ open, onClose }: AccountSheetProps) {
         <h2 id="account-title" className={styles.title}>
           Sign in to follow your clubs.
         </h2>
-        <p className={styles.body}>Save your favourite teams and players, get a goal alert the second it lands, and keep your matchday in sync on every device.</p>
+        <p className={styles.body}>Save your favorite teams and players, get a goal alert the second it lands, and keep your matchday in sync on every device.</p>
       </div>
       <div className={styles.actions}>
         <button type="button" className={`m-feel ${styles.primary}`} onClick={onClose} {...feel}>

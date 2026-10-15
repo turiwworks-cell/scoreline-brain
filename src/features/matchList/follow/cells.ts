@@ -51,7 +51,7 @@ export function bandCells(st: PStats | undefined, phase: Phase, match: Match | u
   }
   if (match?.status === 'scheduled') {
     return [
-      { label: 'Kick-off', value: match.kickoff, kind: 's' },
+      { label: 'Kickoff', value: match.kickoff, kind: 's' },
       { label: 'Opponent', value: opponent, kind: 's' },
     ];
   }

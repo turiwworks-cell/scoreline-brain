@@ -38,7 +38,7 @@ export function momentText(s: Names, m: Moment): string {
     case 'red':
       return `Red card${p ? ` for ${p}` : ''}, ${team}, ${minText(m.minute)}.`;
     case 'kickoff':
-      return `Kick-off: ${teamName(s, match.home)} against ${teamName(s, match.away)}.`;
+      return `Kickoff: ${teamName(s, match.home)} against ${teamName(s, match.away)}.`;
     case 'fulltime':
       return `Full time: ${score}.`;
   }
